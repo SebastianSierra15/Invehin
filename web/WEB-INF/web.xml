@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="6.1" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_1.xsd">
+    <servlet>
+        <servlet-name>test</servlet-name>
+        <servlet-class>servlets.test</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Login</servlet-name>
+        <servlet-class>servlets.Login</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>EstadisticasInicio</servlet-name>
+        <servlet-class>servlets.EstadisticasInicio</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Prendas</servlet-name>
+        <servlet-class>servlets.Prendas</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>test</servlet-name>
+        <url-pattern>/test</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Login</servlet-name>
+        <url-pattern>/Login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EstadisticasInicio</servlet-name>
+        <url-pattern>/EstadisticasInicio</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Prendas</servlet-name>
+        <url-pattern>/Prendas</url-pattern>
+    </servlet-mapping>
+</web-app>
