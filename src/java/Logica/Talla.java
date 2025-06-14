@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.ETalla;
 import Interfaces.ITalla;
+import java.util.List;
 
 /**
  *
@@ -46,5 +48,13 @@ public class Talla implements ITalla
         Talla entidad = new Talla();
 
         return entidad;
+    }
+
+    @Override
+    public List<Talla> obtenerTallas()
+    {
+        ETalla result = new ETalla();
+
+        return result.selectTallas();
     }
 }

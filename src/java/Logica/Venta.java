@@ -3,7 +3,6 @@ package Logica;
 import Entidades.EVenta;
 import Interfaces.IVenta;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -15,6 +14,7 @@ public class Venta implements IVenta
 
     public int idVenta;
     public Timestamp fechaVenta;
+    public int cantidadVenta;
     public int preciototalVenta;
     public int montorecibidoVenta;
     public boolean estadoVenta;
@@ -27,10 +27,11 @@ public class Venta implements IVenta
     {
     }
 
-    public Venta(int idVenta, Timestamp fechaVenta, int preciototalVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, Cliente clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta)
+    public Venta(int idVenta, Timestamp fechaVenta, int cantidadVenta, int preciototalVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, Cliente clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta)
     {
         this.idVenta = idVenta;
         this.fechaVenta = fechaVenta;
+        this.cantidadVenta = cantidadVenta;
         this.preciototalVenta = preciototalVenta;
         this.montorecibidoVenta = montorecibidoVenta;
         this.estadoVenta = estadoVenta;
@@ -41,29 +42,19 @@ public class Venta implements IVenta
     }
 
     @Override
-    public boolean crearVenta(Timestamp fechaVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, int clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta)
+    public boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson)
     {
-        return true;
+        EVenta result = new EVenta();
+
+        return result.insertVenta(montoRecibido, clienteId, metodoPagoId, usuarioId, detallesVentaJson);
     }
 
     @Override
-    public boolean actualizarVenta(int idVenta, Timestamp fechaVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, int clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta)
+    public boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta)
     {
-        return true;
-    }
+        EVenta result = new EVenta();
 
-    @Override
-    public boolean eliminarVenta(int idVenta)
-    {
-        return true;
-    }
-
-    @Override
-    public Venta obtenerVenta(int idVenta)
-    {
-        Venta entidad = new Venta();
-
-        return entidad;
+        return result.updateVenta(idVenta, idClienteVenta, idMetodopagoVenta, estadoVenta);
     }
 
     @Override
@@ -72,5 +63,21 @@ public class Venta implements IVenta
         EVenta result = new EVenta();
 
         return result.getTotalVentas(fechaInicio, fechaFin);
+    }
+
+    @Override
+    public PaginacionResultado<Venta> buscarVentas(String searchTerm, int numPage, int pageSize)
+    {
+        EVenta result = new EVenta();
+
+        return result.selectVentasPorTerminoBusqueda(searchTerm, numPage, pageSize);
+    }
+
+    @Override
+    public List<Venta> obtenerReporteVentas(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        EVenta result = new EVenta();
+
+        return result.selectReporteVentas(fechaInicio, fechaFin);
     }
 }

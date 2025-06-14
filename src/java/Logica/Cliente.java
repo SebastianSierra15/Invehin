@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.ECliente;
 import Interfaces.ICliente;
+import java.util.List;
 
 /**
  *
@@ -56,6 +58,14 @@ public class Cliente extends Persona implements ICliente
         Cliente entidad = new Cliente();
 
         return entidad;
+    }
+
+    @Override
+    public List<Cliente> buscarClientes(String searchTerm)
+    {
+        ECliente result = new ECliente();
+        
+        return result.selectClientesBySearchTerm(searchTerm);
     }
 
 }

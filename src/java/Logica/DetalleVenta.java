@@ -1,6 +1,7 @@
 package Logica;
 
 import Interfaces.IDetalleVenta;
+import java.util.List;
 
 /**
  *
@@ -12,19 +13,29 @@ public class DetalleVenta implements IDetalleVenta
     public int idDetalleVenta;
     public int cantidadDetalleVenta;
     public int subtotalDetalleVenta;
-    public Prenda prendasDetalleVenta;
+    public String prendacodigoDetalleVenta;
+    public String prendanombreDetalleVenta;
+    public String prendacolorDetalleVenta;
+    public String prendatallaDetalleVenta;
+    public int prendaprecioDetalleVenta;
+    public int prendapromocionDetalleVenta;
     public int idventaDetalleVenta;
 
     public DetalleVenta()
     {
     }
 
-    public DetalleVenta(int idDetalleVenta, int cantidadDetalleVenta, int subtotalDetalleVenta, Prenda prendasDetalleVenta, int idventaDetalleVenta)
+    public DetalleVenta(int idDetalleVenta, int cantidadDetalleVenta, int subtotalDetalleVenta, String prendacodigoDetalleVenta, String prendanombreDetalleVenta, String prendacolorDetalleVenta, String prendatallaDetalleVenta, int prendaprecioDetalleVenta, int prendapromocionDetalleVenta, int idventaDetalleVenta)
     {
         this.idDetalleVenta = idDetalleVenta;
         this.cantidadDetalleVenta = cantidadDetalleVenta;
         this.subtotalDetalleVenta = subtotalDetalleVenta;
-        this.prendasDetalleVenta = prendasDetalleVenta;
+        this.prendacodigoDetalleVenta = prendacodigoDetalleVenta;
+        this.prendanombreDetalleVenta = prendanombreDetalleVenta;
+        this.prendacolorDetalleVenta = prendacolorDetalleVenta;
+        this.prendatallaDetalleVenta = prendatallaDetalleVenta;
+        this.prendaprecioDetalleVenta = prendaprecioDetalleVenta;
+        this.prendapromocionDetalleVenta = prendapromocionDetalleVenta;
         this.idventaDetalleVenta = idventaDetalleVenta;
     }
 
@@ -53,4 +64,11 @@ public class DetalleVenta implements IDetalleVenta
 
         return entidad;
     }
+
+    @Override
+    public List<DetalleVenta> obtenerDetallesVentaByVenta(int idVenta)
+    {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+    
 }

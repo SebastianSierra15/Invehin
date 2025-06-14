@@ -11,6 +11,8 @@
         <meta charset="UTF-8" />
         <title>Login | Invehin</title>
 
+        <link rel="icon" type="image/x-icon" href="<%= request.getContextPath() %>/favicon.ico">
+        
         <!-- Importar fuente desde Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -53,7 +55,7 @@
     </head>
 
     <body class="bg-invehin-background font-sans flex justify-center items-center min-h-screen p-4">
-        <div class="bg-invehin-accent p-4 sm:p-8 rounded-xl border-2 border-black w-full sm:max-w-xs flex flex-col items-center shadow-md">
+        <div class="bg-invehin-accent p-4 sm:p-8 rounded-xl border-2 border-black w-full sm:max-w-sm flex flex-col items-center shadow-md">
             <img src="${pageContext.request.contextPath}/images/logo.webp" alt="Invehin Logo" class="mb-4 w-24 sm:w-32" />
 
             <h2 class="text-invehin-primary font-semibold mb-8 text-center text-lg sm:text-xl md:text-2xl">Bienvenido a invehin</h2>

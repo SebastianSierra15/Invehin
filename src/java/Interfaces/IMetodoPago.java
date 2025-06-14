@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.MetodoPago;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface IMetodoPago
     boolean eliminarMetodoPago(int idMetodoPago);
 
     MetodoPago obtenerMetodoPago(int idMetodoPago);
+    
+    List<MetodoPago> obtenerMetodosPago();
 }

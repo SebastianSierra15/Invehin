@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.EMetodoPago;
 import Interfaces.IMetodoPago;
+import java.util.List;
 
 /**
  *
@@ -48,5 +50,13 @@ public class MetodoPago implements IMetodoPago
         MetodoPago entidad = new MetodoPago();
 
         return entidad;
+    }
+
+    @Override
+    public List<MetodoPago> obtenerMetodosPago()
+    {
+        EMetodoPago result = new EMetodoPago();
+
+        return result.selectMetodosPago();
     }
 }

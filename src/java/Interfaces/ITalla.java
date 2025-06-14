@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.Talla;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface ITalla
     boolean eliminarTalla(int idTalla);
 
     Talla obtenerTalla(int idTalla);
+    
+    List<Talla> obtenerTallas();
 }

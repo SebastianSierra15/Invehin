@@ -63,7 +63,6 @@ public class EstadisticasInicio extends HttpServlet
             request.setAttribute("prendasBajoStock", cantidadPrendasBajoStock);
 
             request.getRequestDispatcher("/").forward(request, response);
-
         } catch (IllegalArgumentException e)
         {
             message = "Datos no encontrados.";

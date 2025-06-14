@@ -2,6 +2,7 @@ package Interfaces;
 
 import Logica.DetalleVenta;
 import Logica.Prenda;
+import java.util.List;
 
 /**
  *
@@ -17,4 +18,6 @@ public interface IDetalleVenta
     boolean eliminarDetalleVenta(int idDetalleVenta);
 
     DetalleVenta obtenerDetalleVenta(int idDetalleVenta);
+    
+    List<DetalleVenta> obtenerDetallesVentaByVenta(int idVenta);
 }

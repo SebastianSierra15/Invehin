@@ -1,7 +1,6 @@
 package Interfaces;
 
-import Logica.DetalleVenta;
-import Logica.MetodoPago;
+import Logica.PaginacionResultado;
 import Logica.Venta;
 import java.util.List;
 import java.sql.Timestamp;
@@ -13,13 +12,13 @@ import java.sql.Timestamp;
 public interface IVenta
 {
 
-    boolean crearVenta(Timestamp fechaVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, int clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta);
+    boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson);
 
-    boolean actualizarVenta(int idVenta, Timestamp fechaVenta, int montorecibidoVenta, boolean estadoVenta, MetodoPago metodopagoVenta, int clienteVenta, int usuarioVenta, List<DetalleVenta> detallesventaVenta);
-
-    boolean eliminarVenta(int idVenta);
-
-    Venta obtenerVenta(int idVenta);
+    boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta);
 
     int totalVentas(Timestamp fechaInicio, Timestamp fechaFin);
+
+    PaginacionResultado<Venta> buscarVentas(String searchTerm, int numPage, int pageSize);
+    
+    List<Venta> obtenerReporteVentas(Timestamp fechaInicio, Timestamp fechaFin);
 }

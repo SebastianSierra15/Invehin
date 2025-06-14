@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.EstadoPrenda;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface IEstadoPrenda
     boolean eliminarEstadoPrenda(int idEstadoPrenda);
 
     EstadoPrenda obtenerEstadoPrenda(int idEstadoPrenda);
+    
+    List<EstadoPrenda> obtenerEstadosPrenda();
 }

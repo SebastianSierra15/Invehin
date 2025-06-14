@@ -36,27 +36,27 @@ public class Prenda implements IPrenda
     }
     
     @Override
-    public boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, Color colorPrenda, EstadoPrenda estadoprendaPrenda, Talla tallaPrenda, Subcategoria subcategoriaPrenda)
+    public boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        EPrenda result = new EPrenda();
+        
+        return result.insertPrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idSubcategoria, idTalla);
     }
     
     @Override
-    public boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, Color colorPrenda, EstadoPrenda estadoprendaPrenda, Talla tallaPrenda, Subcategoria subcategoriaPrenda)
+    public boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
+        EPrenda result = new EPrenda();
+        
+        return result.updatePrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idEstadoPrenda, idSubcategoria, idTalla);
     }
     
     @Override
     public boolean eliminarPrenda(String codigoPrenda)
     {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-    
-    @Override
-    public Prenda obtenerPrenda(String codigoPrenda)
-    {
-        throw new UnsupportedOperationException("Not supported yet.");
+        EPrenda result = new EPrenda();
+        
+        return result.deletePrenda(codigoPrenda);
     }
     
     @Override
@@ -76,10 +76,26 @@ public class Prenda implements IPrenda
     }
     
     @Override
-    public List<Prenda> buscarPrendas(String searchTerm)
+    public PaginacionResultado<Prenda> buscarPrendas(String searchTerm, int numPage, int pageSize)
     {
         EPrenda result = new EPrenda();
         
-        return result.selectPrendasBySearchTerm(searchTerm);
+        return result.selectPrendasPorTerminoBusqueda(searchTerm, numPage, pageSize);
+    }
+    
+    @Override
+    public List<Prenda> obtenerReportePrendas(Integer idCategoria, Integer idTalla, boolean stockBajo)
+    {
+        EPrenda result = new EPrenda();
+        
+        return result.selectReportePrendas(idCategoria, idTalla, stockBajo);
+    }
+    
+    @Override
+    public List<Prenda> buscarPrendasParaVenta(String searchTerm)
+    {
+        EPrenda result = new EPrenda();
+        
+        return result.selectPrendasForVenta(searchTerm);
     }
 }

@@ -15,12 +15,16 @@ public class Usuario extends Persona implements IUsuario
     private String correoUsuario;
     private String contraseniaUsuario;
     public boolean estadoUsuario;
-    public Rol rol;
+    public Rol rolUsuario;
 
     public Usuario()
     {
     }
-
+    
+    public String getCorreoUsuario(){
+        return this.correoUsuario;
+    }
+    
     public Usuario(int idUsuario, String correoUsuario, String contraseniaUsuario, boolean estadoUsuario)
     {
         this.idUsuario = idUsuario;
@@ -36,7 +40,7 @@ public class Usuario extends Persona implements IUsuario
         this.correoUsuario = correoUsuario;
         this.contraseniaUsuario = contraseniaUsuario;
         this.estadoUsuario = estadoUsuario;
-        this.rol = new Rol(idRol, nombreRol, estadoRol, permisosRol);
+        this.rolUsuario = new Rol(idRol, nombreRol, estadoRol, permisosRol);
     }
 
     @Override

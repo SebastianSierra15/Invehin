@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.EColor;
 import Interfaces.IColor;
+import java.util.List;
 
 /**
  *
@@ -46,6 +48,14 @@ public class Color implements IColor
         Color entidad = new Color();
 
         return entidad;
+    }
+
+    @Override
+    public List<Color> obtenerColores()
+    {
+        EColor result = new EColor();
+
+        return result.selectColores();
     }
 
 }

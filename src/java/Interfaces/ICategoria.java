@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.Categoria;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface ICategoria
     boolean eliminarCategoria(int idCategoria);
 
     Categoria obtenerCategoria(int Categoria);
+    
+    List<Categoria> obtenerCategorias();
 }

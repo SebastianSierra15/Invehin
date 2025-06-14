@@ -12,8 +12,6 @@ public class Subcategoria implements ISubcategoria
     public int idSubcategoria;
     public String nombreSubcategoria;
     public int precioSubcategoria;
-    public int stockMinimoSubcategoria;
-    public int stockSubcategoria;
     public String imagenSubcategoria;
     public boolean estadoSubcategoria;
     public Categoria categoriaSubcategoria;
@@ -22,13 +20,11 @@ public class Subcategoria implements ISubcategoria
     {
     }
 
-    public Subcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int stockMinimoSubcategoria, int stockSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria)
+    public Subcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria)
     {
         this.idSubcategoria = idSubcategoria;
         this.nombreSubcategoria = nombreSubcategoria;
         this.precioSubcategoria = precioSubcategoria;
-        this.stockMinimoSubcategoria = stockMinimoSubcategoria;
-        this.stockSubcategoria = stockSubcategoria;
         this.imagenSubcategoria = imagenSubcategoria;
         this.estadoSubcategoria = estadoSubcategoria;
         this.categoriaSubcategoria = categoriaSubcategoria;

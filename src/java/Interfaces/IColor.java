@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.Color;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface IColor
     boolean eliminarColor(int idColor);
 
     Color obtenerColor(int idColor);
+
+    List<Color> obtenerColores();
 }

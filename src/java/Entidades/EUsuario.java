@@ -21,10 +21,11 @@ public class EUsuario
     {
         Usuario usuario = null;
         String sql = "{ CALL login(?, ?) }";
-
+        DBConexion db = null;
+        
         try
         {
-            DBConexion db = new DBConexion();
+            db = new DBConexion();
             db.conectar();
 
             try (CallableStatement cs = db.obtener().prepareCall(sql))
@@ -92,11 +93,21 @@ public class EUsuario
                 }
 
             }
-            
-            db.cerrar();
         } catch (SQLException | ClassNotFoundException e)
         {
             e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
 
         return usuario;

@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.EEstadoPrenda;
 import Interfaces.IEstadoPrenda;
+import java.util.List;
 
 /**
  *
@@ -46,5 +48,13 @@ public class EstadoPrenda implements IEstadoPrenda
         EstadoPrenda entidad = new EstadoPrenda();
 
         return entidad;
+    }
+
+    @Override
+    public List<EstadoPrenda> obtenerEstadosPrenda()
+    {
+        EEstadoPrenda result = new EEstadoPrenda();
+        
+        return result.selectEstados();
     }
 }
