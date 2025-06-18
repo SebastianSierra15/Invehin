@@ -13,7 +13,7 @@ public interface IProveedor
 
     public boolean crearProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona);
 
-    public boolean actualizarProveedor(int idProveedor, Persona persona, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor);
+    public boolean actualizarProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona);
 
     public boolean eliminarProveedor(int idProveedor);
 

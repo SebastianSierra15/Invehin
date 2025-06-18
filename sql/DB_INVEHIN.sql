@@ -406,26 +406,6 @@ BEGIN
 END//
 DELIMITER ;
 
--- Volcando estructura para procedimiento db_invehin.delete_proveedor
-DELIMITER //
-CREATE PROCEDURE `delete_proveedor`(
-	IN `id` INT
-)
-BEGIN
-
-	START TRANSACTION;
-	
-	DELETE
-	FROM
-		proveedor p
-	WHERE
-		p.id_proveedor = id;
-	
-	COMMIT;
-
-END//
-DELIMITER ;
-
 -- Volcando estructura para procedimiento db_invehin.delete_rol
 DELIMITER //
 CREATE PROCEDURE `delete_rol`(
@@ -562,6 +542,27 @@ BEGIN
 		p.fk_id_estadoprenda = 3
 	WHERE
 		p.codigo_prenda = codigo;
+	
+	COMMIT;
+
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.desactivar_proveedor
+DELIMITER //
+CREATE PROCEDURE `desactivar_proveedor`(
+	IN `id` INT
+)
+BEGIN
+
+	START TRANSACTION;
+	
+	UPDATE
+		proveedor p
+	SET
+		p.estado_proveedor = 0
+	WHERE
+		p.id_proveedor = id;
 	
 	COMMIT;
 
@@ -1486,7 +1487,7 @@ CREATE TABLE IF NOT EXISTS `persona` (
 
 -- Volcando datos para la tabla db_invehin.persona: ~19 rows (aproximadamente)
 INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `numeroidentificacion_persona`, `telefono_persona`, `genero_persona`) VALUES
-	(1, 'Laura', 'Gómez', '1010101010', '3111111111', 0),
+	(1, 'Laura', 'Gómez', NULL, '3111111111', NULL),
 	(2, 'Diego', 'Ramírez', '1010101011', '3112222222', 1),
 	(3, 'Camila', 'Sánchez', '1010101012', '3113333333', 0),
 	(4, 'Andrés', 'Torres', '1010101013', '3114444444', 1),
@@ -1504,7 +1505,7 @@ INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `nu
 	(17, 'Sebastian', 'Sierra', '1006506525', '3112929178', 1),
 	(18, 'Elias', 'Sierra', '1006506524', '3152919218', 1),
 	(19, 'Fernanda', 'Vargas', '1002603659', '3152926356', 0),
-	(20, 'Sebastian', 'Sierra', NULL, '3112929178', NULL);
+	(20, 'Sebastian', 'Sierra Perdomo', NULL, '3112929178', NULL);
 
 -- Volcando estructura para tabla db_invehin.prenda
 CREATE TABLE IF NOT EXISTS `prenda` (
@@ -1578,13 +1579,13 @@ CREATE TABLE IF NOT EXISTS `proveedor` (
 
 -- Volcando datos para la tabla db_invehin.proveedor: ~11 rows (aproximadamente)
 INSERT INTO `proveedor` (`id_proveedor`, `nombre_proveedor`, `direccion_proveedor`, `correo_proveedor`, `estado_proveedor`, `fk_id_persona`) VALUES
-	(1, 'Proveedor A', 'Calle 1 #100', 'proveedorA@example.com', 1, 1),
+	(1, 'Koaj', 'Calle 1 #100', 'proveedorA@example.com', 1, 1),
 	(2, 'Proveedor B', 'Calle 2 #200', 'proveedorB@example.com', 1, 2),
 	(3, 'Proveedor C', 'Calle 3 #300', 'proveedorC@example.com', 1, 3),
 	(4, 'Proveedor D', 'Calle 4 #400', 'proveedorD@example.com', 1, 4),
 	(5, 'Proveedor E', 'Calle 5 #500', 'proveedorE@example.com', 1, 5),
 	(6, 'Proveedor A', 'Calle 1 #100', 'proveedorA@example.com', 1, 1),
-	(7, 'Proveedor B', 'Calle 2 #200', 'proveedorB@example.com', 1, 2),
+	(7, 'Proveedor B', 'Calle 2 #200', 'proveedorB@example.com', 0, 2),
 	(8, 'Proveedor C', 'Calle 3 #300', 'proveedorC@example.com', 1, 3),
 	(9, 'Proveedor D', 'Calle 4 #400', 'proveedorD@example.com', 1, 4),
 	(10, 'Proveedor E', 'Calle 5 #500', 'proveedorE@example.com', 1, 5),
@@ -2547,6 +2548,7 @@ BEGIN
 		view_proveedor vp
 	WHERE
 		vp.id = id
+		AND vp.estado = 1
 	LIMIT 1;
 	
 END//
@@ -3385,29 +3387,25 @@ DELIMITER //
 CREATE PROCEDURE `update_proveedor`(
 	IN `id` INT,
 	IN `nombre` VARCHAR(100),
-	IN `direccion` VARCHAR(150),
 	IN `correo` VARCHAR(150),
-	IN `estado` VARCHAR(150),
+	IN `direccion` VARCHAR(150),
 	IN `persona_id` INT,
 	IN `nombres` VARCHAR(100),
 	IN `apellidos` VARCHAR(100),
-	IN `numero_identificacion` VARCHAR(15),
-	IN `telefono` VARCHAR(20),
-	IN `genero` TINYINT
+	IN `telefono` VARCHAR(20)
 )
 BEGIN
 	
 	START TRANSACTION;
 		
-	CALL update_persona(persona_id, nombres, apellidos, numero_identificacion, telefono, genero);
+	CALL update_persona(persona_id, nombres, apellidos, NULL, telefono, NULL);
 	
 	UPDATE
 		proveedor p
 	SET
 		p.nombre_proveedor = nombre,
-		p.direccion_proveedor = direccion,
 		p.correo_proveedor = correo,
-		p.estado_proveedor = estado
+		p.direccion_proveedor = direccion
 	WHERE
 		p.id_proveedor = id;
 		

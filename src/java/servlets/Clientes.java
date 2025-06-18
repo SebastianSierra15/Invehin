@@ -120,21 +120,21 @@ public class Clientes extends HttpServlet
             
             Object idClienteRaw = body.get("idCliente");
             Object direccionClienteRaw = body.get("direccionCliente");
-            Object idPerseonaRaw = body.get("idPersona");
+            Object idPersonaRaw = body.get("idPersona");
             Object nombresPersonaRaw = body.get("nombresPersona");
             Object apellidosPersonaRaw = body.get("apellidosPersona");
             Object identificacionPersonaRaw = body.get("identificacionPersona");
             Object telefonoPersonaRaw = body.get("telefonoPersona");
             Object generoPersonaRaw = body.get("generoPersona");
             
-            if (idClienteRaw == null || direccionClienteRaw == null || idPerseonaRaw == null || nombresPersonaRaw == null || apellidosPersonaRaw == null || identificacionPersonaRaw == null || telefonoPersonaRaw == null || generoPersonaRaw == null)
+            if (idClienteRaw == null || direccionClienteRaw == null || idPersonaRaw == null || nombresPersonaRaw == null || apellidosPersonaRaw == null || identificacionPersonaRaw == null || telefonoPersonaRaw == null || generoPersonaRaw == null)
             {
                 throw new IllegalArgumentException("Datos incompletos.");
             }
             
             int idCliente = Integer.parseInt(idClienteRaw.toString());
             String direccionCliente = String.valueOf(direccionClienteRaw);
-            int idPerseona = Integer.parseInt(idPerseonaRaw.toString());
+            int idPersona = Integer.parseInt(idPersonaRaw.toString());
             String nombresPersona = String.valueOf(nombresPersonaRaw);
             String apellidosPersona = String.valueOf(apellidosPersonaRaw);
             String identificacionPersona = String.valueOf(identificacionPersonaRaw);
@@ -142,7 +142,7 @@ public class Clientes extends HttpServlet
             boolean generoPersona = "true".equals(String.valueOf(generoPersonaRaw));
             
             ICliente servicioCliente = new Cliente();
-            boolean exito = servicioCliente.actualizarCliente(idCliente, direccionCliente, idPerseona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona);
+            boolean exito = servicioCliente.actualizarCliente(idCliente, direccionCliente, idPersona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona);
             
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

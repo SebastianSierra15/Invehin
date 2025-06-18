@@ -10,7 +10,7 @@
     <hr class="border-t border-black/40 w-full mb-2" />
 
     <div class="py-2">
-        &copy; <%= java.time.Year.now()%> INVEHIN. Todos los derechos reservados.
+        &copy; <%= java.time.Year.now()%> Invehin. Todos los derechos reservados.
         <br>
         Desarrollado por Ing. Sebastián Sierra
     </div>

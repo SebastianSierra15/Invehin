@@ -62,14 +62,87 @@ public class EProveedor
         return exito;
     }
 
-    public boolean updateProveedor()
+    public boolean updateProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona)
     {
-        return true;
+        String sql = "{CALL update_proveedor(?, ?, ?, ?, ?, ?, ?, ?)}";
+        DBConexion db = null;
+        boolean exito = false;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setInt(1, idProveedor);
+                cs.setString(2, nombreProveedor);
+                cs.setString(3, correoProveedor);
+                cs.setString(4, direccionProveedor);
+                cs.setInt(5, idPersona);
+                cs.setString(6, nombresPersona);
+                cs.setString(7, apellidosPersona);
+                cs.setString(8, telefonoPersona);
+
+                cs.execute();
+                exito = true;
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exito;
     }
 
-    public boolean deleteProveedor()
+    public boolean deleteProveedor(int idProveedor)
     {
-        return true;
+        String sql = "{CALL desactivar_proveedor(?)}";
+        DBConexion db = null;
+        boolean exito = false;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setInt(1, idProveedor);
+
+                cs.execute();
+                exito = true;
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exito;
     }
 
     public Proveedor selectProveedorById()

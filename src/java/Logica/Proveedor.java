@@ -48,15 +48,19 @@ public class Proveedor extends Persona implements IProveedor
     }
 
     @Override
-    public boolean actualizarProveedor(int idProveedor, Persona persona, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor)
+    public boolean actualizarProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona)
     {
-        return true;
+        EProveedor result = new EProveedor();
+        
+        return result.updateProveedor(idProveedor, nombreProveedor, correoProveedor, direccionProveedor, idPersona, nombresPersona, apellidosPersona, telefonoPersona);
     }
 
     @Override
     public boolean eliminarProveedor(int idProveedor)
     {
-        return true;
+        EProveedor result = new EProveedor();
+        
+        return result.deleteProveedor(idProveedor);
     }
 
     @Override

@@ -184,6 +184,7 @@
                                         data-nombre="<%= proveedor.nombreProveedor%>"
                                         data-correo="<%= proveedor.correoProveedor%>"
                                         data-telefono="<%= proveedor.telefonoPersona%>"
+                                        data-direccion="<%= proveedor.direccionProveedor%>"
                                         data-idpersona="<%= proveedor.idPersona%>"
                                         data-nombres="<%= proveedor.nombresPersona%>"
                                         data-apellidos="<%= proveedor.apellidosPersona%>">
@@ -429,6 +430,31 @@
             });
         });
 
+        document.addEventListener("click", function (e) {
+            if (e.target.closest(".editar-proveedor-btn")) {
+                const btn = e.target.closest(".editar-proveedor-btn");
+
+                document.getElementById("editarProveedorId").value = btn.dataset.id;
+                document.getElementById("editarNombre").value = btn.dataset.nombre;
+                document.getElementById("editarCorreo").value = btn.dataset.correo;
+                document.getElementById("editarDireccion").value = btn.dataset.direccion;
+                document.getElementById("editarPersonaId").value = btn.dataset.idpersona;
+                document.getElementById("editarNombres").value = btn.dataset.nombres;
+                document.getElementById("editarApellidos").value = btn.dataset.apellidos;
+                document.getElementById("editarTelefono").value = btn.dataset.telefono;
+
+                document.getElementById("modalEditarProveedor").classList.remove("hidden");
+                document.body.classList.add("overflow-hidden");
+            } else if (e.target.closest(".eliminar-proveedor-btn")) {
+                const btn = e.target.closest(".eliminar-proveedor-btn");
+                const id = btn.dataset.id;
+
+                document.getElementById("confirmarEliminarProveedor").dataset.id = id;
+                document.getElementById("modalConfirmarEliminar").classList.remove("hidden");
+                document.body.classList.add("overflow-hidden");
+            }
+        });
+
         document.getElementById("cancelarConfirmarAgregar").addEventListener("click", function () {
             document.getElementById("modalConfirmarAgregar").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
@@ -461,6 +487,69 @@
             document.body.classList.remove("overflow-hidden");
         });
 
+        document.getElementById("cancelarConfirmarEditar").addEventListener("click", function () {
+            document.getElementById("modalConfirmarEditar").classList.add("hidden");
+        });
+
+        document.getElementById("confirmarEditarProveedor").addEventListener("click", function () {
+            fetch("Proveedores", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(datosProveedorEditado)
+            })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.exito) {
+                            alert("Proveedor actualizado correctamente.");
+                            cerrarModalEditar();
+                            cargarProveedores();
+                        } else {
+                            alert("Error al actualizar: " + data.mensaje);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al enviar actualización:", error);
+                        alert("Ocurrió un error inesperado.");
+                    });
+
+            document.getElementById("modalConfirmarEditar").classList.add("hidden");
+        });
+
+        document.getElementById("cancelarConfirmarEliminar").addEventListener("click", function () {
+            document.getElementById("modalConfirmarEliminar").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        });
+
+        document.getElementById("confirmarEliminarProveedor").addEventListener("click", function () {
+            const id = this.dataset.id;
+
+            fetch("Proveedores", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({idProveedor: id})
+            })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.exito) {
+                            alert("Proveedor eliminado correctamente.");
+                            cargarProveedores();
+                        } else {
+                            alert("Error al eliminar: " + data.mensaje);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al eliminar proveedor", error);
+                        alert("Ocurrió un error inesperado.");
+                    });
+
+            document.getElementById("modalConfirmarEliminar").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        });
+
         document.getElementById("formAgregarProveedor").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -469,6 +558,23 @@
 
             document.getElementById("modalConfirmarAgregar").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
+        });
+
+        document.getElementById("formEditarProveedor").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            datosProveedorEditado = {
+                idProveedor: document.getElementById("editarProveedorId").value,
+                nombreProveedor: document.getElementById("editarNombre").value,
+                correoProveedor: document.getElementById("editarCorreo").value,
+                direccionProveedor: document.getElementById("editarDireccion").value,
+                idPersona: document.getElementById("editarPersonaId").value,
+                nombresPersona: document.getElementById("editarNombres").value,
+                apellidosPersona: document.getElementById("editarApellidos").value,
+                telefonoPersona: document.getElementById("editarTelefono").value
+            };
+
+            document.getElementById("modalConfirmarEditar").classList.remove("hidden");
         });
 
         function irAPagina(nuevaPagina) {
@@ -503,6 +609,11 @@
 
         function cerrarModalAgregar() {
             document.getElementById("modalAgregarProveedor").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+        
+        function cerrarModalEditar() {
+            document.getElementById("modalEditarProveedor").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
         }
     </script>
