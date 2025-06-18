@@ -53,7 +53,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -93,10 +93,10 @@
         </style>
     </head>
 
-    <body class="bg-invehin-background font-sans flex">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden">
         <%@ include file="/components/sidebar.jsp" %>
 
-        <main id="main-content" class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden px-4 pt-6 md:p-8 pb-0 md:pb-0 ml-20 sm:ml-64 transition-all duration-300 gap-4 sm:gap-10">
+        <main id="main-content" class="flex flex-col min-h-screen flex-1 px-4 pt-6 pb-0 md:p-8 md:pb-0 ml-20 sm:ml-64 transition-all duration-300 gap-4 sm:gap-10">
             <h1 class="text-invehin-primary font-bold text-3xl text-center">Registrar Venta</h1>
 
             <section aria-label="Buscador de prendas"   >
@@ -198,7 +198,7 @@
                 </div>
             </section>
 
-            <footer class="mt-auto flex flex-col sm:flex-row justify-between items-end gap-2 sm:gap-4 pt-4 px-6 border-t z-10 py-2">
+            <section class="mt-auto flex flex-col sm:flex-row justify-between items-end gap-2 sm:gap-4 pt-4 px-6 border-t z-10 pt-2">
                 <button id="btnVolver"
                         onclick="volverAlPanelPrendas()"
                         class="hidden order-2 sm:order-none text-invehin-primary border border-invehin-primary px-4 py-2 rounded shadow hover:bg-invehin-accentLight transition">
@@ -216,479 +216,479 @@
                         <i class="fas fa-cart-plus mr-2"></i> Confirmar Prendas
                     </button>
                 </div>
-            </footer>
+            </section>
         </main>
 
-        <script>
-            let timeout = null;
+        <%@ include file="/components/footer.jsp" %>
+    </body>
 
-            const input = document.getElementById('searchInput');
-            const lista = document.getElementById('sugerencias');
-            const tablaBody = document.getElementById("prendasSeleccionadas");
+    <script>
+        let timeout = null;
+        let timeoutCliente = null;
+        const input = document.getElementById('searchInput');
+        const lista = document.getElementById('sugerencias');
+        const tablaBody = document.getElementById("prendasSeleccionadas");
 
-            input.addEventListener('input', function () {
-                clearTimeout(timeout);
+        document.addEventListener("click", function (event) {
+            const input = document.getElementById("searchInput");
+            const lista = document.getElementById("sugerencias");
 
-                const searchTerm = this.value.trim();
-                if (searchTerm.length < 2) {
-                    lista.classList.add("hidden");
-                    return;
-                }
-
-                timeout = setTimeout(() => {
-                    fetchPrendas(searchTerm);
-                }, 300);
-            });
-
-            // Se activa cuando se borra usando la X del input de tipo "search" 
-            input.addEventListener('search', () => {
+            if (!input.contains(event.target) && !lista.contains(event.target)) {
                 lista.classList.add("hidden");
-            });
+            }
+        });
 
-            function fetchPrendas(searchTerm) {
-                fetch('${pageContext.request.contextPath}/PrendasVenta', {
+        document.addEventListener("click", function (event) {
+            const input = document.getElementById("clienteInput");
+            const lista = document.getElementById("sugerenciasCliente");
+            if (!input.contains(event.target) && !lista.contains(event.target)) {
+                lista.classList.add("hidden");
+            }
+        });
+
+        input.addEventListener('input', function () {
+            clearTimeout(timeout);
+
+            const searchTerm = this.value.trim();
+            if (searchTerm.length < 2) {
+                lista.classList.add("hidden");
+                return;
+            }
+
+            timeout = setTimeout(() => {
+                fetchPrendas(searchTerm);
+            }, 300);
+        });
+
+        // Se activa cuando se borra usando la X del input de tipo "search" 
+        input.addEventListener('search', () => {
+            lista.classList.add("hidden");
+        });
+
+        document.getElementById("clienteInput").addEventListener("input", function () {
+            clearTimeout(timeoutCliente);
+
+            const valor = this.value.trim();
+            if (valor.length < 2) {
+                document.getElementById("sugerenciasCliente").classList.add("hidden");
+                return;
+            }
+
+            timeoutCliente = setTimeout(() => {
+                fetch('${pageContext.request.contextPath}/ClientesVenta', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: new URLSearchParams({searchTerm})
-                })
-                        .then(response => response.json())
-                        .then(data => {
-                            renderSugerencias(data);
-                        })
-                        .catch(error => {
-                            console.error('Error al buscar prendas:', error);
-                        });
-            }
-
-            function renderSugerencias(data) {
-                lista.innerHTML = "";
-
-                if (!data || data.length === 0) {
-                    lista.classList.add("hidden");
-                    return;
-                }
-
-                data.forEach((prenda, i) => {
-                    const sub = prenda.subcategoriaPrenda;
-                    const cat = sub?.categoriaSubcategoria;
-                    const talla = prenda.tallaPrenda;
-                    const color = prenda.colorPrenda;
-
-                    const codigo = prenda.codigoPrenda ?? '--';
-                    const nombreCategoria = cat?.nombreCategoria ?? '--';
-                    const nombreSubcategoria = sub?.nombreSubcategoria ?? '--';
-                    const nombreTalla = talla?.nombreTalla ?? '--';
-                    const nombreColor = color?.nombreColor ?? '--';
-                    const precio = sub?.precioSubcategoria ?? 0;
-                    const stock = prenda.stockPrenda ?? 0;
-                    const stockMinimo = prenda.stockminimoPrenda ?? 0;
-
-                    const texto = document.createTextNode(codigo + " - " +
-                            nombreCategoria + " - " + nombreSubcategoria + " · Talla " +
-                            nombreTalla + " · " + nombreColor + " · $" +
-                            Intl.NumberFormat("es-CO").format(precio)
-                            );
-
-                    const li = document.createElement("li");
-                    li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-800";
-                    li.appendChild(texto);
-
-                    li.onclick = () => {
-                        // Calcular cuántas unidades ya están en la tabla
-                        const filas = tablaBody.querySelectorAll("tr");
-                        let cantidadActual = 0;
-                        for (let fila of filas) {
-                            const codigoCelda = fila.children[0].textContent.trim();
-                            if (codigoCelda === codigo) {
-                                const inputCantidad = fila.querySelector("input[type='number']");
-                                cantidadActual = parseInt(inputCantidad.value);
-                                break;
-                            }
-                        }
-
-                        // Validar contra stock
-                        const disponibles = prenda.stockPrenda - cantidadActual;
-                        if (disponibles <= prenda.stockminimoPrenda) {
-                            alert("No hay suficiente stock disponible para agregar más unidades.");
-                            return;
-                        }
-
-                        input.value = "";
-                        lista.classList.add("hidden");
-
-                        agregarPrendaTabla({
-                            codigo,
-                            nombreCategoria,
-                            nombreSubcategoria,
-                            nombreTalla,
-                            nombreColor,
-                            precio,
-                            stock,
-                            stockMinimo
-                        });
-                    };
-
-                    lista.appendChild(li);
-                });
-
-                lista.classList.remove("hidden");
-            }
-
-            function agregarPrendaTabla( { codigo, nombreCategoria, nombreSubcategoria, nombreTalla, nombreColor, precio, stock, stockMinimo }) {
-                // Buscar si ya existe un <tr> con ese código
-                const filas = tablaBody.querySelectorAll("tr");
-                for (let fila of filas) {
-                    const codigoCelda = fila.children[0].textContent.trim();
-                    if (codigoCelda === codigo) {
-                        const inputCantidad = fila.querySelector("input[type='number']");
-                        inputCantidad.value = parseInt(inputCantidad.value) + 1;
-                        actualizarSubtotal(inputCantidad);
-                        return;
-                    }
-                }
-
-                const tr = document.createElement("tr");
-
-                // Celda 1: Codigo
-                const td1 = document.createElement("td");
-                td1.className = "px-3 py-2 border border-white";
-                td1.appendChild(document.createTextNode(codigo));
-                tr.appendChild(td1);
-
-                // Celda 2: Categoría y Subcategoría
-                const td2 = document.createElement("td");
-                td2.className = "px-3 py-2 border border-white";
-                td2.appendChild(document.createTextNode(nombreCategoria + " - " + nombreSubcategoria));
-                tr.appendChild(td2);
-
-                // Celda 3: Talla
-                const td3 = document.createElement("td");
-                td3.className = "px-3 py-2 border border-white";
-                td3.appendChild(document.createTextNode(nombreTalla));
-                tr.appendChild(td3);
-
-                // Celda 4: Color
-                const td4 = document.createElement("td");
-                td4.className = "px-3 py-2 border border-white";
-                td4.appendChild(document.createTextNode(nombreColor));
-                tr.appendChild(td4);
-
-                // Celda 5: Precio
-                const td5 = document.createElement("td");
-                td5.className = "px-3 py-2 border border-white";
-                td5.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(precio)));
-                tr.appendChild(td5);
-
-                // Celda 6: Input cantidad
-                const td6 = document.createElement("td");
-                td6.className = "px-3 py-2 border border-white items-center text-center";
-                const input = document.createElement("input");
-                input.type = "number";
-                input.value = "1";
-                input.min = "1";
-                input.className = "w-16 px-1 py-0.5 border rounded w-full";
-                input.setAttribute("onchange", "actualizarSubtotal(this)");
-                input.setAttribute("data-stock", stock);
-                input.setAttribute("data-minimo", stockMinimo);
-                td6.appendChild(input);
-                tr.appendChild(td6);
-
-                // Celda 7: Subtotal
-                const td7 = document.createElement("td");
-                td7.className = "px-3 py-2 border border-white subtotal";
-                td7.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(precio)));
-                tr.appendChild(td7);
-
-                // Celda 8: Botón eliminar con ícono
-                const td8 = document.createElement("td");
-                td8.className = "px-3 py-2 border border-white text-center";
-                const btn = document.createElement("button");
-                btn.className = "text-red-600 hover:text-red-500";
-                btn.setAttribute("aria-label", "Eliminar");
-                btn.title = "Eliminar prenda";
-                const icon = document.createElement("i");
-                icon.className = "fas fa-trash";
-                icon.setAttribute("aria-hidden", "true");
-                btn.appendChild(icon);
-                btn.onclick = function () {
-                    this.closest('tr').remove();
-                    actualizarTotal();
-                    actualizarBotonConfirmar();
-                };
-
-                td8.appendChild(btn);
-                tr.appendChild(td8);
-
-                tablaBody.appendChild(tr);
-
-                actualizarTotal();
-                actualizarBotonConfirmar();
-            }
-
-            function actualizarSubtotal(input) {
-                const fila = input.closest("tr");
-                const precioTexto = fila.children[4].textContent.replace(/[^\d]/g, "");
-                const precio = parseInt(precioTexto, 10);
-                const cantidad = parseInt(input.value, 10) || 1;
-
-                const stockPrenda = parseInt(input.getAttribute("data-stock"));
-                const stockMinimo = parseInt(input.getAttribute("data-minimo"));
-
-                const totalDisponible = stockPrenda - stockMinimo;
-
-                if (cantidad > totalDisponible) {
-                    alert("Cantidad excede el stock disponible.");
-                    input.value = totalDisponible;
-                    return actualizarSubtotal(input);
-                }
-
-                const subtotal = precio * cantidad;
-                fila.querySelector(".subtotal").textContent = ("$" + Intl.NumberFormat("es-CO").format(subtotal));
-
-                actualizarTotal();
-            }
-
-            function actualizarTotal() {
-                const subtotales = document.querySelectorAll(".subtotal");
-                let total = 0;
-
-                subtotales.forEach(sub => {
-                    const valor = sub.textContent.replace(/[^\d]/g, "");
-                    total += parseInt(valor, 10);
-                });
-
-                document.getElementById("totalAPagarFooter").textContent = ("$" + Intl.NumberFormat("es-CO").format(total));
-            }
-
-            document.addEventListener("click", function (event) {
-                const input = document.getElementById("searchInput");
-                const lista = document.getElementById("sugerencias");
-
-                if (!input.contains(event.target) && !lista.contains(event.target)) {
-                    lista.classList.add("hidden");
-                }
-            });
-
-            function limpiarTabla() {
-                tablaBody.innerHTML = "";
-                actualizarTotal();
-                actualizarBotonConfirmar();
-            }
-
-            function mostrarPanelCliente() {
-                document.getElementById("panelCliente").classList.remove("hidden");
-                document.querySelector('[aria-label="Buscador de prendas"]').classList.add("hidden");
-                document.querySelector('[aria-label="Lista de prendas seleccionadas"]').classList.add("hidden");
-
-                document.getElementById("cambioCalculado").textContent = "$0";
-                document.getElementById("montoPago").value = "0";
-
-                document.getElementById("btnVolver").classList.remove("hidden");
-
-                const btn = document.getElementById("btnConfirmar");
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Confirmar Venta';
-                btn.onclick = finalizarVenta;
-                btn.disabled = true;
-                actualizarBotonConfirmar();
-            }
-
-            function volverAlPanelPrendas() {
-                document.getElementById("panelCliente").classList.add("hidden");
-                document.querySelector('[aria-label="Buscador de prendas"]').classList.remove("hidden");
-                document.querySelector('[aria-label="Lista de prendas seleccionadas"]').classList.remove("hidden");
-
-                document.getElementById("btnVolver").classList.add("hidden");
-
-                const btn = document.getElementById("btnConfirmar");
-                btn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i> Confirmar Venta';
-                btn.onclick = mostrarPanelCliente;
-
-                actualizarBotonConfirmar();
-            }
-
-            function formatearMontoYCalcularCambio(input) {
-                let valor = input.value.replace(/[^\d]/g, "");
-
-                if (!valor) {
-                    input.value = "";
-                    calcularCambio(0);
-                    return;
-                }
-
-                const numero = parseInt(valor, 10);
-                input.value = "$" + Intl.NumberFormat("es-CO").format(numero);
-                calcularCambio(numero);
-            }
-
-            function calcularCambio(montoRecibido = null) {
-                const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
-                let recibido = montoRecibido;
-
-                if (recibido === null) {
-                    recibido = parseInt(document.getElementById("montoPago").value.replace(/[^\d]/g, "") || "0");
-                }
-
-                const cambio = Math.max(recibido - total, 0);
-                document.getElementById("cambioCalculado").textContent = "$" + Intl.NumberFormat("es-CO").format(cambio);
-
-                actualizarBotonConfirmar();
-            }
-
-            function renderSugerenciasCliente(clientes) {
-                const lista = document.getElementById("sugerenciasCliente");
-                lista.innerHTML = "";
-
-                if (!clientes || clientes.length === 0) {
-                    lista.classList.add("hidden");
-                    return;
-                }
-
-                clientes.forEach(cliente => {
-                    const li = document.createElement("li");
-                    li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-800";
-                    li.textContent = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
-                    li.onclick = () => seleccionarCliente(cliente);
-                    lista.appendChild(li);
-                });
-
-                lista.classList.remove("hidden");
-            }
-
-            function seleccionarCliente(cliente) {
-                document.getElementById("cliId").textContent = cliente.idCliente;
-                document.getElementById("cliDocumento").textContent = cliente.numeroidentificacionPersona;
-                document.getElementById("cliNombres").textContent = cliente.nombresPersona;
-                document.getElementById("cliApellidos").textContent = cliente.apellidosPersona;
-                document.getElementById("cliTelefono").textContent = cliente.telefonoPersona;
-                document.getElementById("cliGenero").textContent = cliente.generoPersona === 1 ? "Masculino" : cliente.generoPersona === 0 ? "Femenino" : "Otro";
-                document.getElementById("cliDireccion").textContent = cliente.direccionCliente;
-                document.getElementById("datosCliente").classList.remove("hidden");
-
-                document.getElementById("clienteInput").value = "";
-                document.getElementById("sugerenciasCliente").classList.add("hidden");
-
-                actualizarBotonConfirmar();
-            }
-
-            let timeoutCliente = null;
-
-            document.getElementById("clienteInput").addEventListener("input", function () {
-                clearTimeout(timeoutCliente);
-
-                const valor = this.value.trim();
-                if (valor.length < 2) {
-                    document.getElementById("sugerenciasCliente").classList.add("hidden");
-                    return;
-                }
-
-                timeoutCliente = setTimeout(() => {
-                    fetch('${pageContext.request.contextPath}/Clientes', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: new URLSearchParams({searchTerm: valor})
-                    })
-                            .then(res => res.json())
-                            .then(data => renderSugerenciasCliente(data))
-                            .catch(err => console.error("Error al buscar cliente:", err));
-                }, 300);
-            });
-
-            document.addEventListener("click", function (event) {
-                const input = document.getElementById("clienteInput");
-                const lista = document.getElementById("sugerenciasCliente");
-                if (!input.contains(event.target) && !lista.contains(event.target)) {
-                    lista.classList.add("hidden");
-                }
-            });
-
-            function abrirModalCliente() {
-                alert("Aquí debe abrir un modal para registrar cliente. (Implementación pendiente)");
-            }
-
-            function finalizarVenta() {
-                const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
-                const montoInput = document.getElementById("montoPago").value;
-                const montoRecibido = parseInt(montoInput.replace(/[^\d]/g, "") || "0");
-
-                if (montoRecibido < total) {
-                    alert("El monto recibido no puede ser menor al total a pagar.");
-                    return;
-                }
-
-                const clienteId = document.getElementById("cliId").textContent.trim();
-                const metodoPagoId = 1;
-                const usuarioId = <%= sesion.idUsuario%>;
-
-                const filas = document.querySelectorAll("#prendasSeleccionadas tr");
-                const detalles = [];
-
-                filas.forEach(fila => {
-                    const codigo = fila.children[0].textContent.trim();
-                    const cantidad = parseInt(fila.querySelector("input[type='number']").value);
-                    detalles.push({
-                        codigo_prenda: codigo,
-                        cantidad: cantidad
-                    });
-                });
-
-                const datos = new URLSearchParams();
-                datos.append("montoRecibido", montoRecibido);
-                datos.append("clienteId", clienteId);
-                datos.append("metodoPagoId", metodoPagoId);
-                datos.append("usuarioId", usuarioId);
-                datos.append("detallesVentaJson", JSON.stringify(detalles));
-
-                fetch("${pageContext.request.contextPath}/Ventas", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: datos
+                    body: new URLSearchParams({searchTerm: valor})
                 })
                         .then(res => res.json())
-                        .then(data => {
-                            if (data.exito) {
-                                alert("Venta registrada exitosamente.");
-                                window.location.href = "${pageContext.request.contextPath}/Views/ventas/registrar-venta.jsp";
-                            } else {
-                                alert("Error al registrar la venta: " + data.mensaje);
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error en la venta:", error);
-                            alert("Ocurrió un error al procesar la venta.");
-                        });
+                        .then(data => renderSugerenciasCliente(data))
+                        .catch(err => console.error("Error al buscar cliente:", err));
+            }, 300);
+        });
+
+        function actualizarTotal() {
+            const subtotales = document.querySelectorAll(".subtotal");
+            let total = 0;
+
+            subtotales.forEach(sub => {
+                const valor = sub.textContent.replace(/[^\d]/g, "");
+                total += parseInt(valor, 10);
+            });
+
+            document.getElementById("totalAPagarFooter").textContent = ("$" + Intl.NumberFormat("es-CO").format(total));
+        }
+
+        function limpiarTabla() {
+            tablaBody.innerHTML = "";
+            actualizarTotal();
+            actualizarBotonConfirmar();
+        }
+
+        function mostrarPanelCliente() {
+            document.getElementById("panelCliente").classList.remove("hidden");
+            document.querySelector('[aria-label="Buscador de prendas"]').classList.add("hidden");
+            document.querySelector('[aria-label="Lista de prendas seleccionadas"]').classList.add("hidden");
+
+            document.getElementById("cambioCalculado").textContent = "$0";
+            document.getElementById("montoPago").value = "0";
+
+            document.getElementById("btnVolver").classList.remove("hidden");
+
+            const btn = document.getElementById("btnConfirmar");
+            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Confirmar Venta';
+            btn.onclick = finalizarVenta;
+            btn.disabled = true;
+            actualizarBotonConfirmar();
+        }
+
+        function volverAlPanelPrendas() {
+            document.getElementById("panelCliente").classList.add("hidden");
+            document.querySelector('[aria-label="Buscador de prendas"]').classList.remove("hidden");
+            document.querySelector('[aria-label="Lista de prendas seleccionadas"]').classList.remove("hidden");
+
+            document.getElementById("btnVolver").classList.add("hidden");
+
+            const btn = document.getElementById("btnConfirmar");
+            btn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i> Confirmar Venta';
+            btn.onclick = mostrarPanelCliente;
+
+            actualizarBotonConfirmar();
+        }
+
+        function abrirModalCliente() {
+            alert("Aquí debe abrir un modal para registrar cliente. (Implementación pendiente)");
+        }
+
+        function finalizarVenta() {
+            const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
+            const montoInput = document.getElementById("montoPago").value;
+            const montoRecibido = parseInt(montoInput.replace(/[^\d]/g, "") || "0");
+
+            if (montoRecibido < total) {
+                alert("El monto recibido no puede ser menor al total a pagar.");
+                return;
             }
 
-            function actualizarBotonConfirmar() {
-                const btn = document.getElementById("btnConfirmar");
-                const enPanelCliente = !document.getElementById("panelCliente").classList.contains("hidden");
+            const clienteId = document.getElementById("cliId").textContent.trim();
+            const metodoPagoId = 1;
+            const usuarioId = <%= sesion.idUsuario%>;
 
-                if (enPanelCliente) {
-                    btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Confirmar Venta';
+            const filas = document.querySelectorAll("#prendasSeleccionadas tr");
+            const detalles = [];
 
-                    const clienteVisible = !document.getElementById("datosCliente").classList.contains("hidden");
-                    const montoInput = document.getElementById("montoPago").value;
-                    const monto = parseInt(montoInput.replace(/[^\d]/g, "") || "0");
+            filas.forEach(fila => {
+                const codigo = fila.children[0].textContent.trim();
+                const cantidad = parseInt(fila.querySelector("input[type='number']").value);
+                detalles.push({
+                    codigo_prenda: codigo,
+                    cantidad: cantidad
+                });
+            });
 
-                    const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
+            const datos = new URLSearchParams();
+            datos.append("montoRecibido", montoRecibido);
+            datos.append("clienteId", clienteId);
+            datos.append("metodoPagoId", metodoPagoId);
+            datos.append("usuarioId", usuarioId);
+            datos.append("detallesVentaJson", JSON.stringify(detalles));
 
-                    if (monto < total) {
-                        btn.disabled = true;
-                    } else {
-                        btn.disabled = !(clienteVisible && monto >= total);
-                    }
+            fetch("${pageContext.request.contextPath}/Ventas", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: datos
+            })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.exito) {
+                            alert("Venta registrada exitosamente.");
+                            window.location.href = "${pageContext.request.contextPath}/Views/ventas/registrar-venta.jsp";
+                        } else {
+                            alert("Error al registrar la venta: " + data.mensaje);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error en la venta:", error);
+                        alert("Ocurrió un error al procesar la venta.");
+                    });
+        }
+
+        function actualizarBotonConfirmar() {
+            const btn = document.getElementById("btnConfirmar");
+            const enPanelCliente = !document.getElementById("panelCliente").classList.contains("hidden");
+
+            if (enPanelCliente) {
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Confirmar Venta';
+
+                const clienteVisible = !document.getElementById("datosCliente").classList.contains("hidden");
+                const montoInput = document.getElementById("montoPago").value;
+                const monto = parseInt(montoInput.replace(/[^\d]/g, "") || "0");
+
+                const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
+
+                if (monto < total) {
+                    btn.disabled = true;
                 } else {
-                    btn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i> Confirmar Prendas';
-                    btn.disabled = tablaBody.children.length === 0;
+                    btn.disabled = !(clienteVisible && monto >= total);
+                }
+            } else {
+                btn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i> Confirmar Prendas';
+                btn.disabled = tablaBody.children.length === 0;
+            }
+        }
+
+        function fetchPrendas(searchTerm) {
+            fetch('${pageContext.request.contextPath}/PrendasVenta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: new URLSearchParams({searchTerm})
+            })
+                    .then(response => response.json())
+                    .then(data => {
+                        renderSugerencias(data);
+                    })
+                    .catch(error => {
+                        console.error('Error al buscar prendas:', error);
+                    });
+        }
+
+        function renderSugerencias(data) {
+            lista.innerHTML = "";
+
+            if (!data || data.length === 0) {
+                lista.classList.add("hidden");
+                return;
+            }
+
+            data.forEach((prenda, i) => {
+                const sub = prenda.subcategoriaPrenda;
+                const cat = sub?.categoriaSubcategoria;
+                const talla = prenda.tallaPrenda;
+                const color = prenda.colorPrenda;
+
+                const codigo = prenda.codigoPrenda ?? '--';
+                const nombreCategoria = cat?.nombreCategoria ?? '--';
+                const nombreSubcategoria = sub?.nombreSubcategoria ?? '--';
+                const nombreTalla = talla?.nombreTalla ?? '--';
+                const nombreColor = color?.nombreColor ?? '--';
+                const precio = sub?.precioSubcategoria ?? 0;
+                const stock = prenda.stockPrenda ?? 0;
+                const stockMinimo = prenda.stockminimoPrenda ?? 0;
+
+                const texto = document.createTextNode(codigo + " - " +
+                        nombreCategoria + " - " + nombreSubcategoria + " · Talla " +
+                        nombreTalla + " · " + nombreColor + " · $" +
+                        Intl.NumberFormat("es-CO").format(precio)
+                        );
+
+                const li = document.createElement("li");
+                li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-800";
+                li.appendChild(texto);
+
+                li.onclick = () => {
+                    // Calcular cuántas unidades ya están en la tabla
+                    const filas = tablaBody.querySelectorAll("tr");
+                    let cantidadActual = 0;
+                    for (let fila of filas) {
+                        const codigoCelda = fila.children[0].textContent.trim();
+                        if (codigoCelda === codigo) {
+                            const inputCantidad = fila.querySelector("input[type='number']");
+                            cantidadActual = parseInt(inputCantidad.value);
+                            break;
+                        }
+                    }
+
+                    // Validar contra stock
+                    const disponibles = prenda.stockPrenda - cantidadActual;
+                    if (disponibles <= prenda.stockminimoPrenda) {
+                        alert("No hay suficiente stock disponible para agregar más unidades.");
+                        return;
+                    }
+
+                    input.value = "";
+                    lista.classList.add("hidden");
+
+                    agregarPrendaTabla({
+                        codigo,
+                        nombreCategoria,
+                        nombreSubcategoria,
+                        nombreTalla,
+                        nombreColor,
+                        precio,
+                        stock,
+                        stockMinimo
+                    });
+                };
+
+                lista.appendChild(li);
+            });
+
+            lista.classList.remove("hidden");
+        }
+
+        function actualizarSubtotal(input) {
+            const fila = input.closest("tr");
+            const precioTexto = fila.children[4].textContent.replace(/[^\d]/g, "");
+            const precio = parseInt(precioTexto, 10);
+            const cantidad = parseInt(input.value, 10) || 1;
+
+            const stockPrenda = parseInt(input.getAttribute("data-stock"));
+            const stockMinimo = parseInt(input.getAttribute("data-minimo"));
+
+            const totalDisponible = stockPrenda - stockMinimo;
+
+            if (cantidad > totalDisponible) {
+                alert("Cantidad excede el stock disponible.");
+                input.value = totalDisponible;
+                return actualizarSubtotal(input);
+            }
+
+            const subtotal = precio * cantidad;
+            fila.querySelector(".subtotal").textContent = ("$" + Intl.NumberFormat("es-CO").format(subtotal));
+
+            actualizarTotal();
+        }
+
+        function formatearMontoYCalcularCambio(input) {
+            let valor = input.value.replace(/[^\d]/g, "");
+
+            if (!valor) {
+                input.value = "";
+                calcularCambio(0);
+                return;
+            }
+
+            const numero = parseInt(valor, 10);
+            input.value = "$" + Intl.NumberFormat("es-CO").format(numero);
+            calcularCambio(numero);
+        }
+
+        function calcularCambio(montoRecibido = null) {
+            const total = parseInt(document.getElementById("totalAPagarFooter").textContent.replace(/[^\d]/g, ""));
+            let recibido = montoRecibido;
+
+            if (recibido === null) {
+                recibido = parseInt(document.getElementById("montoPago").value.replace(/[^\d]/g, "") || "0");
+            }
+
+            const cambio = Math.max(recibido - total, 0);
+            document.getElementById("cambioCalculado").textContent = "$" + Intl.NumberFormat("es-CO").format(cambio);
+
+            actualizarBotonConfirmar();
+        }
+
+        function renderSugerenciasCliente(clientes) {
+            const lista = document.getElementById("sugerenciasCliente");
+            lista.innerHTML = "";
+
+            if (!clientes || clientes.length === 0) {
+                lista.classList.add("hidden");
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const li = document.createElement("li");
+                li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-800";
+                li.textContent = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
+                li.onclick = () => seleccionarCliente(cliente);
+                lista.appendChild(li);
+            });
+
+            lista.classList.remove("hidden");
+        }
+
+        function seleccionarCliente(cliente) {
+            document.getElementById("cliId").textContent = cliente.idCliente;
+            document.getElementById("cliDocumento").textContent = cliente.numeroidentificacionPersona;
+            document.getElementById("cliNombres").textContent = cliente.nombresPersona;
+            document.getElementById("cliApellidos").textContent = cliente.apellidosPersona;
+            document.getElementById("cliTelefono").textContent = cliente.telefonoPersona;
+            document.getElementById("cliGenero").textContent = cliente.generoPersona === 1 ? "Masculino" : cliente.generoPersona === 0 ? "Femenino" : "Otro";
+            document.getElementById("cliDireccion").textContent = cliente.direccionCliente;
+            document.getElementById("datosCliente").classList.remove("hidden");
+
+            document.getElementById("clienteInput").value = "";
+            document.getElementById("sugerenciasCliente").classList.add("hidden");
+
+            actualizarBotonConfirmar();
+        }
+
+        function agregarPrendaTabla( { codigo, nombreCategoria, nombreSubcategoria, nombreTalla, nombreColor, precio, stock, stockMinimo }) {
+            // Buscar si ya existe un <tr> con ese código
+            const filas = tablaBody.querySelectorAll("tr");
+            for (let fila of filas) {
+                const codigoCelda = fila.children[0].textContent.trim();
+                if (codigoCelda === codigo) {
+                    const inputCantidad = fila.querySelector("input[type='number']");
+                    inputCantidad.value = parseInt(inputCantidad.value) + 1;
+                    actualizarSubtotal(inputCantidad);
+                    return;
                 }
             }
-        </script>
-    </body>
+
+            const tr = document.createElement("tr");
+
+            // Celda 1: Codigo
+            const td1 = document.createElement("td");
+            td1.className = "px-3 py-2 border border-white";
+            td1.appendChild(document.createTextNode(codigo));
+            tr.appendChild(td1);
+
+            // Celda 2: Categoría y Subcategoría
+            const td2 = document.createElement("td");
+            td2.className = "px-3 py-2 border border-white";
+            td2.appendChild(document.createTextNode(nombreCategoria + " - " + nombreSubcategoria));
+            tr.appendChild(td2);
+
+            // Celda 3: Talla
+            const td3 = document.createElement("td");
+            td3.className = "px-3 py-2 border border-white";
+            td3.appendChild(document.createTextNode(nombreTalla));
+            tr.appendChild(td3);
+
+            // Celda 4: Color
+            const td4 = document.createElement("td");
+            td4.className = "px-3 py-2 border border-white";
+            td4.appendChild(document.createTextNode(nombreColor));
+            tr.appendChild(td4);
+
+            // Celda 5: Precio
+            const td5 = document.createElement("td");
+            td5.className = "px-3 py-2 border border-white";
+            td5.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(precio)));
+            tr.appendChild(td5);
+
+            // Celda 6: Input cantidad
+            const td6 = document.createElement("td");
+            td6.className = "px-3 py-2 border border-white items-center text-center";
+            const input = document.createElement("input");
+            input.type = "number";
+            input.value = "1";
+            input.min = "1";
+            input.className = "w-16 px-1 py-0.5 border rounded w-full";
+            input.setAttribute("onchange", "actualizarSubtotal(this)");
+            input.setAttribute("data-stock", stock);
+            input.setAttribute("data-minimo", stockMinimo);
+            td6.appendChild(input);
+            tr.appendChild(td6);
+
+            // Celda 7: Subtotal
+            const td7 = document.createElement("td");
+            td7.className = "px-3 py-2 border border-white subtotal";
+            td7.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(precio)));
+            tr.appendChild(td7);
+
+            // Celda 8: Botón eliminar con ícono
+            const td8 = document.createElement("td");
+            td8.className = "px-3 py-2 border border-white text-center";
+            const btn = document.createElement("button");
+            btn.className = "text-red-600 hover:text-red-500";
+            btn.setAttribute("aria-label", "Eliminar");
+            btn.title = "Eliminar prenda";
+            const icon = document.createElement("i");
+            icon.className = "fas fa-trash";
+            icon.setAttribute("aria-hidden", "true");
+            btn.appendChild(icon);
+            btn.onclick = function () {
+                this.closest('tr').remove();
+                actualizarTotal();
+                actualizarBotonConfirmar();
+            };
+
+            td8.appendChild(btn);
+            tr.appendChild(td8);
+
+            tablaBody.appendChild(tr);
+
+            actualizarTotal();
+            actualizarBotonConfirmar();
+        }
+    </script>
 </html>

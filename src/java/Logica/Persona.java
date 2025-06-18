@@ -1,12 +1,10 @@
 package Logica;
 
-import Interfaces.IPersona;
-
 /**
  *
  * @author Ing. Sebastian Sierra
  */
-public class Persona implements IPersona
+public class Persona
 {
 
     public int idPersona;
@@ -28,31 +26,5 @@ public class Persona implements IPersona
         this.apellidosPersona = apellidosPersona;
         this.telefonoPersona = telefonoPersona;
         this.generoPersona = generoPersona;
-    }
-
-    @Override
-    public boolean crearPresona(String numeroidentificacionPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, boolean generoPersona)
-    {
-        return true;
-    }
-
-    @Override
-    public boolean actualizarPresona(int idPersona, String numeroidentificacionPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, boolean generoPersona)
-    {
-        return true;
-    }
-
-    @Override
-    public boolean eliminarPresona(int idPersona)
-    {
-        return true;
-    }
-
-    @Override
-    public Persona obtenerPresona(int idPersona)
-    {
-        Persona entidad = new Persona();
-
-        return entidad;
     }
 }

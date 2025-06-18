@@ -1,5 +1,6 @@
 package Interfaces;
 
+import Logica.PaginacionResultado;
 import Logica.Persona;
 import Logica.Usuario;
 
@@ -12,13 +13,15 @@ public interface IUsuario
 
     Usuario iniciarSesion(String correo, String contrasenia);
 
-    boolean crearUsuario(Persona persona, String correoUsuario, String contraseniaUsuario, Persona personaUsuario);
+    boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
 
-    boolean cambiarEstado(int idUsuario);
+    boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
 
-    boolean actualizarContrasenia(int idUsuario, String contraseniaUsuario);
+    boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
 
-    boolean eliminarUsuario(int idUsuario);
+    boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva);
 
     Usuario obtenerUsuario(int idUsuario);
+
+    PaginacionResultado<Usuario> obtenerUsuarios(String searchTerm, int numPage, int pageSize);
 }

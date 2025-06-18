@@ -20,11 +20,12 @@ public class Usuario extends Persona implements IUsuario
     public Usuario()
     {
     }
-    
-    public String getCorreoUsuario(){
+
+    public String getCorreoUsuario()
+    {
         return this.correoUsuario;
     }
-    
+
     public Usuario(int idUsuario, String correoUsuario, String contraseniaUsuario, boolean estadoUsuario)
     {
         this.idUsuario = idUsuario;
@@ -52,34 +53,50 @@ public class Usuario extends Persona implements IUsuario
     }
 
     @Override
-    public boolean crearUsuario(Persona persona, String correoUsuario, String contraseniaUsuario, Persona personaUsuario)
+    public boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
     {
-        return true;
+        EUsuario result = new EUsuario();
+
+        return result.insertUsuario(correoUsuario, idRol, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
     }
 
     @Override
-    public boolean cambiarEstado(int idUsuario)
+    public boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
     {
-        return true;
+        EUsuario result = new EUsuario();
+
+        return result.updateUsuario(idUsuario, idRol, estadoUsuario, idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
     }
 
     @Override
-    public boolean actualizarContrasenia(int idUsuario, String contraseniaUsuario)
+    public boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
     {
-        return true;
+        EUsuario result = new EUsuario();
+
+        return result.updatePerfil(idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
     }
 
     @Override
-    public boolean eliminarUsuario(int idUsuario)
+    public boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva)
     {
-        return true;
+        EUsuario result = new EUsuario();
+
+        return result.cambiarContrasenia(idUsuario, contraseniaActual, contraseniaNueva);
     }
 
     @Override
     public Usuario obtenerUsuario(int idUsuario)
     {
-        Usuario entidad = new Usuario();
+        EUsuario result = new EUsuario();
 
-        return entidad;
+        return result.selectUsuarioById(idUsuario);
+    }
+
+    @Override
+    public PaginacionResultado<Usuario> obtenerUsuarios(String searchTerm, int numPage, int pageSize)
+    {
+        EUsuario result = new EUsuario();
+
+        return result.selectUsuariosPorTerminoBusqueda(searchTerm, numPage, pageSize);
     }
 }

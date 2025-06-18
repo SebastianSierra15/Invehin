@@ -1,5 +1,6 @@
 package Logica;
 
+import Entidades.ERol;
 import Interfaces.IRol;
 import java.util.List;
 
@@ -63,5 +64,13 @@ public class Rol implements IRol
         Rol entidad = new Rol();
 
         return entidad;
+    }
+
+    @Override
+    public List<Rol> obtenerRolesEstaticos()
+    {
+        ERol result = new ERol();
+
+        return result.selectRolesEstaticos();
     }
 }

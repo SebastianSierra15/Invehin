@@ -35,8 +35,8 @@
         <meta charset="UTF-8">
         <title>Dashboard - INVEHIN</title>
 
-        <link rel="icon" type="image/x-icon" href="<%= request.getContextPath() %>/favicon.ico">
-        
+        <link rel="icon" type="image/x-icon" href="<%= request.getContextPath()%>/favicon.ico">
+
         <!-- Importar fuente desde Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -47,7 +47,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -78,10 +78,10 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     </head>
 
-    <body class="bg-invehin-background font-sans flex">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden">
         <%@ include file="components/sidebar.jsp" %>
 
-        <main id="main-content" class="flex flex-col w-full max-w-full overflow-x-hidden  px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-4 sm:gap-10">
+        <main id="main-content" class="flex min-h-screen flex-col flex-1 px-4 pt-6 md:p-8 md:pb-0 ml-20 sm:ml-64 transition-all duration-300 gap-4 sm:gap-10">
             <div class="items-center justify-center text-center mx-auto">
                 <h1 class="text-invehin-primary font-bold text-3xl md:text-4xl mb-4  md:mb-12">Bienvenido, <%=sesion.nombresPersona%></h1>
 
@@ -134,5 +134,7 @@
                 </a>
             </section>
         </main>
+
+        <%@ include file="components/footer.jsp" %>
     </body>
 </html>

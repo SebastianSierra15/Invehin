@@ -23,7 +23,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -57,10 +57,10 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     </head>
 
-    <body class="bg-invehin-background font-sans flex">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden">
         <%@ include file="/components/sidebar.jsp" %>
 
-        <main id="main-content" class="flex flex-col min-h-screen w-full max-w-full items-center justify-center overflow-x-hidden px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-2">
+        <main id="main-content" class="flex flex-col min-h-screen flex-1 items-center justify-center px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-2">
             <div class="bg-invehin-backgroundAltLight p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
                 <div class="text-6xl text-invehin-primary mb-4">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -76,5 +76,7 @@
                 </a>
             </div>
         </main>
+                   
+        <%@ include file="/components/footer.jsp" %>
     </body>
 </html>

@@ -66,7 +66,7 @@ public class Venta implements IVenta
     }
 
     @Override
-    public PaginacionResultado<Venta> buscarVentas(String searchTerm, int numPage, int pageSize)
+    public PaginacionResultado<Venta> obtenerVentas(String searchTerm, int numPage, int pageSize)
     {
         EVenta result = new EVenta();
 

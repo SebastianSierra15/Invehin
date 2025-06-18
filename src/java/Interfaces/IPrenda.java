@@ -1,11 +1,7 @@
 package Interfaces;
 
-import Logica.Color;
-import Logica.EstadoPrenda;
 import Logica.PaginacionResultado;
 import Logica.Prenda;
-import Logica.Subcategoria;
-import Logica.Talla;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -26,7 +22,7 @@ public interface IPrenda
 
     int cantidadPrendasVendidas(Timestamp fechaInicio, Timestamp fechaFin);
 
-    PaginacionResultado<Prenda> buscarPrendas(String searchTerm, int numPage, int pageSize);
+    PaginacionResultado<Prenda> obtenerPrendas(String searchTerm, int numPage, int pageSize);
 
     List<Prenda> obtenerReportePrendas(Integer idCategoria, Integer idTalla, boolean stockBajo);
 

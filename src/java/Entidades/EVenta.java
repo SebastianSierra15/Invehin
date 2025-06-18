@@ -189,6 +189,7 @@ public class EVenta
 
                             Cliente cliente = new Cliente(
                                     rs.getInt("cliente_id"),
+                                    rs.getTimestamp("cliente_fecha_registro"),
                                     rs.getString("cliente_direccion"),
                                     rs.getBoolean("cliente_estado"),
                                     rs.getInt("persona_id"),
@@ -316,6 +317,7 @@ public class EVenta
 
                             Cliente cliente = new Cliente(
                                     rs.getInt("cliente_id"),
+                                    rs.getTimestamp("cliente_fecha_registro"),
                                     rs.getString("cliente_direccion"),
                                     rs.getBoolean("cliente_estado"),
                                     rs.getInt("persona_id"),

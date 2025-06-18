@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/D:/Proyectos/INVEHIN/web/Views/proveedores/proveedores.jsp</file>
+            <file>file:/D:/Proyectos/INVEHIN/web/Views/clientes/clientes.jsp</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/servlets/Proveedores.java</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/Logica/Proveedor.java</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/servlets/Clientes.java</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/Entidades/EProveedor.java</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/Entidades/ECliente.java</file>
+            <file>file:/D:/Proyectos/INVEHIN/src/java/Interfaces/IProveedor.java</file>
+        </group>
+    </open-files>
+</project-private>

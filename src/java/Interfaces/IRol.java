@@ -22,4 +22,6 @@ public interface IRol
     boolean eliminarRol(int idRol);
 
     Rol obtenerRol(int idRol);
+
+    List<Rol> obtenerRolesEstaticos();
 }

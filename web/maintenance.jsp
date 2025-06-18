@@ -58,6 +58,7 @@
     </head>
 
     <body class="bg-invehin-background font-sans flex items-center justify-center min-h-screen">
+
         <main class="bg-invehin-backgroundAltLight p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
             <div class="text-6xl text-invehin-primary mb-4">
                 <i class="fas fa-tools"></i>

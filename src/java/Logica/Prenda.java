@@ -76,7 +76,7 @@ public class Prenda implements IPrenda
     }
     
     @Override
-    public PaginacionResultado<Prenda> buscarPrendas(String searchTerm, int numPage, int pageSize)
+    public PaginacionResultado<Prenda> obtenerPrendas(String searchTerm, int numPage, int pageSize)
     {
         EPrenda result = new EPrenda();
         

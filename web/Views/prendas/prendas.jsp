@@ -80,7 +80,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -114,10 +114,10 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     </head>
 
-    <body class="bg-invehin-background font-sans flex" data-totalprendas="<%= totalPrendas%>">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden" data-totalprendas="<%= totalPrendas%>">
         <%@ include file="/components/sidebar.jsp" %>
 
-        <main id="main-content" class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-2">
+        <main id="main-content" class="flex flex-col min-h-screen flex-1 px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-2">
             <h1 class="text-invehin-primary font-bold text-3xl text-center mb-10">Listado de Prendas</h1>
 
             <!-- Filtros -->
@@ -167,7 +167,7 @@
                     <caption class="sr-only">Tabla de prendas</caption>
                     <thead class="bg-invehin-primary text-white">
                         <tr>
-                            <th class="px-3 py-2 border border-white">ID</th>
+                            <th class="px-3 py-2 border border-white">Código</th>
                             <th class="px-3 py-2 border border-white">Categoria</th>
                             <th class="px-3 py-2 border border-white">Subcategoria</th>
                             <th class="px-3 py-2 border border-white">Talla</th>
@@ -276,6 +276,8 @@
             </div>
         </main>
 
+        <%@ include file="/components/footer.jsp" %>
+        
         <!-- Modal agregar prenda -->
         <div id="modalAgregarPrenda" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-xl w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">
@@ -303,7 +305,6 @@
                         <div class="gap-1">
                             <label for="agregarCategoria" class="block font-semibold text-black">Categoría</label>
                             <select id="agregarCategoria" name="categoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione una categoria</option>
                                 <% if (categorias != null && !categorias.isEmpty())
                                     { %>
                                 <% for (Categoria categoria : categorias)
@@ -317,7 +318,6 @@
                         <div class="gap-1">
                             <label for="agregarSubcategoria" class="block font-semibold text-black">Subcategoría</label>
                             <select id="agregarSubcategoria" name="subcategoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" disabled>
-                                <option value="">Seleccione una subcategoría</option>
                                 <% if (categorias != null)
                                     {
                                         for (Categoria categoria : categorias)
@@ -336,7 +336,6 @@
                         <div class="gap-1">
                             <label for="agregarTalla" class="block font-semibold text-black">Talla</label>
                             <select id="agregarTalla" name="talla" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione una talla</option>
                                 <% if (tallas != null && !tallas.isEmpty())
                                     { %>
                                 <% for (Talla talla : tallas)
@@ -350,7 +349,6 @@
                         <div class="gap-1">
                             <label for="agregarColor" class="block font-semibold text-black">Color</label>
                             <select id="agregarColor" name="color" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione un color</option>
                                 <% if (colores != null && !colores.isEmpty())
                                     { %>
                                 <% for (Color color : colores)
@@ -430,7 +428,6 @@
                         <div class="gap-1">
                             <label for="editarCategoria" class="block font-semibold text-black">Categoria</label>
                             <select id="editarCategoria" name="categoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione una categoria</option>
                                 <% if (categorias != null && !categorias.isEmpty())
                                     { %>
                                 <% for (Categoria categoria : categorias)
@@ -446,7 +443,6 @@
                         <div class="gap-1">
                             <label for="editarSubcategoria" class="block font-semibold text-black">Subcategoria</label>
                             <select id="editarSubcategoria" name="subcategoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" disabled>
-                                <option value="">Seleccione una subcategoría</option>
                                 <% if (categorias != null)
                                     {
                                         for (Categoria categoria : categorias)
@@ -466,7 +462,6 @@
                         <div class="gap-1">
                             <label for="editarTalla" class="block font-semibold text-black">Talla</label>
                             <select id="editarTalla" name="talla" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione una talla</option>
                                 <% if (tallas != null && !tallas.isEmpty())
                                     { %>
                                 <% for (Talla talla : tallas)
@@ -482,7 +477,6 @@
                         <div class="gap-1">
                             <label for="editarColor" class="block font-semibold text-black">Color</label>
                             <select id="editarColor" name="color" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione un color</option>
                                 <% if (colores != null && !colores.isEmpty())
                                     { %>
                                 <% for (Color color : colores)
@@ -524,7 +518,6 @@
                         <div class="gap-1">
                             <label for="editarEstado" class="block font-semibold text-black">Estado</label>
                             <select id="editarEstado" name="estado" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="">Seleccione un estado</option>
                                 <% if (estados != null && !estados.isEmpty())
                                     {
                                         for (EstadoPrenda estado : estados)
@@ -860,6 +853,16 @@
             document.getElementById("editarPrecio").value = precio ? parseInt(precio).toLocaleString() : "";
         });
 
+        document.getElementById("formAgregarPrenda").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            datosPrendaNueva = new URLSearchParams(formData);
+
+            document.getElementById("modalConfirmarAgregar").classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        });
+
         document.getElementById("formEditarPrenda").addEventListener("submit", function (e) {
             e.preventDefault();
 
@@ -874,16 +877,6 @@
             };
 
             document.getElementById("modalConfirmarEditar").classList.remove("hidden");
-        });
-
-        document.getElementById("formAgregarPrenda").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-            datosPrendaNueva = new URLSearchParams(formData);
-
-            document.getElementById("modalConfirmarAgregar").classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
         });
 
         function irAPagina(nuevaPagina) {

@@ -11,8 +11,8 @@
         <meta charset="UTF-8" />
         <title>Login | Invehin</title>
 
-        <link rel="icon" type="image/x-icon" href="<%= request.getContextPath() %>/favicon.ico">
-        
+        <link rel="icon" type="image/x-icon" href="<%= request.getContextPath()%>/favicon.ico">
+
         <!-- Importar fuente desde Google Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
@@ -23,7 +23,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -61,6 +61,13 @@
             <h2 class="text-invehin-primary font-semibold mb-8 text-center text-lg sm:text-xl md:text-2xl">Bienvenido a invehin</h2>
 
             <form action="${pageContext.request.contextPath}/Login" method="post" class="w-full">
+                <% if (request.getAttribute("message") != null)
+                    {%>
+                <div class="-mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm text-center">
+                    <%= request.getAttribute("message")%>
+                </div>
+                <% }%>
+
                 <label for="correo" class="text-invehin-primaryLight text-sm mb-1 block font-semibold">Correo electrónico</label>
                 <input id="correo" name="correo" type="email" placeholder="ingresa tu correo electrónico"
                        class="w-full border border-invehin-primaryLight rounded px-2 py-1 mb-4
@@ -70,13 +77,9 @@
                 <input id="contrasenia" name="contrasenia" type="password" placeholder="ingresa tu contraseña"
                        class="w-full border border-invehin-primaryLight rounded px-2 py-1 mb-2
                        focus:outline-none focus:ring-2 focus:ring-invehin-primaryLight bg-invehin-accentLight" required />
-                
-                <div class="mb-10 text-xs text-left">
-                    <a href="#" class="text-blue-700 underline hover:text-blue-900">¿Olvidaste tu contraseña?</a>
-                </div>
 
                 <button type="submit"
-                        class="w-full bg-invehin-primary text-white py-2 rounded font-semibold hover:bg-invehin-primaryLight
+                        class="mt-8 w-full bg-invehin-primary text-white py-2 rounded font-semibold hover:bg-invehin-primaryLight
                         transition-colors duration-300">
                     Iniciar Sesión
                 </button>

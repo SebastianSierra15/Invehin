@@ -18,7 +18,7 @@ public interface IVenta
 
     int totalVentas(Timestamp fechaInicio, Timestamp fechaFin);
 
-    PaginacionResultado<Venta> buscarVentas(String searchTerm, int numPage, int pageSize);
+    PaginacionResultado<Venta> obtenerVentas(String searchTerm, int numPage, int pageSize);
     
     List<Venta> obtenerReporteVentas(Timestamp fechaInicio, Timestamp fechaFin);
 }

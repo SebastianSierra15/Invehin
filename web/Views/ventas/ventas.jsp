@@ -6,7 +6,6 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="Logica.MetodoPago"%>
-<%@page import="Logica.PaginacionResultado"%>
 <%@page import="Logica.Venta"%>
 <%@page import="Logica.Usuario"%>
 <%@page import="com.google.gson.Gson" %>
@@ -77,7 +76,7 @@
                 theme: {
                     extend: {
                         fontFamily: {
-                            sans: ['Poppins', 'sans-serif'],
+                            sans: ['Poppins', 'sans-serif']
                         },
                         colors: {
                             invehin: {
@@ -111,10 +110,10 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     </head>
 
-    <body class="bg-invehin-background font-sans flex" data-totalventas="<%= totalVentas%>">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden" data-totalventas="<%= totalVentas%>">
         <%@ include file="/components/sidebar.jsp" %>
 
-        <main id="main-content" class="flex flex-col min-h-screen w-full max-w-full overflow-x-hidden px-4 py-6 md:p-8 ml-20 sm:ml-64 transition-all duration-300 gap-2">
+        <main id="main-content" class="flex flex-col min-h-screen flex-1 px-4 pt-6 md:p-8 md:pb-0 ml-20 sm:ml-64 transition-all duration-300 gap-2">
             <h1 class="text-invehin-primary font-bold text-3xl text-center mb-10">Listado de Ventas</h1>
 
             <!-- Filtros -->
@@ -123,6 +122,7 @@
                     <div class="flex items-center gap-2 w-full sm:w-auto">
                         <label for="pageSizeSelect" class="text-sm text-invehin-dark font-medium whitespace-nowrap">Mostrar:</label>
                         <select id="pageSizeSelect" class="border border-gray-300 rounded px-2 py-1 shadow-sm text-sm">
+                            <option value="5" <%= pageSize == 5 ? "selected" : ""%>>5</option>
                             <option value="10" <%= pageSize == 10 ? "selected" : ""%>>10</option>
                             <option value="30" <%= pageSize == 30 ? "selected" : ""%>>30</option>
                             <option value="50" <%= pageSize == 50 ? "selected" : ""%>>50</option>
@@ -176,6 +176,7 @@
                             <th class="px-3 py-2 border border-white text-center">Editar</th>
                         </tr>
                     </thead>
+
                     <tbody id="ventasFiltradas" class="bg-pink-100">
                         <%
                             if (ventas != null && !ventas.isEmpty())
@@ -270,6 +271,8 @@
                 </nav>
             </div>
         </main>
+
+        <%@ include file="/components/footer.jsp" %>
 
         <!-- Modal de detalle venta -->
         <div id="modalDetalleVenta" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
@@ -430,6 +433,8 @@
         let pageSize = <%= pageSize%>;
         let totalVentas = <%= totalVentas%>;
         let searchTimeout = null;
+        let datosVentaEditada = null;
+        let timeoutEditarCliente = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             cargarVentas();
@@ -452,32 +457,30 @@
                 currentPage = 1;
                 cargarVentas();
             });
+
+            const fechaInicioInput = document.querySelector('input[name="fechaInicio"]');
+            const fechaFinInput = document.querySelector('input[name="fechaFin"]');
+
+            const hoy = new Date().toISOString().split("T")[0];
+            fechaInicioInput.min = "2020-01-01";
+            fechaInicioInput.max = hoy;
+
+            fechaFinInput.disabled = true;
+
+            fechaInicioInput.addEventListener("change", () => {
+                const inicio = fechaInicioInput.value;
+
+                if (inicio) {
+                    fechaFinInput.disabled = false;
+                    fechaFinInput.min = inicio;
+                    fechaFinInput.max = hoy;
+                    fechaFinInput.value = inicio;
+                } else {
+                    fechaFinInput.disabled = true;
+                    fechaFinInput.value = "";
+                }
+            });
         });
-
-        function cargarVentas() {
-            const searchTerm = document.getElementById("searchInput").value.trim();
-
-            fetch("Ventas?modo=ajax&searchTerm=" + encodeURIComponent(searchTerm) + "&numPage=" + currentPage + "&pageSize=" + pageSize).then(res => res.text()).then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, "text/html");
-
-                const nuevaTabla = doc.querySelector("#ventasFiltradas");
-                const resumen = doc.querySelector("#resumenVentas").textContent;
-                const nuevaPaginacion = doc.querySelector("nav[aria-label='Paginación']");
-
-                document.querySelector("#ventasFiltradas").innerHTML = nuevaTabla.innerHTML;
-                document.querySelector("#resumenVentas").textContent = resumen;
-                document.querySelector("nav[aria-label='Paginación']").innerHTML = nuevaPaginacion.innerHTML;
-
-                // actualizar totalVentas si el servlet lo recalcula
-                totalVentas = parseInt(doc.querySelector("body").dataset.totalventas) || totalVentas;
-            }).catch(err => console.error("Error cargando ventas:", err));
-        }
-
-        function irAPagina(nuevaPagina) {
-            currentPage = nuevaPagina;
-            cargarVentas();
-        }
 
         document.addEventListener("click", function (e) {
             if (e.target.closest(".ver-detalle-btn")) {
@@ -489,47 +492,7 @@
                 } catch (err) {
                     console.error("JSON inválido:", rawJson, err);
                 }
-            }
-        });
-
-        function mostrarModalDetalle(detalles) {
-            const tbody = document.getElementById("detalleVentaBody");
-            tbody.innerHTML = "";
-
-            detalles.forEach(d => {
-                const tr = document.createElement("tr");
-
-                const campos = [
-                    d.prendacodigoDetalleVenta,
-                    d.prendanombreDetalleVenta,
-                    d.prendacolorDetalleVenta,
-                    d.prendatallaDetalleVenta,
-                    "$" + Intl.NumberFormat("es-CO").format(d.prendaprecioDetalleVenta),
-                    d.cantidadDetalleVenta,
-                    "$" + Intl.NumberFormat("es-CO").format(d.subtotalDetalleVenta)
-                ];
-
-                campos.forEach(valor => {
-                    const td = document.createElement("td");
-                    td.className = "px-3 py-2 border border-white";
-                    td.textContent = valor;
-                    tr.appendChild(td);
-                });
-
-                tbody.appendChild(tr);
-            });
-
-            document.getElementById("modalDetalleVenta").classList.remove("hidden");
-            document.body.classList.add("overflow-hidden");
-        }
-
-        function cerrarModalDetalleVenta() {
-            document.getElementById("modalDetalleVenta").classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
-
-        document.addEventListener("click", function (e) {
-            if (e.target.closest(".editar-venta-btn")) {
+            } else if (e.target.closest(".editar-venta-btn")) {
                 const btn = e.target.closest(".editar-venta-btn");
 
                 const id = btn.dataset.id;
@@ -550,84 +513,12 @@
             }
         });
 
-        function cerrarModalEditar() {
-            document.getElementById("modalEditarVenta").classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
-
-        let timeoutEditarCliente = null;
-
-        document.getElementById("editarClienteInput").addEventListener("input", function () {
-            clearTimeout(timeoutEditarCliente);
-            const valor = this.value.trim();
-
-            if (valor.length < 2) {
-                document.getElementById("editarSugerenciasCliente").classList.add("hidden");
-                return;
-            }
-
-            timeoutEditarCliente = setTimeout(() => {
-                fetch("Clientes", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    body: new URLSearchParams({searchTerm: valor})
-                })
-                        .then(res => res.json())
-                        .then(data => renderEditarSugerenciasCliente(data))
-                        .catch(err => console.error("Error al buscar cliente (editar):", err));
-            }, 300);
-        });
-
-        function renderEditarSugerenciasCliente(clientes) {
-            const lista = document.getElementById("editarSugerenciasCliente");
-            lista.innerHTML = "";
-
-            if (!clientes || clientes.length === 0) {
-                lista.classList.add("hidden");
-                return;
-            }
-
-            clientes.forEach(cliente => {
-                const li = document.createElement("li");
-                li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-800";
-                li.textContent = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
-                li.onclick = () => seleccionarEditarCliente(cliente);
-                lista.appendChild(li);
-            });
-
-            lista.classList.remove("hidden");
-        }
-
-        function seleccionarEditarCliente(cliente) {
-            document.getElementById("editarClienteId").value = cliente.idCliente;
-            document.getElementById("editarClienteInput").value = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
-            document.getElementById("editarSugerenciasCliente").classList.add("hidden");
-        }
-
         document.addEventListener("click", function (event) {
             const input = document.getElementById("editarClienteInput");
             const lista = document.getElementById("editarSugerenciasCliente");
             if (!input.contains(event.target) && !lista.contains(event.target)) {
                 lista.classList.add("hidden");
             }
-        });
-
-        let datosVentaEditada = null;
-
-        document.getElementById("formEditarVenta").addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            datosVentaEditada = {
-                idVenta: parseInt(document.getElementById("editarVentaId").value),
-                clienteId: parseInt(document.getElementById("editarClienteId").value),
-                metodoPagoId: parseInt(document.getElementById("editarMetodoPagoId").value),
-                estado: document.getElementById("editarEstadoVenta").value === "true"
-            };
-
-            document.getElementById("modalConfirmarEditar").classList.remove("hidden");
         });
 
         document.getElementById("cancelarConfirmarEditar").addEventListener("click", function () {
@@ -660,34 +551,138 @@
             document.getElementById("modalConfirmarEditar").classList.add("hidden");
         });
 
+        document.getElementById("editarClienteInput").addEventListener("input", function () {
+            clearTimeout(timeoutEditarCliente);
+            const valor = this.value.trim();
+
+            if (valor.length < 2) {
+                document.getElementById("editarSugerenciasCliente").classList.add("hidden");
+                return;
+            }
+
+            timeoutEditarCliente = setTimeout(() => {
+                fetch("Clientes", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: new URLSearchParams({searchTerm: valor})
+                })
+                        .then(res => res.json())
+                        .then(data => renderEditarSugerenciasCliente(data))
+                        .catch(err => console.error("Error al buscar cliente (editar):", err));
+            }, 300);
+        });
+
+        document.getElementById("formEditarVenta").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            datosVentaEditada = {
+                idVenta: parseInt(document.getElementById("editarVentaId").value),
+                clienteId: parseInt(document.getElementById("editarClienteId").value),
+                metodoPagoId: parseInt(document.getElementById("editarMetodoPagoId").value),
+                estado: document.getElementById("editarEstadoVenta").value === "true"
+            };
+
+            document.getElementById("modalConfirmarEditar").classList.remove("hidden");
+        });
+
+        function irAPagina(nuevaPagina) {
+            currentPage = nuevaPagina;
+            cargarVentas();
+        }
+
+        function mostrarModalDetalle(detalles) {
+            const tbody = document.getElementById("detalleVentaBody");
+            tbody.innerHTML = "";
+
+            detalles.forEach(d => {
+                const tr = document.createElement("tr");
+
+                const campos = [
+                    d.prendacodigoDetalleVenta,
+                    d.prendanombreDetalleVenta,
+                    d.prendacolorDetalleVenta,
+                    d.prendatallaDetalleVenta,
+                    "$" + Intl.NumberFormat("es-CO").format(d.prendaprecioDetalleVenta),
+                    d.cantidadDetalleVenta,
+                    "$" + Intl.NumberFormat("es-CO").format(d.subtotalDetalleVenta)
+                ];
+
+                campos.forEach(valor => {
+                    const td = document.createElement("td");
+                    td.className = "px-3 py-2 border border-white";
+                    td.textContent = valor;
+                    tr.appendChild(td);
+                });
+
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById("modalDetalleVenta").classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function renderEditarSugerenciasCliente(clientes) {
+            const lista = document.getElementById("editarSugerenciasCliente");
+            lista.innerHTML = "";
+
+            if (!clientes || clientes.length === 0) {
+                lista.classList.add("hidden");
+                return;
+            }
+
+            clientes.forEach(cliente => {
+                const li = document.createElement("li");
+                li.className = "cursor-pointer px-4 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium text-gray-800";
+                li.textContent = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
+                li.onclick = () => seleccionarEditarCliente(cliente);
+                lista.appendChild(li);
+            });
+
+            lista.classList.remove("hidden");
+        }
+
+        function seleccionarEditarCliente(cliente) {
+            document.getElementById("editarClienteId").value = cliente.idCliente;
+            document.getElementById("editarClienteInput").value = cliente.numeroidentificacionPersona + " - " + cliente.nombresPersona + " " + cliente.apellidosPersona;
+            document.getElementById("editarSugerenciasCliente").classList.add("hidden");
+        }
+
+        function cargarVentas() {
+            const searchTerm = document.getElementById("searchInput").value.trim();
+
+            fetch("Ventas?modo=ajax&searchTerm=" + encodeURIComponent(searchTerm) + "&numPage=" + currentPage + "&pageSize=" + pageSize).then(res => res.text()).then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+
+                const nuevaTabla = doc.querySelector("#ventasFiltradas");
+                const resumen = doc.querySelector("#resumenVentas").textContent;
+                const nuevaPaginacion = doc.querySelector("nav[aria-label='Paginación']");
+
+                document.querySelector("#ventasFiltradas").innerHTML = nuevaTabla.innerHTML;
+                document.querySelector("#resumenVentas").textContent = resumen;
+                document.querySelector("nav[aria-label='Paginación']").innerHTML = nuevaPaginacion.innerHTML;
+
+                // actualizar totalVentas si el servlet lo recalcula
+                totalVentas = parseInt(doc.querySelector("body").dataset.totalventas) || totalVentas;
+            }).catch(err => console.error("Error cargando ventas:", err));
+        }
+
+        function cerrarModalDetalleVenta() {
+            document.getElementById("modalDetalleVenta").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById("modalEditarVenta").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        }
+
         function abrirModalReporte() {
             document.getElementById("modalReporte").classList.remove("hidden");
         }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const fechaInicioInput = document.querySelector('input[name="fechaInicio"]');
-            const fechaFinInput = document.querySelector('input[name="fechaFin"]');
-
-            const hoy = new Date().toISOString().split("T")[0];
-            fechaInicioInput.min = "2020-01-01";
-            fechaInicioInput.max = hoy;
-
-            fechaFinInput.disabled = true;
-
-            fechaInicioInput.addEventListener("change", () => {
-                const inicio = fechaInicioInput.value;
-
-                if (inicio) {
-                    fechaFinInput.disabled = false;
-                    fechaFinInput.min = inicio;
-                    fechaFinInput.max = hoy;
-                    fechaFinInput.value = inicio;
-                } else {
-                    fechaFinInput.disabled = true;
-                    fechaFinInput.value = "";
-                }
-            });
-        });
 
         function cerrarModalReporte() {
             document.getElementById("modalReporte").classList.add("hidden");

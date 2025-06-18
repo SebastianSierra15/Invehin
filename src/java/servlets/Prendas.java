@@ -49,7 +49,7 @@ public class Prendas extends HttpServlet
 
             // Obtener prendas
             IPrenda servicioPrenda = new Prenda();
-            PaginacionResultado<Prenda> prendas = servicioPrenda.buscarPrendas(searchTerm, numPage, pageSize);
+            PaginacionResultado<Prenda> prendas = servicioPrenda.obtenerPrendas(searchTerm, numPage, pageSize);
 
             // Solo en la carga inicial se obtienen los datos estáticos necesarios para la vista
             if (!esAjax)

@@ -1,5 +1,6 @@
 package Logica;
 
+import Entidades.EProveedor;
 import Interfaces.IProveedor;
 
 /**
@@ -9,29 +10,29 @@ import Interfaces.IProveedor;
 public class Proveedor extends Persona implements IProveedor
 {
 
-    public int indProveedor;
+    public int idProveedor;
     public String nombreProveedor;
-    protected String direccionProveedor;
-    protected String correoProveedor;
+    public String direccionProveedor;
+    public String correoProveedor;
     public boolean estadoProveedor;
 
     public Proveedor()
     {
     }
 
-    public Proveedor(int indProveedor, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor)
+    public Proveedor(int idProveedor, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor)
     {
-        this.indProveedor = indProveedor;
+        this.idProveedor = idProveedor;
         this.nombreProveedor = nombreProveedor;
         this.direccionProveedor = direccionProveedor;
         this.correoProveedor = correoProveedor;
         this.estadoProveedor = estadoProveedor;
     }
 
-    public Proveedor(int indProveedor, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor, int idPersona, String numeroIdentificacionPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, boolean generoPersona)
+    public Proveedor(int idProveedor, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor, int idPersona, String numeroIdentificacionPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, boolean generoPersona)
     {
         super(idPersona, numeroIdentificacionPersona, nombresPersona, apellidosPersona, telefonoPersona, generoPersona);
-        this.indProveedor = indProveedor;
+        this.idProveedor = idProveedor;
         this.nombreProveedor = nombreProveedor;
         this.direccionProveedor = direccionProveedor;
         this.correoProveedor = correoProveedor;
@@ -39,9 +40,11 @@ public class Proveedor extends Persona implements IProveedor
     }
 
     @Override
-    public boolean crearProveedor(Persona persona, String nombreProveedor, String direccionProveedor, String correoProveedor, boolean estadoProveedor)
+    public boolean crearProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona)
     {
-        return true;
+        EProveedor result = new EProveedor();
+        
+        return result.insertProveedor(nombreProveedor, correoProveedor, direccionProveedor, nombresPersona, apellidosPersona, telefonoPersona);
     }
 
     @Override
@@ -62,5 +65,13 @@ public class Proveedor extends Persona implements IProveedor
         Proveedor entidad = new Proveedor();
 
         return entidad;
+    }
+
+    @Override
+    public PaginacionResultado<Proveedor> obtenerProveedores(String searchTerm, int numPage, int pageSize)
+    {
+        EProveedor result = new EProveedor();
+
+        return result.selectProveedoresPorTerminoBusqueda(searchTerm, numPage, pageSize);
     }
 }

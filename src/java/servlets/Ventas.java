@@ -43,7 +43,7 @@ public class Ventas extends HttpServlet
 
             // Obtener ventas
             IVenta servicioVenta = new Venta();
-            PaginacionResultado<Venta> ventas = servicioVenta.buscarVentas(searchTerm, numPage, pageSize);
+            PaginacionResultado<Venta> ventas = servicioVenta.obtenerVentas(searchTerm, numPage, pageSize);
 
             // Solo en la carga inicial se obtienen los datos estáticos necesarios para la vista
             if (!esAjax)
