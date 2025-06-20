@@ -1,8 +1,5 @@
 package Interfaces;
 
-import Logica.Categoria;
-import Logica.Subcategoria;
-
 /**
  *
  * @author Ing. Sebastian Sierra
@@ -10,11 +7,9 @@ import Logica.Subcategoria;
 public interface ISubcategoria
 {
 
-    boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int stockMinimoSubcategoria, int stockSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria);
+    boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int idCategoria);
 
-    boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int stockMinimoSubcategoria, int stockSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria);
+    boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int idCategoria);
 
-    boolean eliminarSubcategoria(int idSubcategoria);
-
-    Subcategoria obtenerSubcategoria(int idSubcategoria);
+    boolean cambiarEstadoSubcategoria(int idSubcategoria, boolean estadoSubcategoria);
 }

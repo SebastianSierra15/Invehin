@@ -1,6 +1,8 @@
 package Logica;
 
+import Entidades.EPermiso;
 import Interfaces.IPermiso;
+import java.util.List;
 
 /**
  *
@@ -46,5 +48,13 @@ public class Permiso implements IPermiso
         Permiso entidad = new Permiso();
 
         return entidad;
+    }
+
+    @Override
+    public List<Permiso> obtenerPermisos()
+    {
+        EPermiso result = new EPermiso();
+        
+        return result.selectPermisos();
     }
 }

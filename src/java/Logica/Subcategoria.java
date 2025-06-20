@@ -1,5 +1,6 @@
 package Logica;
 
+import Entidades.ESubcategoria;
 import Interfaces.ISubcategoria;
 
 /**
@@ -31,28 +32,26 @@ public class Subcategoria implements ISubcategoria
     }
 
     @Override
-    public boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int stockMinimoSubcategoria, int stockSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria)
+    public boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int idCategoria)
     {
-        return true;
+        ESubcategoria result = new ESubcategoria();
+
+        return result.insertSubcategoria(nombreSubcategoria, precioSubcategoria, idCategoria);
     }
 
     @Override
-    public boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int stockMinimoSubcategoria, int stockSubcategoria, String imagenSubcategoria, boolean estadoSubcategoria, Categoria categoriaSubcategoria)
+    public boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int idCategoria)
     {
-        return true;
+        ESubcategoria result = new ESubcategoria();
+
+        return result.updateSubcategoria(idSubcategoria, nombreSubcategoria, precioSubcategoria, idCategoria);
     }
 
     @Override
-    public boolean eliminarSubcategoria(int idSubcategoria)
+    public boolean cambiarEstadoSubcategoria(int idSubcategoria, boolean estadoSubcategoria)
     {
-        return true;
-    }
+        ESubcategoria result = new ESubcategoria();
 
-    @Override
-    public Subcategoria obtenerSubcategoria(int idSubcategoria)
-    {
-        Subcategoria entidad = new Subcategoria();
-
-        return entidad;
+        return result.cambiarEstadoSubcategoria(idSubcategoria, estadoSubcategoria);
     }
 }

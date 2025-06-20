@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.Permiso;
+import java.util.List;
 
 /**
  *
@@ -16,4 +17,6 @@ public interface IPermiso
     boolean eliminarPermiso(int idPermiso);
 
     Permiso obtenerPermiso(int idPermiso);
+    
+    List<Permiso> obtenerPermisos();
 }

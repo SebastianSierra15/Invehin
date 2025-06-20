@@ -167,7 +167,7 @@
                         </ul>
                     </div>
 
-                    <button onclick="abrirModalCliente()" 
+                    <button onclick="abrirModalAgregar()" 
                             class="bg-invehin-primaryLight text-white font-medium px-4 py-2 rounded shadow hover:bg-invehin-primary transition whitespace-nowrap">
                         <i class="fas fa-user-plus mr-2"></i>Agregar Cliente
                     </button>
@@ -198,7 +198,7 @@
                 </div>
             </section>
 
-            <section class="mt-auto flex flex-col sm:flex-row justify-between items-end gap-2 sm:gap-4 pt-4 px-6 border-t z-10 pt-2">
+            <section class="mt-auto flex flex-col sm:flex-row justify-between items-end gap-2 sm:gap-4 pt-4 px-6 pb-2 border-t z-10 pt-2">
                 <button id="btnVolver"
                         onclick="volverAlPanelPrendas()"
                         class="hidden order-2 sm:order-none text-invehin-primary border border-invehin-primary px-4 py-2 rounded shadow hover:bg-invehin-accentLight transition">
@@ -220,6 +220,74 @@
         </main>
 
         <%@ include file="/components/footer.jsp" %>
+        
+        <!-- Modal agregar cliente -->
+        <div id="modalAgregarCliente" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+            <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-xl w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">
+                <!-- Header -->
+                <div class="bg-invehin-primary text-white px-4 py-3 flex items-center justify-between ">
+                    <h2 class="text-lg font-bold">Agregar Cliente</h2>
+                    <button onclick="cerrarModalAgregar()" class="text-gray-200 hover:text-gray-100 text-lg">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <!-- Contenido -->
+                <form id="formAgregarCliente" action="Clientes" method="POST" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
+                    <div class="grid sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-4">
+                        <div class="gap-1">
+                            <label for="agregarNombres" class="block font-semibold text-black">Nombres</label>
+                            <input id="agregarNombres" name="nombres" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="Nombres" required />
+                        </div>
+
+                        <div class="gap-1">
+                            <label for="agregarApellidos" class="block font-semibold text-black">Apellidos</label>
+                            <input id="agregarApellidos" name="apellidos" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="Apellidos" required />
+                        </div>
+
+                        <div class="gap-1">
+                            <label for="agregarIdentificacion" class="block font-semibold text-black">Número de identificación</label>
+                            <input id="agregarIdentificacion" name="identificacion" type="number" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="Número de identificación" required />
+                        </div>
+
+                        <div class="gap-1">
+                            <label for="agregarTelefono" class="block font-semibold text-black">Teléfono</label>
+                            <input id="agregarTelefono" name="telefono" type="text" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="+57 312 345 6789" required />
+                        </div>
+
+                        <div class="gap-1">
+                            <label for="agregarDireccion" class="block font-semibold text-black">Dirección</label>
+                            <input id="agregarDireccion" name="direccion" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="Cra 1C bis..." required />
+                        </div>
+
+                        <div class="gap-1">
+                            <label for="agregarGenero" class="block font-semibold text-black">Género</label>
+                            <select id="agregarGenero" name="genero" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
+                                <option value="true">Masculino</option>
+                                <option value="false">Femenino</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-3 border-t border-gray-400 mx-[-1rem] px-4 mt-1">
+                        <button type="button" onclick="cerrarModalAgregar()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancelar</button>
+                        <button type="submit" id="btnAgregarCliente" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Agregar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal confirmación agregar cliente -->
+        <div id="modalConfirmarAgregar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+            <div class="bg-white border border-black rounded-lg shadow-lg max-w-md w-11/12 p-6 text-center">
+                <h2 class="text-invehin-primary text-lg font-bold mb-4">Confirmar registro</h2>
+                <p class="mb-6 text-sm text-gray-700">¿Estás seguro de que deseas agregar el cliente?</p>
+                <div class="flex justify-center gap-4">
+                    <button id="cancelarConfirmarAgregar" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 text-sm">Cancelar</button>
+                    <button id="confirmarAgregarCliente" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Confirmar</button>
+                </div>
+            </div>
+        </div>
     </body>
 
     <script>
@@ -228,6 +296,7 @@
         const input = document.getElementById('searchInput');
         const lista = document.getElementById('sugerencias');
         const tablaBody = document.getElementById("prendasSeleccionadas");
+        let datosClienteNuevo = null;
 
         document.addEventListener("click", function (event) {
             const input = document.getElementById("searchInput");
@@ -244,6 +313,37 @@
             if (!input.contains(event.target) && !lista.contains(event.target)) {
                 lista.classList.add("hidden");
             }
+        });
+
+        document.getElementById("cancelarConfirmarAgregar").addEventListener("click", function () {
+            document.getElementById("modalConfirmarAgregar").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+        });
+
+        document.getElementById("confirmarAgregarCliente").addEventListener("click", function () {
+            fetch("${pageContext.request.contextPath}/Clientes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: datosClienteNuevo.toString()
+            })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.exito) {
+                            alert(data.mensaje);
+                            cerrarModalAgregar();
+                        } else {
+                            alert("Error: " + data.mensaje);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error al registrar cliente", error);
+                        alert("Ocurrió un error inesperado.");
+                    });
+
+            document.getElementById("modalConfirmarAgregar").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
         });
 
         input.addEventListener('input', function () {
@@ -287,6 +387,16 @@
                         .then(data => renderSugerenciasCliente(data))
                         .catch(err => console.error("Error al buscar cliente:", err));
             }, 300);
+        });
+
+        document.getElementById("formAgregarCliente").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            datosClienteNuevo = new URLSearchParams(formData);
+
+            document.getElementById("modalConfirmarAgregar").classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
         });
 
         function actualizarTotal() {
@@ -419,6 +529,16 @@
                 btn.innerHTML = '<i class="fas fa-cart-plus mr-2"></i> Confirmar Prendas';
                 btn.disabled = tablaBody.children.length === 0;
             }
+        }
+
+        function abrirModalAgregar() {
+            document.getElementById("modalAgregarCliente").classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+
+        function cerrarModalAgregar() {
+            document.getElementById("modalAgregarCliente").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
         }
 
         function fetchPrendas(searchTerm) {

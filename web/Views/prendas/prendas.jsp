@@ -195,7 +195,8 @@
                             <td class="px-3 py-2 border border-white"><%= prenda.tallaPrenda.nombreTalla%></td>
                             <td class="px-3 py-2 border border-white"><%= prenda.colorPrenda.nombreColor%></td>
                             <td class="px-3 py-2 border border-white">$<%= String.format("%,d", prenda.subcategoriaPrenda.precioSubcategoria)%></td>
-                            <td class="px-3 py-2 border border-white"><%= prenda.stockPrenda%></td>
+                            <td class="px-3 py-2 border border-white
+                                <%= prenda.stockPrenda < prenda.stockminimoPrenda ? "bg-red-200" : (prenda.stockPrenda == prenda.stockminimoPrenda ? "bg-yellow-200" : "")%>"><%= prenda.stockPrenda%></td>
                             <td class="px-3 py-2 border border-white"><%= prenda.stockminimoPrenda%></td>
                             <td class="px-3 py-2 border border-white"><%= prenda.estadoprendaPrenda.nombreEstadoPrenda%></td>
                             <td class="px-3 py-2 border border-white text-center">
@@ -277,7 +278,7 @@
         </main>
 
         <%@ include file="/components/footer.jsp" %>
-        
+
         <!-- Modal agregar prenda -->
         <div id="modalAgregarPrenda" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-xl w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">

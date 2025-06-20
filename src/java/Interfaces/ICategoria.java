@@ -1,6 +1,7 @@
 package Interfaces;
 
 import Logica.Categoria;
+import Logica.PaginacionResultado;
 import java.util.List;
 
 /**
@@ -14,9 +15,9 @@ public interface ICategoria
 
     boolean actualizarCategoria(int idCategoria, String nombreCategoria);
 
-    boolean eliminarCategoria(int idCategoria);
+    boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria);
 
-    Categoria obtenerCategoria(int Categoria);
-    
+    PaginacionResultado<Categoria> obtenerCategorias(String searchTerm, int numPage, int pageSize);
+
     List<Categoria> obtenerCategorias();
 }

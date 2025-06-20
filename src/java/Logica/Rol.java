@@ -29,45 +29,38 @@ public class Rol implements IRol
     }
 
     @Override
-    public boolean crearRol(String nombreRol, boolean estadoRol, List<Permiso> permisosRol)
+    public boolean crearRol(String nombreRol, String permisosRolJson)
     {
-        return true;
+        ERol result = new ERol();
+        
+        return result.insertRol(nombreRol, permisosRolJson);
     }
 
     @Override
-    public boolean actualizarRol(int idRol, String nombreRol, boolean estadoRol, List<Permiso> permisosRol)
+    public boolean actualizarRol(int idRol, String nombreRol, String permisosRolJson)
     {
-        return true;
-    }
-
-    @Override
-    public boolean agregarPermiso(int idRol, Permiso permiso)
-    {
-        return true;
-    }
-
-    @Override
-    public boolean quitarPermiso(int IdRol, Permiso permiso)
-    {
-        return true;
+        ERol result = new ERol();
+        
+        return result.updateRol(idRol, nombreRol, permisosRolJson);
     }
 
     @Override
     public boolean eliminarRol(int idRol)
     {
-        return true;
+        ERol result = new ERol();
+        return result.deleteRol(idRol);
     }
 
     @Override
-    public Rol obtenerRol(int idRol)
+    public PaginacionResultado<Rol> obtenerRoles(String searchTerm, int numPage, int pageSize)
     {
-        Rol entidad = new Rol();
+        ERol result = new ERol();
 
-        return entidad;
+        return result.selectRolesPorTerminoBusqueda(searchTerm, numPage, pageSize);
     }
 
     @Override
-    public List<Rol> obtenerRolesEstaticos()
+    public List<Rol> obtenerRoles()
     {
         ERol result = new ERol();
 

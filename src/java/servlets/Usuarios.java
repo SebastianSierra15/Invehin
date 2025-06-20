@@ -48,7 +48,7 @@ public class Usuarios extends HttpServlet
             if (!esAjax)
             {
                 IRol servicioRol = new Rol();
-                List<Rol> roles = servicioRol.obtenerRolesEstaticos();
+                List<Rol> roles = servicioRol.obtenerRoles();
                 request.setAttribute("roles", roles);
             }
 

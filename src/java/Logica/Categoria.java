@@ -13,50 +13,58 @@ public class Categoria implements ICategoria
 
     public int idCategoria;
     public String nombreCategoria;
+    public boolean estadoCategoria;
     public List<Subcategoria> subcategoriasCategoria;
 
     public Categoria()
     {
     }
 
-    public Categoria(int idCategoria, String nombreCategoria, List<Subcategoria> subcategoriasCategoria)
+    public Categoria(int idCategoria, String nombreCategoria, boolean estadoCategoria, List<Subcategoria> subcategoriasCategoria)
     {
         this.idCategoria = idCategoria;
         this.nombreCategoria = nombreCategoria;
+        this.estadoCategoria = estadoCategoria;
         this.subcategoriasCategoria = subcategoriasCategoria;
     }
 
     @Override
     public boolean crearCategoria(String nombreCategoria)
     {
-        return true;
+        ECategoria result = new ECategoria();
+
+        return result.insertCategoria(nombreCategoria);
     }
 
     @Override
     public boolean actualizarCategoria(int idCategoria, String nombreCategoria)
     {
-        return true;
+        ECategoria result = new ECategoria();
+
+        return result.updateCategoria(idCategoria, nombreCategoria);
     }
 
     @Override
-    public boolean eliminarCategoria(int idCategoria)
+    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria)
     {
-        return true;
+        ECategoria result = new ECategoria();
+
+        return result.cambiarEstadoCategoria(idCategoria, estadoCategoria);
     }
 
     @Override
-    public Categoria obtenerCategoria(int Categoria)
+    public PaginacionResultado<Categoria> obtenerCategorias(String searchTerm, int numPage, int pageSize)
     {
-        Categoria entidad = new Categoria();
+        ECategoria result = new ECategoria();
 
-        return entidad;
+        return result.selectCategoriasPorTerminoBusqueda(searchTerm, numPage, pageSize);
     }
 
     @Override
     public List<Categoria> obtenerCategorias()
     {
         ECategoria result = new ECategoria();
-        
+
         return result.selectCategorias();
     }
 }

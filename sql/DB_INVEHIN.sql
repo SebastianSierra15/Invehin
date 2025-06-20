@@ -115,6 +115,50 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Volcando estructura para procedimiento db_invehin.cambiar_estado_categoria
+DELIMITER //
+CREATE PROCEDURE `cambiar_estado_categoria`(
+	IN `id` INT,
+	IN `estado` TINYINT
+)
+BEGIN
+
+	START TRANSACTION;
+	
+	UPDATE
+		categoria c
+	SET
+		c.estado_categoria = estado
+	WHERE
+		c.id_categoria = id;
+	
+	COMMIT;
+
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.cambiar_estado_subcategoria
+DELIMITER //
+CREATE PROCEDURE `cambiar_estado_subcategoria`(
+	IN `id` INT,
+	IN `estado` TINYINT
+)
+BEGIN
+
+	START TRANSACTION;
+	
+	UPDATE
+		subcategoria s
+	SET
+		s.estado_subcategoria = estado
+	WHERE
+		s.id_subcategoria = id;
+	
+	COMMIT;
+
+END//
+DELIMITER ;
+
 -- Volcando estructura para función db_invehin.cantidad_prendas_bajo_stock
 DELIMITER //
 CREATE FUNCTION `cantidad_prendas_bajo_stock`() RETURNS int
@@ -163,20 +207,22 @@ DELIMITER ;
 CREATE TABLE IF NOT EXISTS `categoria` (
   `id_categoria` int NOT NULL AUTO_INCREMENT,
   `nombre_categoria` varchar(50) NOT NULL,
+  `estado_categoria` tinyint NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.categoria: ~9 rows (aproximadamente)
-INSERT INTO `categoria` (`id_categoria`, `nombre_categoria`) VALUES
-	(1, 'Blusa'),
-	(2, 'Pantalon'),
-	(3, 'Falda'),
-	(4, 'Vestido'),
-	(5, 'Camisa'),
-	(6, 'Short'),
-	(7, 'Abrigo'),
-	(8, 'Suéter'),
-	(9, 'Chaqueta');
+INSERT INTO `categoria` (`id_categoria`, `nombre_categoria`, `estado_categoria`) VALUES
+	(1, 'Blusa', 1),
+	(2, 'Pantalon', 1),
+	(3, 'Falda', 1),
+	(4, 'Vestido', 1),
+	(5, 'Camisa', 1),
+	(6, 'Short', 1),
+	(7, 'Abrigo', 0),
+	(8, 'Suéter', 1),
+	(9, 'Chaqueta', 1),
+	(10, 'Sombreroooooo', 0);
 
 -- Volcando estructura para tabla db_invehin.cliente
 CREATE TABLE IF NOT EXISTS `cliente` (
@@ -188,7 +234,7 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   PRIMARY KEY (`id_cliente`),
   KEY `fk_cliente_persona_idx` (`fk_id_persona`),
   CONSTRAINT `fk_cliente_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.cliente: ~8 rows (aproximadamente)
 INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente`, `estado_cliente`, `fk_id_persona`) VALUES
@@ -199,7 +245,9 @@ INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente
 	(5, 'Cra 5 #50-50', '2025-05-23 18:25:00', 1, 13),
 	(6, 'Cra 6 #60-60', '2025-05-03 13:30:15', 1, 14),
 	(7, 'Cra 7 #70-70', '2025-05-02 21:44:54', 1, 15),
-	(8, 'las avenidas', '2025-06-15 21:49:44', 0, 18);
+	(8, 'las avenidas', '2025-06-15 21:49:44', 0, 18),
+	(9, 'Los angeles', '2025-06-20 22:16:38', 1, 21),
+	(10, 'California', '2025-06-20 22:22:10', 1, 22);
 
 -- Volcando estructura para tabla db_invehin.color
 CREATE TABLE IF NOT EXISTS `color` (
@@ -225,26 +273,6 @@ INSERT INTO `color` (`id_color`, `nombre_color`) VALUES
 	(13, 'Coral'),
 	(14, 'Naranja'),
 	(15, 'Amarillo');
-
--- Volcando estructura para procedimiento db_invehin.delete_categoria
-DELIMITER //
-CREATE PROCEDURE `delete_categoria`(
-	IN `id` INT
-)
-BEGIN
-
-	START TRANSACTION;
-	
-	DELETE
-	FROM
-		categoria c
-	WHERE
-		c.id_categoria = id;
-	
-	COMMIT;
-
-END//
-DELIMITER ;
 
 -- Volcando estructura para procedimiento db_invehin.delete_color
 DELIMITER //
@@ -415,31 +443,17 @@ BEGIN
 
 	START TRANSACTION;
 	
+	UPDATE
+		usuario u
+		SET u.fk_id_rol = 2
+	WHERE
+		u.fk_id_rol = id;
+
 	DELETE
 	FROM
 		rol r
 	WHERE
 		r.id_rol = id;
-	
-	COMMIT;
-
-END//
-DELIMITER ;
-
--- Volcando estructura para procedimiento db_invehin.delete_subcategoria
-DELIMITER //
-CREATE PROCEDURE `delete_subcategoria`(
-	IN `id` INT
-)
-BEGIN
-
-	START TRANSACTION;
-	
-	DELETE
-	FROM
-		subcategoria s
-	WHERE
-		s.id_subcategoria = id;
 	
 	COMMIT;
 
@@ -661,7 +675,7 @@ CREATE TABLE IF NOT EXISTS `detalleventa` (
   KEY `fk_prendaventa_venta_idx` (`fk_id_venta`),
   CONSTRAINT `fk_prendaventa_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE,
   CONSTRAINT `fk_prendaventa_venta` FOREIGN KEY (`fk_id_venta`) REFERENCES `venta` (`id_venta`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detalleventa: ~32 rows (aproximadamente)
 INSERT INTO `detalleventa` (`id_detalleventa`, `cantidad_detalleventa`, `fk_codigo_prenda`, `fk_id_venta`) VALUES
@@ -702,7 +716,8 @@ INSERT INTO `detalleventa` (`id_detalleventa`, `cantidad_detalleventa`, `fk_codi
 	(35, 1, 'PR002', 23),
 	(36, 1, 'PR005', 25),
 	(37, 2, 'PR007', 26),
-	(38, 1, 'PR002', 27);
+	(38, 1, 'PR002', 27),
+	(39, 2, 'CM001', 28);
 
 -- Volcando estructura para tabla db_invehin.estadoprenda
 CREATE TABLE IF NOT EXISTS `estadoprenda` (
@@ -1149,8 +1164,8 @@ BEGIN
 			permisorol.fk_id_rol,
 			permisorol.fk_id_permiso
 		) VALUES (
-			permiso_id,
-			rol_id
+			rol_id,
+			permiso_id
 		);
 		
 		SET i = i + 1;
@@ -1166,7 +1181,6 @@ DELIMITER //
 CREATE PROCEDURE `insert_subcategoria`(
 	IN `nombre` VARCHAR(50),
 	IN `precio` INT,
-	IN `imagen` VARCHAR(500),
 	IN `categoria_id` INT
 )
 BEGIN
@@ -1176,12 +1190,10 @@ BEGIN
 	INSERT INTO subcategoria (
 		subcategoria.nombre_subcategoria,
 		subcategoria.precio_subcategoria,
-		subcategoria.imagen_subcategoria,
 		subcategoria.fk_id_categoria
 	) VALUES (
 		nombre,
 		precio,
-		imagen,
 		categoria_id
 	);
 	
@@ -1434,10 +1446,7 @@ INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`) VALUES
 	(8, 'Gestionar prendas'),
 	(9, 'Gestionar pedidos'),
 	(10, 'Gestionar proveedores'),
-	(11, 'Gestionar inventario'),
-	(12, 'Configurar marca'),
-	(13, 'Ver reportes'),
-	(14, 'Gestionar promociones');
+	(11, 'Gestionar inventario');
 
 -- Volcando estructura para tabla db_invehin.permisorol
 CREATE TABLE IF NOT EXISTS `permisorol` (
@@ -1450,9 +1459,9 @@ CREATE TABLE IF NOT EXISTS `permisorol` (
   KEY `fk_permisorol_rol_idx` (`fk_id_rol`),
   CONSTRAINT `fk_permisorol_permiso` FOREIGN KEY (`fk_id_permiso`) REFERENCES `permiso` (`id_permiso`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_permisorol_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.permisorol: ~18 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.permisorol: ~27 rows (aproximadamente)
 INSERT INTO `permisorol` (`id_permisorol`, `estado_permisorol`, `fk_id_permiso`, `fk_id_rol`) VALUES
 	(1, 1, 1, 1),
 	(2, 1, 2, 1),
@@ -1465,13 +1474,18 @@ INSERT INTO `permisorol` (`id_permisorol`, `estado_permisorol`, `fk_id_permiso`,
 	(9, 1, 9, 1),
 	(10, 1, 10, 1),
 	(11, 1, 11, 1),
-	(12, 1, 12, 1),
-	(13, 1, 13, 1),
-	(14, 1, 4, 3),
-	(15, 1, 6, 3),
-	(16, 1, 7, 3),
-	(17, 1, 13, 4),
-	(18, 1, 14, 1);
+	(14, 1, 4, 4),
+	(15, 1, 6, 4),
+	(16, 1, 7, 4),
+	(37, 1, 1, 3),
+	(38, 1, 4, 3),
+	(39, 1, 11, 3),
+	(40, 1, 9, 3),
+	(41, 1, 8, 3),
+	(42, 1, 2, 3),
+	(43, 1, 7, 3),
+	(44, 1, 6, 3),
+	(45, 1, 7, 5);
 
 -- Volcando estructura para tabla db_invehin.persona
 CREATE TABLE IF NOT EXISTS `persona` (
@@ -1483,7 +1497,7 @@ CREATE TABLE IF NOT EXISTS `persona` (
   `genero_persona` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_persona`),
   UNIQUE KEY `id_persona_UNIQUE` (`id_persona`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.persona: ~19 rows (aproximadamente)
 INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `numeroidentificacion_persona`, `telefono_persona`, `genero_persona`) VALUES
@@ -1505,7 +1519,9 @@ INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `nu
 	(17, 'Sebastian', 'Sierra', '1006506525', '3112929178', 1),
 	(18, 'Elias', 'Sierra', '1006506524', '3152919218', 1),
 	(19, 'Fernanda', 'Vargas', '1002603659', '3152926356', 0),
-	(20, 'Sebastian', 'Sierra Perdomo', NULL, '3112929178', NULL);
+	(20, 'Sebastian', 'Sierra Perdomo', NULL, '3112929178', NULL),
+	(21, 'Fabian', 'Garcia', '12131515', '312569486', 1),
+	(22, 'Fabian', 'Castro', '15555255', '3254805555', 1);
 
 -- Volcando estructura para tabla db_invehin.prenda
 CREATE TABLE IF NOT EXISTS `prenda` (
@@ -1531,7 +1547,7 @@ CREATE TABLE IF NOT EXISTS `prenda` (
 -- Volcando datos para la tabla db_invehin.prenda: ~14 rows (aproximadamente)
 INSERT INTO `prenda` (`codigo_prenda`, `stock_prenda`, `stockminimo_prenda`, `fk_id_color`, `fk_id_estadoprenda`, `fk_id_subcategoria`, `fk_id_talla`) VALUES
 	('1', 1, 1, 7, 3, 17, 1),
-	('CM001', 32, 7, 8, 1, 21, 5),
+	('CM001', 30, 7, 8, 1, 21, 5),
 	('FM001', 45, 10, 7, 1, 13, 1),
 	('PR001', 5, 10, 1, 1, 1, 1),
 	('PR002', 105, 10, 2, 1, 2, 2),
@@ -1544,7 +1560,7 @@ INSERT INTO `prenda` (`codigo_prenda`, `stock_prenda`, `stockminimo_prenda`, `fk
 	('PR009', 87, 5, 4, 1, 4, 4),
 	('PR010', 16, 15, 5, 3, 5, 5),
 	('SC001', 10, 5, 4, 1, 36, 3),
-	('SH001', 10, 5, 1, 1, 27, 2);
+	('SH001', 5, 5, 1, 1, 27, 2);
 
 -- Volcando estructura para tabla db_invehin.promocion
 CREATE TABLE IF NOT EXISTS `promocion` (
@@ -1624,7 +1640,9 @@ BEGIN
 	FROM
 		view_prenda vp
 	WHERE
-		vp.estadoprenda_id != 3
+		vp.categoria_estado = 1
+		AND vp.subcategoria_estado = 1
+		AND vp.estadoprenda_id != 3
 		AND (categoria_id IS NULL OR vp.categoria_id = categoria_id)
 		AND (talla_id IS NULL OR vp.talla_id = talla_id)
 		AND (stock_bajo IS NULL OR stock_bajo = 0 OR vp.stock < vp.stock_minimo)
@@ -1703,23 +1721,97 @@ CREATE TABLE IF NOT EXISTS `rol` (
   `nombre_rol` varchar(50) NOT NULL,
   `estado_rol` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.rol: ~4 rows (aproximadamente)
 INSERT INTO `rol` (`id_rol`, `nombre_rol`, `estado_rol`) VALUES
 	(1, 'SuperAdmin', 1),
-	(2, 'Administrador', 1),
-	(3, 'Empleado', 1),
-	(4, 'Contador', 1);
+	(2, 'Invitado', 1),
+	(3, 'Administrador', 1),
+	(4, 'Empleado', 1),
+	(5, 'Contador', 1);
 
 -- Volcando estructura para procedimiento db_invehin.select_categorias
 DELIMITER //
-CREATE PROCEDURE `select_categorias`()
+CREATE PROCEDURE `select_categorias`(
+	IN `search_term` VARCHAR(50),
+	IN `num_page` INT,
+	IN `page_size` INT
+)
+BEGIN
+
+	DECLARE offset_value INT;
+	SET offset_value = (num_page - 1) * page_size;
+	
+	START TRANSACTION;
+	
+	-- tabla temporal de categorias
+	CREATE TEMPORARY TABLE temp_categorias (id INT PRIMARY KEY);
+	INSERT INTO temp_categorias (id)
+	SELECT
+		c.id_categoria AS id
+	FROM
+		categoria c
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR c.nombre_categoria LIKE CONCAT('%', search_term, '%')
+	ORDER BY
+		c.nombre_categoria ASC
+	LIMIT page_size OFFSET offset_value;
+	
+	-- categorias
+	SELECT
+		c.id_categoria AS id,
+		c.nombre_categoria AS nombre,
+		c.estado_categoria AS estado
+	FROM
+		categoria c
+	WHERE
+		c.id_categoria IN (SELECT tc.id FROM temp_categorias tc)
+	ORDER BY
+		c.nombre_categoria ASC;
+	
+	-- total categorias
+	SELECT
+		COUNT(c.id_categoria) AS total_entries
+	FROM
+		categoria c
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR c.nombre_categoria LIKE CONCAT('%', search_term, '%');
+	
+	-- subcategorias
+	SELECT
+		s.id_subcategoria AS id,
+		s.nombre_subcategoria AS nombre,
+		s.precio_subcategoria AS precio,
+		s.imagen_subcategoria AS imagen,
+		s.estado_subcategoria AS estado,
+		s.fk_id_categoria AS categoria_id
+	FROM
+		subcategoria s
+	WHERE
+		s.fk_id_categoria IN (SELECT tc.id FROM temp_categorias tc)
+	ORDER BY
+		s.fk_id_categoria ASC,
+		s.nombre_subcategoria ASC;
+	
+   DROP TEMPORARY TABLE IF EXISTS temp_categorias;
+    
+   COMMIT;
+	
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.select_categorias_estaticas
+DELIMITER //
+CREATE PROCEDURE `select_categorias_estaticas`()
 BEGIN
 
 	SELECT
 		c.id_categoria AS id,
-		c.nombre_categoria AS nombre
+		c.nombre_categoria AS nombre,
+		c.estado_categoria AS estado
 	FROM
 		categoria c
 	ORDER BY
@@ -1736,9 +1828,11 @@ BEGIN
 	FROM
 		subcategoria s
 	INNER JOIN categoria c ON s.fk_id_categoria = c.id_categoria
+	WHERE
+		c.estado_categoria = 1
 	ORDER BY
 		c.nombre_categoria ASC;
-	
+
 END//
 DELIMITER ;
 
@@ -1755,7 +1849,8 @@ BEGIN
 	FROM
 		categoria c
 	WHERE
-		c.id_categoria = id
+		c.estado_categoria = 1
+		AND c.id_categoria = id
 	LIMIT 1;
 	
 END//
@@ -2361,6 +2456,7 @@ BEGIN
 		vp.subcategoria_imagen,
 		vp.categoria_id,
 		vp.categoria_nombre,
+		vp.categoria_estado,
 		vp.promocion_id,
 		vp.promocion_porcentaje,
 		vp.promocion_fechainicio,
@@ -2368,7 +2464,9 @@ BEGIN
 	FROM
 		view_prenda vp
 	WHERE
-		vp.estadoprenda_id = 1
+		vp.categoria_estado = 1
+		AND vp.subcategoria_estado = 1
+		AND vp.estadoprenda_id = 1
 		AND (search_term IS NULL OR search_term = ''
 		OR vp.codigo LIKE CONCAT('%', search_term, '%')
 		OR vp.color_nombre LIKE CONCAT('%', search_term, '%')
@@ -2554,6 +2652,85 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Volcando estructura para procedimiento db_invehin.select_roles
+DELIMITER //
+CREATE PROCEDURE `select_roles`(
+	IN `search_term` VARCHAR(50),
+	IN `num_page` INT,
+	IN `page_size` INT
+)
+BEGIN
+	
+	DECLARE offset_value INT;
+	SET offset_value = (num_page - 1) * page_size;
+	
+	START TRANSACTION;
+	
+	-- tabla temporal de roles
+	CREATE TEMPORARY TABLE temp_roles (id INT PRIMARY KEY);
+	INSERT INTO temp_roles (id)
+	SELECT
+		r.id_rol AS id
+	FROM
+		rol r
+	WHERE
+		r.estado_rol = 1
+		AND r.id_rol != 1
+		AND r.id_rol != 2
+		AND (search_term IS NULL OR search_term = ''
+		OR r.nombre_rol LIKE CONCAT('%', search_term, '%')
+		OR r.id_rol LIKE CONCAT('%', search_term, '%'))
+	ORDER BY
+		r.nombre_rol ASC,
+		r.id_rol ASC
+	LIMIT page_size OFFSET offset_value;
+	
+	-- roles
+	SELECT
+		r.id_rol AS id,
+		r.nombre_rol AS nombre,
+		r.estado_rol AS estado
+	FROM
+		rol r
+	WHERE
+		r.id_rol IN (SELECT tr.id FROM temp_roles tr);
+	
+	-- totalroles
+	SELECT
+		COUNT(r.id_rol) AS total_entries
+	FROM
+		rol r
+	WHERE
+		r.estado_rol = 1
+		AND r.id_rol != 1
+		AND r.id_rol != 2
+		AND (search_term IS NULL OR search_term = ''
+		OR r.nombre_rol LIKE CONCAT('%', search_term, '%')
+		OR r.id_rol LIKE CONCAT('%', search_term, '%'));
+	
+	-- Resultado: permisos por cada rol
+    SELECT
+        pr.fk_id_rol AS rol_id,
+        p.id_permiso AS permiso_id,
+        p.nombre_permiso AS permiso_nombre
+    FROM
+	 	permisorol pr
+    INNER JOIN permiso p ON pr.fk_id_permiso = p.id_permiso
+    WHERE
+	 	pr.estado_permisorol = 1
+      AND pr.fk_id_rol IN (SELECT tr.id FROM temp_roles tr)
+	ORDER BY
+		pr.fk_id_rol ASC,
+		p.nombre_permiso ASC;
+        
+	-- Eliminar la tabla temporal
+    DROP TEMPORARY TABLE IF EXISTS temp_roles;
+    
+    COMMIT;
+    
+END//
+DELIMITER ;
+
 -- Volcando estructura para procedimiento db_invehin.select_roles_estaticos
 DELIMITER //
 CREATE PROCEDURE `select_roles_estaticos`()
@@ -2567,6 +2744,7 @@ BEGIN
 		rol r
 	WHERE
 		r.id_rol != 1
+		AND r.id_rol != 2
 	ORDER BY
 		r.nombre_rol ASC;
 
@@ -2953,7 +3131,7 @@ CREATE TABLE IF NOT EXISTS `subcategoria` (
   `id_subcategoria` int NOT NULL AUTO_INCREMENT,
   `nombre_subcategoria` varchar(50) NOT NULL,
   `precio_subcategoria` int NOT NULL,
-  `imagen_subcategoria` varchar(500) NOT NULL,
+  `imagen_subcategoria` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `estado_subcategoria` tinyint(1) NOT NULL DEFAULT '1',
   `fk_id_categoria` int NOT NULL,
   `fk_id_promocion` int DEFAULT NULL,
@@ -2962,7 +3140,7 @@ CREATE TABLE IF NOT EXISTS `subcategoria` (
   KEY `fk_subcategoria_promocion_idx` (`fk_id_promocion`) USING BTREE,
   CONSTRAINT `fk_subcategoria_categoria` FOREIGN KEY (`fk_id_categoria`) REFERENCES `categoria` (`id_categoria`) ON UPDATE CASCADE,
   CONSTRAINT `fk_subcategoria_promocion` FOREIGN KEY (`fk_id_promocion`) REFERENCES `promocion` (`id_promocion`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.subcategoria: ~45 rows (aproximadamente)
 INSERT INTO `subcategoria` (`id_subcategoria`, `nombre_subcategoria`, `precio_subcategoria`, `imagen_subcategoria`, `estado_subcategoria`, `fk_id_categoria`, `fk_id_promocion`) VALUES
@@ -3010,7 +3188,9 @@ INSERT INTO `subcategoria` (`id_subcategoria`, `nombre_subcategoria`, `precio_su
 	(42, 'Cuero', 85000, 'cuero.jpg', 1, 9, NULL),
 	(43, 'Bomber', 70000, 'bomber.jpg', 1, 9, 5),
 	(44, 'Blazer', 75000, 'blazer.jpg', 1, 9, NULL),
-	(45, 'Parka', 80000, 'parka_chaqueta.jpg', 1, 9, NULL);
+	(45, 'Parka', 80000, 'parka_chaqueta.jpg', 1, 9, NULL),
+	(46, 'Seda', 85000, NULL, 0, 7, NULL),
+	(47, 'Clasico', 60000, NULL, 1, 10, NULL);
 
 -- Volcando estructura para tabla db_invehin.talla
 CREATE TABLE IF NOT EXISTS `talla` (
@@ -3467,10 +3647,7 @@ CREATE PROCEDURE `update_subcategoria`(
 	IN `id` INT,
 	IN `nombre` VARCHAR(50),
 	IN `precio` INT,
-	IN `imagen` VARCHAR(500),
-	IN `estado` TINYINT,
-	IN `categoria_id` INT,
-	IN `promocion_id` INT
+	IN `categoria_id` INT
 )
 BEGIN
 	
@@ -3481,10 +3658,7 @@ BEGIN
 	SET
 		s.nombre_subcategoria = nombre,
 		s.precio_subcategoria = precio,
-		s.imagen_subcategoria = imagen,
-		s.estado_subcategoria = estado,
-		s.fk_id_categoria = categoria_id,
-		s.fk_id_promocion = promocion_id
+		s.fk_id_categoria = categoria_id
 	WHERE
 		s.id_subcategoria = id;
 	
@@ -3580,22 +3754,21 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   `contrasenia_usuario` varchar(255) NOT NULL,
   `estado_usuario` tinyint(1) NOT NULL DEFAULT '1',
   `fk_id_persona` int NOT NULL,
-  `fk_id_rol` int NOT NULL,
+  `fk_id_rol` int NOT NULL DEFAULT '2',
   PRIMARY KEY (`id_usuario`),
   UNIQUE KEY `correo_usuario` (`correo_usuario`),
   KEY `fk_usuario_persona_idx` (`fk_id_persona`),
   KEY `fk_usuario_rol_idx` (`fk_id_rol`),
-  CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE,
-  CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON UPDATE CASCADE
+  CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.usuario: ~5 rows (aproximadamente)
 INSERT INTO `usuario` (`id_usuario`, `correo_usuario`, `contrasenia_usuario`, `estado_usuario`, `fk_id_persona`, `fk_id_rol`) VALUES
 	(1, 'sebsirra13@gmail.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 17, 1),
-	(2, 'empleado@invehin.com', 'hashed_password_2', 1, 7, 3),
-	(3, 'contador@invehin.com', 'hashed_password_4', 1, 8, 4),
+	(2, 'empleado@invehin.com', 'hashed_password_2', 1, 7, 4),
+	(3, 'contador@invehin.com', 'hashed_password_4', 1, 8, 5),
 	(4, 'admin@invehin.com', 'hashed_password_1', 1, 6, 2),
-	(5, 'recepcionista@email.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 0, 19, 3);
+	(5, 'recepcionista@email.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 0, 19, 4);
 
 -- Volcando estructura para tabla db_invehin.venta
 CREATE TABLE IF NOT EXISTS `venta` (
@@ -3613,7 +3786,7 @@ CREATE TABLE IF NOT EXISTS `venta` (
   CONSTRAINT `fk_venta_cliente` FOREIGN KEY (`fk_id_cliente`) REFERENCES `cliente` (`id_cliente`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_metodopago` FOREIGN KEY (`fk_id_metodopago`) REFERENCES `metodopago` (`id_metodopago`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_usuario` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.venta: ~25 rows (aproximadamente)
 INSERT INTO `venta` (`id_venta`, `fecha_venta`, `montorecibido_venta`, `estado_venta`, `fk_id_cliente`, `fk_id_metodopago`, `fk_id_usuario`) VALUES
@@ -3641,7 +3814,8 @@ INSERT INTO `venta` (`id_venta`, `fecha_venta`, `montorecibido_venta`, `estado_v
 	(23, '2025-06-05 18:28:21', 150000, 1, 1, 1, 1),
 	(25, '2025-06-05 22:28:52', 30000, 1, 4, 1, 1),
 	(26, '2025-06-05 22:32:36', 50000, 1, 3, 2, 1),
-	(27, '2025-06-14 18:37:44', 30000, 1, 2, 1, 1);
+	(27, '2025-06-14 18:37:44', 30000, 1, 2, 1, 1),
+	(28, '2025-06-20 17:28:01', 80000, 1, 10, 1, 1);
 
 -- Volcando estructura para vista db_invehin.view_cliente
 -- Creando tabla temporal para superar errores de dependencia de VIEW
@@ -3673,10 +3847,11 @@ CREATE TABLE `view_prenda` (
 	`subcategoria_id` INT NULL,
 	`subcategoria_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
 	`subcategoria_precio` INT NOT NULL,
-	`subcategoria_imagen` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`subcategoria_imagen` VARCHAR(1) NULL COLLATE 'utf8mb4_0900_ai_ci',
 	`subcategoria_estado` TINYINT(1) NOT NULL,
 	`categoria_id` INT NOT NULL,
 	`categoria_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
+	`categoria_estado` TINYINT NOT NULL,
 	`promocion_id` INT NULL,
 	`promocion_porcentaje` INT NULL,
 	`promocion_fechainicio` DATETIME NULL,
@@ -3778,7 +3953,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_cliente` AS select `c
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `view_prenda`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_prenda` AS select `p`.`codigo_prenda` AS `codigo`,`p`.`stock_prenda` AS `stock`,`p`.`stockminimo_prenda` AS `stock_minimo`,`p`.`fk_id_color` AS `color_id`,`c`.`nombre_color` AS `color_nombre`,`p`.`fk_id_talla` AS `talla_id`,`t`.`nombre_talla` AS `talla_nombre`,`p`.`fk_id_estadoprenda` AS `estadoprenda_id`,`ep`.`nombre_estadoprenda` AS `estadoprenda_nombre`,`p`.`fk_id_subcategoria` AS `subcategoria_id`,`s`.`nombre_subcategoria` AS `subcategoria_nombre`,`s`.`precio_subcategoria` AS `subcategoria_precio`,`s`.`imagen_subcategoria` AS `subcategoria_imagen`,`s`.`estado_subcategoria` AS `subcategoria_estado`,`s`.`fk_id_categoria` AS `categoria_id`,`ca`.`nombre_categoria` AS `categoria_nombre`,`s`.`fk_id_promocion` AS `promocion_id`,`pr`.`porcentaje_promocion` AS `promocion_porcentaje`,`pr`.`fechainicio_promocion` AS `promocion_fechainicio`,`pr`.`fechafin_promocion` AS `promocion_fechafin` from ((((((`prenda` `p` join `color` `c` on((`p`.`fk_id_color` = `c`.`id_color`))) join `estadoprenda` `ep` on((`p`.`fk_id_estadoprenda` = `ep`.`id_estadoprenda`))) join `talla` `t` on((`p`.`fk_id_talla` = `t`.`id_talla`))) join `subcategoria` `s` on((`p`.`fk_id_subcategoria` = `s`.`id_subcategoria`))) join `categoria` `ca` on((`s`.`fk_id_categoria` = `ca`.`id_categoria`))) left join `promocion` `pr` on((`s`.`fk_id_promocion` = `pr`.`id_promocion`)));
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_prenda` AS select `p`.`codigo_prenda` AS `codigo`,`p`.`stock_prenda` AS `stock`,`p`.`stockminimo_prenda` AS `stock_minimo`,`p`.`fk_id_color` AS `color_id`,`c`.`nombre_color` AS `color_nombre`,`p`.`fk_id_talla` AS `talla_id`,`t`.`nombre_talla` AS `talla_nombre`,`p`.`fk_id_estadoprenda` AS `estadoprenda_id`,`ep`.`nombre_estadoprenda` AS `estadoprenda_nombre`,`p`.`fk_id_subcategoria` AS `subcategoria_id`,`s`.`nombre_subcategoria` AS `subcategoria_nombre`,`s`.`precio_subcategoria` AS `subcategoria_precio`,`s`.`imagen_subcategoria` AS `subcategoria_imagen`,`s`.`estado_subcategoria` AS `subcategoria_estado`,`s`.`fk_id_categoria` AS `categoria_id`,`ca`.`nombre_categoria` AS `categoria_nombre`,`ca`.`estado_categoria` AS `categoria_estado`,`s`.`fk_id_promocion` AS `promocion_id`,`pr`.`porcentaje_promocion` AS `promocion_porcentaje`,`pr`.`fechainicio_promocion` AS `promocion_fechainicio`,`pr`.`fechafin_promocion` AS `promocion_fechafin` from ((((((`prenda` `p` join `color` `c` on((`p`.`fk_id_color` = `c`.`id_color`))) join `estadoprenda` `ep` on((`p`.`fk_id_estadoprenda` = `ep`.`id_estadoprenda`))) join `talla` `t` on((`p`.`fk_id_talla` = `t`.`id_talla`))) join `subcategoria` `s` on((`p`.`fk_id_subcategoria` = `s`.`id_subcategoria`))) join `categoria` `ca` on((`s`.`fk_id_categoria` = `ca`.`id_categoria`))) left join `promocion` `pr` on((`s`.`fk_id_promocion` = `pr`.`id_promocion`)));
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `view_proveedor`;

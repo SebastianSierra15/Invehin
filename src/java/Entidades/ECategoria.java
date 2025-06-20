@@ -1,6 +1,7 @@
 package Entidades;
 
 import Logica.Categoria;
+import Logica.PaginacionResultado;
 import Logica.Subcategoria;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
@@ -16,36 +17,232 @@ import java.util.Map;
  */
 public class ECategoria
 {
+
     public ECategoria()
     {
     }
 
-    public boolean insertCategoria()
+    public boolean insertCategoria(String nombreCategoria)
     {
-        return true;
+        String sql = "{CALL insert_categoria(?)}";
+        DBConexion db = null;
+        boolean exito = false;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setString(1, nombreCategoria);
+
+                cs.execute();
+                exito = true;
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exito;
     }
 
-    public boolean updateCategoria()
+    public boolean updateCategoria(int idCategoria, String nombreCategoria)
     {
-        return true;
+        String sql = "{CALL update_categoria(?, ?)}";
+        DBConexion db = null;
+        boolean exito = false;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setInt(1, idCategoria);
+                cs.setString(2, nombreCategoria);
+
+                cs.execute();
+                exito = true;
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exito;
     }
 
-    public boolean deleteCategoria()
+    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria)
     {
-        return true;
+        String sql = "{CALL cambiar_estado_categoria(?, ?)}";
+        DBConexion db = null;
+        boolean exito = false;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setInt(1, idCategoria);
+                cs.setBoolean(2, estadoCategoria);
+
+                cs.execute();
+                exito = true;
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return exito;
     }
 
-    public Categoria selectCategoriaById()
+    public PaginacionResultado<Categoria> selectCategoriasPorTerminoBusqueda(String searchTerm, int numPage, int pageSize)
     {
-        Categoria entidad = new Categoria();
+        List<Categoria> categorias = new ArrayList<>();
+        int total = 0;
+        String sql = "{CALL select_categorias(?, ?, ?)}";
+        DBConexion db = null;
 
-        return entidad;
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setString(1, searchTerm);
+                cs.setInt(2, numPage);
+                cs.setInt(3, pageSize);
+
+                boolean hasResults = cs.execute();
+
+                if (hasResults)
+                {
+                    try (ResultSet rs = cs.getResultSet())
+                    {
+                        while (rs.next())
+                        {
+                            Categoria categoria = new Categoria(
+                                    rs.getInt("id"),
+                                    rs.getString("nombre"),
+                                    rs.getBoolean("estado"),
+                                    new ArrayList<>()
+                            );
+
+                            categorias.add(categoria);
+                        }
+                    }
+                }
+
+                if (cs.getMoreResults())
+                {
+                    try (ResultSet rs2 = cs.getResultSet())
+                    {
+                        if (rs2.next())
+                        {
+                            total = rs2.getInt("total_entries");
+                        }
+                    }
+                }
+
+                if (cs.getMoreResults())
+                {
+                    try (ResultSet rs3 = cs.getResultSet())
+                    {
+                        // Agrupar subcategorias por categoria_id
+                        Map<Integer, List<Subcategoria>> subcategoriasMap = new HashMap<>();
+
+                        while (rs3.next())
+                        {
+                            int categoriaId = rs3.getInt("categoria_id");
+
+                            Subcategoria subcategoria = new Subcategoria(
+                                    rs3.getInt("id"),
+                                    rs3.getString("nombre"),
+                                    rs3.getInt("precio"),
+                                    rs3.getString("imagen"),
+                                    rs3.getBoolean("estado"),
+                                    new Categoria()
+                            );
+
+                            subcategoriasMap.computeIfAbsent(categoriaId, k -> new ArrayList<>()).add(subcategoria);
+                        }
+
+                        // Asignar las subcategorias a cada categoria
+                        for (Categoria categoria : categorias)
+                        {
+                            List<Subcategoria> subcategorias = subcategoriasMap.getOrDefault(categoria.idCategoria, new ArrayList<>());
+                            categoria.subcategoriasCategoria = subcategorias;
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return new PaginacionResultado<>(categorias, total);
     }
 
     public List<Categoria> selectCategorias()
     {
         List<Categoria> categorias = new ArrayList<>();
-        String sql = "{CALL select_categorias()}";
+        String sql = "{CALL select_categorias_estaticas()}";
         DBConexion db = null;
 
         try
@@ -66,6 +263,7 @@ public class ECategoria
                             Categoria categoria = new Categoria(
                                     rs.getInt("id"),
                                     rs.getString("nombre"),
+                                    rs.getBoolean("estado"),
                                     new ArrayList<>()
                             );
 
@@ -78,7 +276,7 @@ public class ECategoria
                 {
                     try (ResultSet rs2 = cs.getResultSet())
                     {
-                        // Agrupar detalles por venta_id
+                        // Agrupar subcategorias por categoria_id
                         Map<Integer, List<Subcategoria>> subcategoriasMap = new HashMap<>();
 
                         while (rs2.next())
@@ -97,7 +295,7 @@ public class ECategoria
                             subcategoriasMap.computeIfAbsent(categoriaId, k -> new ArrayList<>()).add(subcategoria);
                         }
 
-                        // Asignar los detalles a cada venta
+                        // Asignar las subcategorias a cada categoria
                         for (Categoria categoria : categorias)
                         {
                             List<Subcategoria> subcategorias = subcategoriasMap.getOrDefault(categoria.idCategoria, new ArrayList<>());

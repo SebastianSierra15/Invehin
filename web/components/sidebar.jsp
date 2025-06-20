@@ -160,21 +160,21 @@
             </a>
             <% }%>
 
-            <% if (tienePermiso(idsPermisos, 1))
-                {%>
-            <a href="${pageContext.request.contextPath}/Categorias" name="nav-item" class="flex items-center gap-2 text-black font-semibold px-4 py-2 rounded border-2 border-black bg-invehin-backgroundAlt hover:bg-invehin-primaryLighter
-               <%= request.getRequestURI().endsWith("/Views/categorias/categorias.jsp") ? "bg-invehin-primaryLighter" : ""%>">
-                <i class="fas fa-clipboard-list text-xl" title="Categorias"></i>
-                <span class="sidebar-text">Categorias</span>
-            </a>
-            <% }%>
-
             <% if (tienePermiso(idsPermisos, 3))
                 {%>
             <a href="${pageContext.request.contextPath}/Usuarios" name="nav-item" class="flex items-center gap-2 text-black font-semibold px-4 py-2 rounded border-2 border-black bg-invehin-backgroundAlt hover:bg-invehin-primaryLighter
                <%= request.getRequestURI().endsWith("/Views/usuarios/usuarios.jsp") ? "bg-invehin-primaryLighter" : ""%>">
                 <i class="fas fa-users-line text-xl" title="Usuarios"></i>
                 <span class="sidebar-text">Usuarios</span>
+            </a>
+            <% }%>
+
+            <% if (tienePermiso(idsPermisos, 1))
+                {%>
+            <a href="${pageContext.request.contextPath}/Categorias" name="nav-item" class="flex items-center gap-2 text-black font-semibold px-4 py-2 rounded border-2 border-black bg-invehin-backgroundAlt hover:bg-invehin-primaryLighter
+               <%= request.getRequestURI().endsWith("/Views/categorias/categorias.jsp") ? "bg-invehin-primaryLighter" : ""%>">
+                <i class="fas fa-clipboard-list text-xl" title="Categorias"></i>
+                <span class="sidebar-text">Categorias</span>
             </a>
             <% }%>
 

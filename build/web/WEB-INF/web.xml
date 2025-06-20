@@ -52,6 +52,18 @@
         <servlet-name>Proveedores</servlet-name>
         <servlet-class>servlets.Proveedores</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Roles</servlet-name>
+        <servlet-class>servlets.Roles</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Categorias</servlet-name>
+        <servlet-class>servlets.Categorias</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>Subcategorias</servlet-name>
+        <servlet-class>servlets.Subcategorias</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Prendas</servlet-name>
         <url-pattern>/Prendas</url-pattern>
@@ -103,6 +115,18 @@
     <servlet-mapping>
         <servlet-name>Proveedores</servlet-name>
         <url-pattern>/Proveedores</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Roles</servlet-name>
+        <url-pattern>/Roles</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Categorias</servlet-name>
+        <url-pattern>/Categorias</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Subcategorias</servlet-name>
+        <url-pattern>/Subcategorias</url-pattern>
     </servlet-mapping>
     <error-page>
         <error-code>404</error-code>

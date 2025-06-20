@@ -150,7 +150,7 @@ public class EPrenda
 
         return exito;
     }
-    
+
     public int getPrendasBajoStock()
     {
         int cantidad = 0;
@@ -286,6 +286,7 @@ public class EPrenda
                             Categoria categoria = new Categoria(
                                     rs.getInt("categoria_id"),
                                     rs.getString("categoria_nombre"),
+                                    true,
                                     new ArrayList<>()
                             );
 
@@ -401,6 +402,7 @@ public class EPrenda
                             Categoria categoria = new Categoria(
                                     rs.getInt("categoria_id"),
                                     rs.getString("categoria_nombre"),
+                                    true,
                                     new ArrayList<>()
                             );
 
@@ -470,7 +472,7 @@ public class EPrenda
                         Color color = new Color(rs.getInt("color_id"), rs.getString("color_nombre"));
                         Talla talla = new Talla(rs.getInt("talla_id"), rs.getString("talla_nombre"));
                         EstadoPrenda estado = new EstadoPrenda(rs.getInt("estadoprenda_id"), rs.getString("estadoprenda_nombre"));
-                        Categoria categoria = new Categoria(rs.getInt("categoria_id"), rs.getString("categoria_nombre"), new ArrayList<>());
+                        Categoria categoria = new Categoria(rs.getInt("categoria_id"), rs.getString("categoria_nombre"), rs.getBoolean("categoria_estado"), new ArrayList<>());
 
                         Subcategoria subcategoria = new Subcategoria(
                                 rs.getInt("subcategoria_id"),
