@@ -1,8 +1,8 @@
 package Interfaces;
 
 import Logica.PaginacionResultado;
-import Logica.Persona;
 import Logica.Proveedor;
+import java.util.List;
 
 /**
  *
@@ -20,4 +20,6 @@ public interface IProveedor
     public Proveedor obtenerProveedor(int idProveedor);
 
     PaginacionResultado<Proveedor> obtenerProveedores(String searchTerm, int numPage, int pageSize);
+    
+    List<Proveedor> obtenerProveedores();
 }

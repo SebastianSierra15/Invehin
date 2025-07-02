@@ -1,7 +1,8 @@
 package Logica;
 
+import Entidades.EPedido;
 import Interfaces.IPedido;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -12,8 +13,9 @@ public class Pedido implements IPedido
 {
 
     public int idPedido;
-    public Date fechaPedido;
+    public Timestamp fechaPedido;
     public int preciototalPedido;
+    public int cantidadPedido;
     public boolean estadoPedido;
     public List<DetallePedido> detallespedidoPedido;
     public Proveedor proveedorPedido;
@@ -22,26 +24,31 @@ public class Pedido implements IPedido
     {
     }
 
-    public Pedido(int idPedido, Date fechaPedido, int preciototalPedido, boolean estadoPedido, List detallespedidoPedido, Proveedor proveedorPedido)
+    public Pedido(int idPedido, Timestamp fechaPedido, int preciototalPedido, int cantidadPedido, boolean estadoPedido, List detallespedidoPedido, Proveedor proveedorPedido)
     {
         this.idPedido = idPedido;
         this.fechaPedido = fechaPedido;
         this.preciototalPedido = preciototalPedido;
+        this.cantidadPedido = cantidadPedido;
         this.estadoPedido = estadoPedido;
         this.detallespedidoPedido = detallespedidoPedido;
         this.proveedorPedido = proveedorPedido;
     }
 
     @Override
-    public boolean crearPedido(Date fechaPedido, boolean estadoPedido, List detallespedidoPedido, Proveedor proveedorPedido)
+    public boolean crearPedido(Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson)
     {
-        return true;
+        EPedido result = new EPedido();
+        
+        return result.insertPedido(fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
     }
 
     @Override
-    public boolean actualizarPedido(int idPedido, Date fechaPedido, boolean estadoPedido, List detallespedidoPedido, Proveedor proveedorPedido)
+    public boolean actualizarPedido(int idPedido, Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson)
     {
-        return true;
+        EPedido result = new EPedido();
+        
+        return result.updatePedido(idPedido, fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
     }
 
     @Override
@@ -56,5 +63,21 @@ public class Pedido implements IPedido
         Pedido entidad = new Pedido();
 
         return entidad;
+    }
+
+    @Override
+    public PaginacionResultado<Pedido> obtenerPedidos(String searchTerm, int numPage, int pageSize)
+    {
+        EPedido result = new EPedido();
+        
+        return result.selectPedidosPorTerminoBusqueda(searchTerm, numPage, pageSize);
+    }
+
+    @Override
+    public List<Pedido> obtenerReportePedidos(Timestamp fechaInicio, Timestamp fechaFin, Integer idProveedor, Boolean estadoPedido)
+    {
+        EPedido result = new EPedido();
+        
+        return result.selectReportePedidos(fechaInicio, fechaFin, idProveedor, estadoPedido);
     }
 }

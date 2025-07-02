@@ -13,20 +13,28 @@ public class DetallePedido implements IDetallePedido
     public int cantidadDetallePedido;
     public int costounitarioDetallePedido;
     public int subtotalDetallePedido;
-    public Prenda prendaDetallePedido;
+    public String prendacodigoDetallePedido;
+    public String prendanombreDetallePedido;
+    public String prendacolorDetallePedido;
+    public String prendatallaDetallePedido;
+    public int prendaprecioDetallePedido;
     public int idpedidoDetallePedido;
 
     public DetallePedido()
     {
     }
 
-    public DetallePedido(int idDetallePedido, int cantidadDetallePedido, int costounitarioDetallePedido, int subtotalDetallePedido, Prenda prendaDetallePedido, int idpedidoDetallePedido)
+    public DetallePedido(int idDetallePedido, int cantidadDetallePedido, int costounitarioDetallePedido, int subtotalDetallePedido, String prendacodigoDetallePedido, String prendanombreDetallePedido, String prendacolorDetallePedido, String prendatallaDetallePedido, int prendaprecioDetallePedido, int idpedidoDetallePedido)
     {
         this.idDetallePedido = idDetallePedido;
         this.cantidadDetallePedido = cantidadDetallePedido;
         this.costounitarioDetallePedido = costounitarioDetallePedido;
         this.subtotalDetallePedido = subtotalDetallePedido;
-        this.prendaDetallePedido = prendaDetallePedido;
+        this.prendacodigoDetallePedido = prendacodigoDetallePedido;
+        this.prendanombreDetallePedido = prendanombreDetallePedido;
+        this.prendacolorDetallePedido = prendacolorDetallePedido;
+        this.prendatallaDetallePedido = prendatallaDetallePedido;
+        this.prendaprecioDetallePedido = prendaprecioDetallePedido;
         this.idpedidoDetallePedido = idpedidoDetallePedido;
     }
 

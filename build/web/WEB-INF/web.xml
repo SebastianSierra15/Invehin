@@ -64,6 +64,14 @@
         <servlet-name>Subcategorias</servlet-name>
         <servlet-class>servlets.Subcategorias</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Pedidos</servlet-name>
+        <servlet-class>servlets.Pedidos</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ReportePedidos</servlet-name>
+        <servlet-class>servlets.ReportePedidos</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Prendas</servlet-name>
         <url-pattern>/Prendas</url-pattern>
@@ -127,6 +135,14 @@
     <servlet-mapping>
         <servlet-name>Subcategorias</servlet-name>
         <url-pattern>/Subcategorias</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Pedidos</servlet-name>
+        <url-pattern>/Pedidos</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ReportePedidos</servlet-name>
+        <url-pattern>/ReportePedidos</url-pattern>
     </servlet-mapping>
     <error-page>
         <error-code>404</error-code>

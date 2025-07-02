@@ -227,4 +227,58 @@ public class EProveedor
 
         return new PaginacionResultado<>(proveedores, total);
     }
+
+    public List<Proveedor> selectProveedoresEstaticos()
+    {
+        List<Proveedor> proveedores = new ArrayList<>();
+        String sql = "{CALL select_proveedores_estaticos()}";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                boolean hasResults = cs.execute();
+
+                if (hasResults)
+                {
+                    try (ResultSet rs = cs.getResultSet())
+                    {
+                        while (rs.next())
+                        {
+                            Proveedor proveedor = new Proveedor(
+                                    rs.getInt("id"),
+                                    rs.getString("nombre"),
+                                    "",
+                                    "",
+                                    true
+                            );
+
+                            proveedores.add(proveedor);
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return proveedores;
+    }
 }

@@ -2,6 +2,7 @@ package Logica;
 
 import Entidades.EProveedor;
 import Interfaces.IProveedor;
+import java.util.List;
 
 /**
  *
@@ -77,5 +78,13 @@ public class Proveedor extends Persona implements IProveedor
         EProveedor result = new EProveedor();
 
         return result.selectProveedoresPorTerminoBusqueda(searchTerm, numPage, pageSize);
+    }
+
+    @Override
+    public List<Proveedor> obtenerProveedores()
+    {
+        EProveedor result = new EProveedor();
+        
+        return result.selectProveedoresEstaticos();
     }
 }
