@@ -1,11 +1,10 @@
 <%-- 
-    Document   : pedidos
-    Created on : 20/06/2025, 6:12:57?p.?m.
+    Document   : inventario
+    Created on : 4/07/2025, 2:48:23?p.?m.
     Author     : Ing. Sebastián Sierra
 --%>
 
-<%@page import="Logica.Proveedor"%>
-<%@page import="Logica.Pedido"%>
+<%@page import="Logica.Inventario"%>
 <%@page import="Logica.Usuario"%>
 <%@page import="com.google.gson.Gson" %>
 <%@page import="java.util.List"%>
@@ -23,7 +22,7 @@
     boolean tienePermiso = false;
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 9)
+        if (permiso.idPermiso == 11)
         {
             tienePermiso = true;
             break;
@@ -39,29 +38,29 @@
 
 <%
     // Recibir resultado de paginación
-    List<Pedido> pedidos = (List<Pedido>) request.getAttribute("pedidos");
-    int totalPedidos = (int) request.getAttribute("totalPedidos");
+    List<Inventario> inventarios = (List<Inventario>) request.getAttribute("inventarios");
+    int totalInventarios = (int) request.getAttribute("totalInventarios");
 
     // Recibir paginación actual
     int numPage = (request.getAttribute("numPage") != null) ? (Integer) request.getAttribute("numPage") : 1;
     int pageSize = (request.getAttribute("pageSize") != null) ? (Integer) request.getAttribute("pageSize") : 10;
 
     // Para paginación
-    int totalPaginas = (int) Math.ceil((double) totalPedidos / pageSize);
+    int totalPaginas = (int) Math.ceil((double) totalInventarios / pageSize);
     int maxPaginas = 8;
     int inicio = Math.max(1, numPage - maxPaginas / 2);
     int fin = Math.min(totalPaginas, inicio + maxPaginas - 1);
     inicio = Math.max(1, fin - maxPaginas + 1);
 
     // Datos estáticos
-    List<Proveedor> proveedores = (List<Proveedor>) request.getAttribute("proveedores");
+    // List<Proveedor> proveedores = (List<Proveedor>) request.getAttribute("proveedores");
 %>
 
 <!DOCTYPE html>
-<html lang="es">
+<html>
     <head>
         <meta charset="UTF-8">
-        <title>Pedidos - INVEHIN</title>
+        <title>Inventario - INVEHIN</title>
 
         <link rel="icon" type="image/x-icon" href="<%= request.getContextPath()%>/favicon.ico">
 
@@ -106,11 +105,11 @@
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     </head>
 
-    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden" data-totalpedidos="<%= totalPedidos%>">
+    <body class="bg-invehin-background font-sans flex flex-col overflow-x-hidden" data-totalinventarios="<%= totalInventarios%>">
         <%@ include file="/components/sidebar.jsp" %>
 
         <main id="main-content" class="flex flex-col min-h-screen flex-1 px-4 pt-6 md:p-8 md:pb-0 ml-20 sm:ml-64 transition-all duration-300 gap-2">
-            <h1 class="text-invehin-primary font-bold text-3xl text-center mb-10">Listado de Pedidos</h1>
+            <h1 class="text-invehin-primary font-bold text-3xl text-center mb-10">Listado de Inventarios Realizados</h1>
 
             <!-- Filtros -->
             <section class="flex flex-col justify-between gap-2">
@@ -132,7 +131,7 @@
                         </button>
 
                         <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
-                            <i class="fas fa-plus mr-2"></i>Registrar Pedido
+                            <i class="fas fa-plus mr-2"></i>Nuevo Inventario
                         </button>
                     </div>
                 </div>
@@ -140,14 +139,14 @@
                 <div class="w-full flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-4 w-auto">
                     <%
                         int desde = (int) ((numPage - 1) * pageSize + 1);
-                        int hasta = Math.min(numPage * pageSize, totalPedidos);
+                        int hasta = Math.min(numPage * pageSize, totalInventarios);
                     %>
-                    <div id="resumenPedidos" class="text-dark text-sm w-full">
-                        Mostrando <%= totalPedidos > 0 ? desde : 0%> a <%= hasta%> de <%= totalPedidos%> pedidos
+                    <div id="resumenInventarios" class="text-dark text-sm w-full">
+                        Mostrando <%= totalInventarios > 0 ? desde : 0%> a <%= hasta%> de <%= totalInventarios%> inventarios
                     </div>
 
                     <div class="relative w-full">
-                        <input id="searchInput" type="search" placeholder="Buscar pedido..." class="w-full pl-10 pr-4 py-1 rounded-md shadow-md bg-white border border-gray-300 outline-none" />
+                        <input id="searchInput" type="search" placeholder="Buscar inventario..." class="w-full pl-10 pr-4 py-1 rounded-md shadow-md bg-white border border-gray-300 outline-none" />
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
                 </div>
@@ -156,50 +155,47 @@
             <!-- Tabla -->
             <div class="overflow-x-auto w-full">
                 <table class="w-full text-sm text-left bg-invehin-accentLight rounded-lg border-separate border-spacing-0 overflow-hidden">
-                    <caption class="sr-only">Tabla de pedidos</caption>
+                    <caption class="sr-only">Tabla de inventarios</caption>
                     <thead class="bg-invehin-primary text-white">
                         <tr>
                             <th class="px-3 py-2 border border-white">ID</th>
                             <th class="px-3 py-2 border border-white">Fecha</th>
-                            <th class="px-3 py-2 border border-white">Proveedor</th>
-                            <th class="px-3 py-2 border border-white">Cantidad</th>
-                            <th class="px-3 py-2 border border-white">Precio total</th>
+                            <th class="px-3 py-2 border border-white">Observación</th>
+                            <th class="px-3 py-2 border border-white">Usuario</th>
                             <th class="px-3 py-2 border border-white">Estado</th>
                             <th class="px-3 py-2 border border-white text-center">Detalle</th>
                             <th class="px-3 py-2 border border-white text-center">Editar</th>
                         </tr>
                     </thead>
 
-                    <tbody id="pedidosFiltrados" class="bg-pink-100">
+                    <tbody id="inventariosFiltrados" class="bg-pink-100">
                         <%
-                            if (pedidos != null && !pedidos.isEmpty())
+                            if (inventarios != null && !inventarios.isEmpty())
                             {
-                                for (Pedido pedido : pedidos)
+                                for (Inventario inventario : inventarios)
                                 {
                                     Gson gson = new Gson();
-                                    String detallesJson = gson.toJson(pedido.detallespedidoPedido).replace("\"", "&quot;");
+                                    String detallesJson = gson.toJson(inventario.detallesinventarioInventario).replace("\"", "&quot;");
                         %>
                         <tr>
-                            <td class="px-3 py-2 border border-white"><%= pedido.idPedido%></td>
-                            <td class="px-3 py-2 border border-white"><%= pedido.fechaPedido%></td>
-                            <td class="px-3 py-2 border border-white"><%= pedido.proveedorPedido.nombreProveedor%></td>
-                            <td class="px-3 py-2 border border-white"><%= pedido.cantidadPedido%></td>
-                            <td class="px-3 py-2 border border-white">$<%= String.format("%,d", pedido.preciototalPedido)%></td>
-                            <td class="px-3 py-2 border border-white"><%= pedido.estadoPedido ? "Entregado" : "Sin entregar"%></td>
+                            <td class="px-3 py-2 border border-white"><%= inventario.idInventario%></td>
+                            <td class="px-3 py-2 border border-white"><%= inventario.fechaInventario%></td>
+                            <td class="px-3 py-2 border border-white"><%= inventario.observacionInventario%></td>
+                            <td class="px-3 py-2 border border-white"><%= inventario.nombreusuarioInventario%></td>
+                            <td class="px-3 py-2 border border-white"><%= inventario.estadoInventario ? "Realizado" : "Por terminar"%></td>
                             <td class="px-3 py-2 border border-white text-center">
-                                <button class="text-green-600 hover:text-green-500 transition ver-detalle-btn" title="Ver detalle pedido"
+                                <button class="text-green-600 hover:text-green-500 transition ver-detalle-btn" title="Ver detalle inventario"
                                         data-detalles='<%= detallesJson%>'>
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </td>
                             <td class="px-3 py-2 border border-white text-center">
-                                <button title="Editar pedido" class="text-blue-600 hover:text-blue-500 transition editar-pedido-btn"
-                                        data-id="<%= pedido.idPedido%>"
-                                        data-fecha="<%= pedido.fechaPedido%>"
-                                        data-proveedor="<%= pedido.proveedorPedido.idProveedor%>"
-                                        data-cantidad="<%= pedido.cantidadPedido%>"
-                                        data-precio="<%= pedido.preciototalPedido%>"
-                                        data-estado="<%= pedido.estadoPedido%>"
+                                <button title="Editar inventario" class="text-blue-600 hover:text-blue-500 transition editar-inventario-btn"
+                                        data-id="<%= inventario.idInventario%>"
+                                        data-fecha="<%= inventario.fechaInventario%>"
+                                        data-observacion="<%= inventario.observacionInventario%>"
+                                        data-usuarionombre="<%= inventario.nombreusuarioInventario%>"
+                                        data-estado="<%= inventario.estadoInventario%>"
                                         data-detalles="<%= detallesJson%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -211,7 +207,7 @@
                         {
                         %>
                         <tr>
-                            <td colspan="8" class="text-center text-gray-500 py-3">No se encontraron pedidos.</td>
+                            <td colspan="8" class="text-center text-gray-500 py-3">No se encontraron inventarios.</td>
                         </tr>
                         <%
                             }
@@ -264,14 +260,14 @@
 
         <%@ include file="/components/footer.jsp" %>
 
-        <!-- Modal de detalle pedido -->
-        <div id="modalDetallePedido" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <!-- Modal de detalle inventario -->
+        <div id="modalDetalleInventario" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-3xl max-h-[90vh] flex flex-col relative overflow-hidden">
                 <!-- Header -->
                 <div class="bg-invehin-primary text-white px-4 py-3 flex items-center justify-between ">
-                    <h2 class="text-lg font-bold">Detalle Pedido</h2>
+                    <h2 class="text-lg font-bold">Detalle Inventario</h2>
 
-                    <button onclick="cerrarModalDetallePedido()" class="text-gray-200 hover:text-gray-100 text-lg">
+                    <button onclick="cerrarModalDetalleInventario()" class="text-gray-200 hover:text-gray-100 text-lg">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -280,17 +276,13 @@
                     <table class="w-full text-sm text-left rounded-lg border-separate border-spacing-0 overflow-hidden">
                         <thead class="bg-invehin-primary text-white">
                             <tr>
-                                <th class="px-3 py-2 border border-white">Código</th>
-                                <th class="px-3 py-2 border border-white">Nombre</th>
-                                <th class="px-3 py-2 border border-white">Color</th>
-                                <th class="px-3 py-2 border border-white">Talla</th>
-                                <th class="px-3 py-2 border border-white">Cantidad</th>
-                                <th class="px-3 py-2 border border-white">Costo unitario</th>
-                                <th class="px-3 py-2 border border-white">Subtotal</th>
-                                <th class="px-3 py-2 border border-white">Precio Actual</th>
+                                <th class="px-3 py-2 border border-white">Prenda</th>
+                                <th class="px-3 py-2 border border-white">Cantidad Registrada</th>
+                                <th class="px-3 py-2 border border-white">Cantidad en el Sistema</th>
+                                <th class="px-3 py-2 border border-white">Observación</th>
                             </tr>
                         </thead>
-                        <tbody id="detallePedidoBody" class="bg-pink-50">
+                        <tbody id="detalleInventarioBody" class="bg-pink-50">
                             <!-- Se llenará con JavaScript -->
                         </tbody>
                     </table>
@@ -298,12 +290,12 @@
             </div>
         </div>
 
-        <!-- Modal agregar pedido -->
-        <div id="modalAgregarPedido" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <!-- Modal nuevo inventario -->
+        <div id="modalAgregarInventario" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-3xl w-11/12 sm:min-w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">
                 <!-- Header -->
                 <div class="bg-invehin-primary text-white px-4 py-3 flex items-center justify-between ">
-                    <h2 class="text-lg font-bold">Agregar Pedido</h2>
+                    <h2 class="text-lg font-bold">Nuevo Inventario</h2>
 
                     <button onclick="cerrarModalAgregar()" class="text-gray-200 hover:text-gray-100 text-lg">
                         <i class="fas fa-times"></i>
@@ -311,52 +303,31 @@
                 </div>
 
                 <!-- Contenido -->
-                <form id="formAgregarPedido" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
-                    <input type="hidden" id="agregarPedidoId" />
+                <form id="formAgregarInventario" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
+                    <input type="hidden" id="agregarIdUsuario" value=<%= sesion.idUsuario%> />
 
                     <div class="grid sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-4">
                         <div class="gap-1">
                             <label for="agregarFecha" class="block font-semibold text-black">Fecha</label>
-                            <input id="agregarFecha" name="fecha" type="date" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" required />
+                            <input id="agregarFecha" name="fecha" type="date" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" readonly />
                         </div>
 
                         <div class="gap-1">
-                            <label for="agregarProveedor" class="block font-semibold text-black">Proveedor</label>
-                            <select id="agregarProveedor" name="proveedor" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <% if (proveedores != null && !proveedores.isEmpty())
-                                    { %>
-                                <% for (Proveedor proveedor : proveedores)
-                                    {%>
-                                <option value="<%= proveedor.idProveedor%>"><%= proveedor.nombreProveedor%></option>
-                                <% } %>
-                                <% }%>
-                            </select>
-
-                            <input type="hidden" id="agregarProveedorId" name="proveedorId" />
+                            <label for="agregarResponsable" class="block font-semibold text-black">Responsable</label>
+                            <input id="agregarResponsable" name="responsable" type="text" value="<%= sesion.nombresPersona + " " + sesion.apellidosPersona%>" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" readonly />
                         </div>
 
-                        <div class="gap-1">
-                            <label for="agregarCantidad" class="block font-semibold text-black">Cantidad</label>
-                            <input id="agregarCantidad" name="cantidad" type="number" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-gray-100 text-gray-700 cursor-not-allowed" readonly />
+                        <div class="col-span-2 gap-1">
+                            <label for="agregarObservacion" class="block font-semibold text-black">Observaciones</label>
+                            <textarea id="agregarObservacion" name="observacion" rows="3"
+                                      class="block w-full px-3 border border-black/50 rounded-md shadow-sm bg-white text-gray-800 resize-none"
+                                      placeholder="Todo en orden" required></textarea>
                         </div>
 
-                        <div class="gap-1">
-                            <label for="agregarPrecio" class="block font-semibold text-black">Precio total</label>
-                            <input id="agregarPrecio" name="precio total" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-gray-100 text-gray-700 cursor-not-allowed" readonly />
-                        </div>
-
-                        <div class="gap-1">
-                            <label for="agregarEstado" class="block font-semibold text-black">Estado</label>
-                            <select id="agregarEstado" name="estado" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="true">Entregado</option>
-                                <option value="false">Sin entregar</option>
-                            </select>
-                        </div>
-
-                        <h2 class="col-span-2 text-black font-semibold">Detalles del pedido</h2>
+                        <h2 class="col-span-2 text-black font-semibold">Detalles del inventario</h2>
 
                         <button type="button" onclick="abrirModalAgregarPrendaDesdeAgregar()" class="-mt-2 bg-green-600 text-sm text-white px-4 py-2 rounded hover:bg-green-700">
-                            Agregar prenda al pedido
+                            Registrar prenda al inventario
                         </button>
 
                         <div class="col-span-2 overflow-x-auto w-full">
@@ -365,15 +336,15 @@
                                     <tr>
                                         <th class="px-3 py-2 border border-white">Código</th>
                                         <th class="px-3 py-2 border border-white">Nombre</th>
-                                        <th class="px-3 py-2 border border-white">Color</th>
                                         <th class="px-3 py-2 border border-white">Talla</th>
-                                        <th class="px-3 py-2 border border-white">Cantidad</th>
-                                        <th class="px-3 py-2 border border-white">Costo unitario</th>
-                                        <th class="px-3 py-2 border border-white">Subtotal</th>
+                                        <th class="px-3 py-2 border border-white">Color</th>
+                                        <th class="px-3 py-2 border border-white">Cantidad en el Sistema</th>
+                                        <th class="px-3 py-2 border border-white">Cantidad Existente</th>
+                                        <th class="px-3 py-2 border border-white">Observación</th>
                                         <th class="px-3 py-2 border border-white">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="agregarDetallePedidoBody" class="bg-pink-50">
+                                <tbody id="agregarDetalleInventarioBody" class="bg-pink-50">
                                     <!-- Se llenará con JavaScript -->
                                 </tbody>
                             </table>
@@ -382,18 +353,18 @@
 
                     <div class="flex justify-end gap-2 pt-3 border-t border-gray-400 mx-[-1rem] px-4 mt-1">
                         <button type="button" onclick="cerrarModalAgregar()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancelar</button>
-                        <button type="submit" id="btnGuardarPedido" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Guardar</button>
+                        <button type="submit" id="btnGuardarInventario" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Finalizar</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Modal de edición de pedido -->
-        <div id="modalEditarPedido" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <!-- Modal de edición de inventario -->
+        <div id="modalEditarInventario" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-3xl w-11/12 sm:min-w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">
                 <!-- Header -->
                 <div class="bg-invehin-primary text-white px-4 py-3 flex items-center justify-between ">
-                    <h2 class="text-lg font-bold">Editar Pedido</h2>
+                    <h2 class="text-lg font-bold">Editar Inventario</h2>
 
                     <button onclick="cerrarModalEditar()" class="text-gray-200 hover:text-gray-100 text-lg">
                         <i class="fas fa-times"></i>
@@ -401,52 +372,39 @@
                 </div>
 
                 <!-- Contenido -->
-                <form id="formEditarPedido" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
-                    <input type="hidden" id="editarPedidoId" />
+                <form id="formEditarInventario" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
+                    <input type="hidden" id="editarInventarioId" />
 
                     <div class="grid sm:grid-cols-2 gap-2 sm:gap-x-6 sm:gap-y-4">
                         <div class="gap-1">
                             <label for="editarFecha" class="block font-semibold text-black">Fecha</label>
-                            <input id="editarFecha" name="fecha" type="date" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" required />
+                            <input id="editarFecha" name="fecha" type="date" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" readonly />
                         </div>
 
                         <div class="gap-1">
-                            <label for="editarProveedor" class="block font-semibold text-black">Proveedor</label>
-                            <select id="editarProveedor" name="proveedor" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <% if (proveedores != null && !proveedores.isEmpty())
-                                    { %>
-                                <% for (Proveedor proveedor : proveedores)
-                                    {%>
-                                <option value="<%= proveedor.idProveedor%>"><%= proveedor.nombreProveedor%></option>
-                                <% } %>
-                                <% }%>
-                            </select>
-
-                            <input type="hidden" id="editarProveedorId" name="proveedorId" />
+                            <label for="editarResponsable" class="block font-semibold text-black">Responsable</label>
+                            <input id="editarResponsable" name="responsable" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" readonly />
                         </div>
 
-                        <div class="gap-1">
-                            <label for="editarCantidad" class="block font-semibold text-black">Cantidad</label>
-                            <input id="editarCantidad" name="cantidad" type="number" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-gray-100 text-gray-700 cursor-not-allowed" readonly />
-                        </div>
-
-                        <div class="gap-1">
-                            <label for="editarPrecio" class="block font-semibold text-black">Precio total</label>
-                            <input id="editarPrecio" name="precio total" type="text" class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-gray-100 text-gray-700 cursor-not-allowed" readonly />
-                        </div>
-
-                        <div class="gap-1">
+                        <div class="col-span-1 gap-1">
                             <label for="editarEstado" class="block font-semibold text-black">Estado</label>
                             <select id="editarEstado" name="estado" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                                <option value="true">Entregado</option>
-                                <option value="false">Sin entregar</option>
+                                <option value="true">Realizado</option>
+                                <option value="false">Por terminar</option>
                             </select>
                         </div>
 
-                        <h2 class="col-span-2 text-black font-semibold">Detalles del pedido</h2>
+                        <div class="col-span-2 gap-1">
+                            <label for="editarObservacion" class="block font-semibold text-black">Observaciones</label>
+                            <textarea id="editarObservacion" name="observacion" rows="3"
+                                      class="block w-full px-3 border border-black/50 rounded-md shadow-sm bg-white text-gray-800 resize-none"
+                                      placeholder="Todo en orden" required></textarea>
+                        </div>
+
+                        <h2 class="col-span-2 text-black font-semibold">Detalles del inventario</h2>
 
                         <button type="button" onclick="abrirModalAgregarPrendaDesdeEditar()" class="-mt-2 bg-green-600 text-sm text-white px-4 py-2 rounded hover:bg-green-700">
-                            Agregar prenda al pedido
+                            Registrar prenda al inventario
                         </button>
 
                         <div class="col-span-2 overflow-x-auto w-full">
@@ -455,15 +413,15 @@
                                     <tr>
                                         <th class="px-3 py-2 border border-white">Código</th>
                                         <th class="px-3 py-2 border border-white">Nombre</th>
-                                        <th class="px-3 py-2 border border-white">Color</th>
                                         <th class="px-3 py-2 border border-white">Talla</th>
-                                        <th class="px-3 py-2 border border-white">Cantidad</th>
-                                        <th class="px-3 py-2 border border-white">Costo unitario</th>
-                                        <th class="px-3 py-2 border border-white">Subtotal</th>
+                                        <th class="px-3 py-2 border border-white">Color</th>
+                                        <th class="px-3 py-2 border border-white">Cantidad en el Sistema</th>
+                                        <th class="px-3 py-2 border border-white">Cantidad Existente</th>
+                                        <th class="px-3 py-2 border border-white">Observación</th>
                                         <th class="px-3 py-2 border border-white">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody id="editarDetallePedidoBody" class="bg-pink-50">
+                                <tbody id="editarDetalleInventarioBody" class="bg-pink-50">
                                     <!-- Se llenará con JavaScript -->
                                 </tbody>
                             </table>
@@ -472,16 +430,16 @@
 
                     <div class="flex justify-end gap-2 pt-3 border-t border-gray-400 mx-[-1rem] px-4 mt-1">
                         <button type="button" onclick="cerrarModalEditar()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 text-sm">Cancelar</button>
-                        <button type="submit" id="btnGuardarPedido" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Guardar</button>
+                        <button type="submit" id="btnGuardarInventar" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Guardar</button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Modal agregar prenda -->
+        <!-- Modal registrar prenda al inventario -->
         <div id="modalAgregarPrenda" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg max-w-md sm:max-w-xl w-11/12 sm:w-11/12 p-6">
-                <h2 class="text-invehin-primary text-lg font-bold mb-4">Agregar prenda al pedido</h2>
+                <h2 class="text-invehin-primary text-lg font-bold mb-4">Agregar prenda al inventario</h2>
 
                 <div class="max-w-1/2 relative">
                     <label for="searchInputPrenda" class="block font-semibold text-black">Buscar prenda</label>
@@ -506,39 +464,50 @@
                     <input type="hidden" id="codigoPrendaSeleccionada" />
                 </div>
 
-                <label class="block font-semibold mt-4 mb-1">Cantidad</label>
-                <input id="cantidadPrenda" name="cantidad prenda" type="number" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" required>
+                <div class="grid sm:grid-cols-2 gap-2 sm:gap-4 mt-4">
+                    <div class="gap-1">
+                        <label for="cantidadSistemaPrenda" class="block font-semibold">Cantidad en el sistema</label>
+                        <input id="cantidadSistemaPrenda" name="cantidad prenda" type="number" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-gray-100 cursor-not-allowed" placeholder="0" readonly>
+                    </div>
 
-                <label class="block font-semibold mt-4 mb-1">Costo unitario ($)</label>
-                <input id="costoUnitarioPrenda" name="costo unitario prenda" type="number" min="0" step="0.01" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" required>
+                    <div class="gap-1">
+                        <label for="cantidadExistentePrenda"  class="block font-semibold">Cantidad existente</label>
+                        <input id="cantidadExistentePrenda" name="cantidad prenda" type="number" min="0" step="1" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" placeholder="0" required>
+                    </div>
+                </div>
+
+                <label for="observacionPrenda" class="block font-semibold mt-4 mb-1">Observación de la prenda</label>
+                <textarea id="observacionPrenda" name="observacionPrenda" rows="2"
+                          class="block w-full px-2 border border-black/50 rounded-md shadow-sm bg-white text-gray-800 resize-none"
+                          placeholder="Observación opcional..."></textarea>
 
                 <div class="mt-6 flex justify-end gap-2">
                     <button onclick="cerrarModalAgregarPrenda()" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
-                    <button onclick="agregarPrendaAlPedido()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Agregar</button>
+                    <button onclick="agregarPrendaAlInventario()" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Agregar</button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal confirmación agregar pedido -->
+        <!-- Modal confirmación agregar inventario -->
         <div id="modalConfirmarAgregar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg max-w-md w-11/12 p-6 text-center">
                 <h2 class="text-invehin-primary text-lg font-bold mb-4">Confirmar registro</h2>
-                <p class="mb-6 text-sm text-gray-700">¿Estás seguro de que deseas agregar este pedido?</p>
+                <p class="mb-6 text-sm text-gray-700">¿Estás seguro de que deseas realizar este inventario?</p>
                 <div class="flex justify-center gap-4">
                     <button id="cancelarConfirmarAgregar" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 text-sm">Cancelar</button>
-                    <button id="confirmarAgregarPedido" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Confirmar</button>
+                    <button id="confirmarAgregarInventario" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Confirmar</button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal confirmación editar pedido -->
+        <!-- Modal confirmación editar inventario -->
         <div id="modalConfirmarEditar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg max-w-md w-11/12 p-6 text-center">
                 <h2 class="text-invehin-primary text-lg font-bold mb-4">Confirmar edición</h2>
-                <p class="mb-6 text-sm text-gray-700">¿Estás seguro de que deseas editar este pedido?</p>
+                <p class="mb-6 text-sm text-gray-700">¿Estás seguro de que deseas editar este inventario?</p>
                 <div class="flex justify-center gap-4">
                     <button id="cancelarConfirmarEditar" class="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400 text-sm">Cancelar</button>
-                    <button id="confirmarEditarPedido" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Confirmar</button>
+                    <button id="confirmarEditarInventario" class="px-4 py-2 bg-invehin-primary text-white rounded hover:bg-invehin-primaryLight text-sm">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -556,7 +525,7 @@
                 </div>
 
                 <!-- Contenido -->
-                <form action="ReportePedidos" method="GET" target="_blank" 
+                <form action="ReporteInventarios" method="GET" target="_blank" 
                       onsubmit="cerrarModalReporte()" class="flex flex-col overflow-y-auto px-4 py-4 flex-1 gap-2 sm:gap-4">
                     <div class="gap-1">
                         <label class="block font-semibold text-black">Fecha Inicio</label>
@@ -569,25 +538,11 @@
                     </div>
 
                     <div class="gap-1">
-                        <label class="block font-semibold text-black">Proveedor (opcional)</label>
-                        <select name="proveedor" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
-                            <option value="">Todos los proveedores</option>
-                            <% if (proveedores != null && !proveedores.isEmpty())
-                        { %>
-                            <% for (Proveedor proveedor : proveedores)
-                            {%>
-                            <option value="<%= proveedor.idProveedor%>"><%= proveedor.nombreProveedor%></option>
-                            <% } %>
-                            <% }%>
-                        </select>
-                    </div>
-
-                    <div class="gap-1">
                         <label class="block font-semibold text-black">Estado (opcional)</label>
                         <select name="estado" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
                             <option value="">Todos los estados</option>
-                            <option value="true">Entregado</option>
-                            <option value="false">Sin entregar</option>
+                            <option value="true">Realizado</option>
+                            <option value="false">Por terminar</option>
                         </select>
                     </div>
 
@@ -611,29 +566,30 @@
     <script>
         let currentPage = <%= numPage%>;
         let pageSize = <%= pageSize%>;
-        let totalPedidos = <%= totalPedidos%>;
+        let totalInventarios = <%= totalInventarios%>;
         let searchTimeout = null;
-        let datosPedidoEditado = null;
-        let datosPedidoNuevo = null;
+        let datosInventarioEditado = null;
+        let datosInventarioNuevo = null;
         let timeout = null;
         let origenAgregarPrenda = null;
         const input = document.getElementById('searchInputPrenda');
         const lista = document.getElementById('sugerencias');
 
         document.addEventListener("DOMContentLoaded", () => {
-            cargarPedidos();
+            cargarInventarios();
+
             document.getElementById("searchInput").addEventListener("input", () => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     currentPage = 1;
-                    cargarPedidos();
+                    cargarInventarios();
                 }, 300);
             });
 
             document.getElementById("pageSizeSelect").addEventListener("change", (e) => {
                 pageSize = parseInt(e.target.value);
                 currentPage = 1;
-                cargarPedidos();
+                cargarInventarios();
             });
         });
 
@@ -641,6 +597,7 @@
             if (e.target.closest(".ver-detalle-btn")) {
                 const btn = e.target.closest(".ver-detalle-btn");
                 const rawJson = btn.dataset.detalles;
+
                 try {
                     const detalles = JSON.parse(rawJson.replace(/&quot;/g, '"'));
                     mostrarModalDetalle(detalles);
@@ -648,22 +605,22 @@
                     console.error("JSON inválido:", rawJson, err);
                 }
 
-            } else if (e.target.closest(".editar-pedido-btn")) {
-                const btn = e.target.closest(".editar-pedido-btn");
+            } else if (e.target.closest(".editar-inventario-btn")) {
+                const btn = e.target.closest(".editar-inventario-btn");
                 const rawJson = btn.dataset.detalles;
                 const id = btn.dataset.id;
                 const fechaCompleta = btn.dataset.fecha;
                 const fecha = fechaCompleta.split(" ")[0];
-                const proveedorId = btn.dataset.proveedor;
-                const cantidad = btn.dataset.cantidad;
-                const precio = btn.dataset.precio;
+                const usuarioNombre = btn.dataset.usuarionombre;
+                const observacion = btn.dataset.observacion;
                 const estado = btn.dataset.estado;
+
+                document.getElementById("editarInventarioId").value = id;
                 document.getElementById("editarFecha").value = fecha;
-                document.getElementById("editarPedidoId").value = id;
-                document.getElementById("editarProveedor").value = proveedorId;
-                document.getElementById("editarCantidad").value = cantidad;
-                document.getElementById("editarPrecio").value = "$" + Intl.NumberFormat("es-CO").format(precio);
+                document.getElementById("editarResponsable").value = usuarioNombre;
+                document.getElementById("editarObservacion").value = observacion;
                 document.getElementById("editarEstado").value = estado;
+
                 try {
                     const detalles = JSON.parse(rawJson.replace(/&quot;/g, '"'));
                     editarModalDetalle(detalles);
@@ -671,7 +628,7 @@
                     console.error("JSON inválido:", rawJson, err);
                 }
 
-                document.getElementById("modalEditarPedido").classList.remove("hidden");
+                document.getElementById("modalEditarInventario").classList.remove("hidden");
                 document.body.classList.add("overflow-hidden");
             }
         });
@@ -679,6 +636,7 @@
         document.addEventListener("click", function (event) {
             const input = document.getElementById("searchInputPrenda");
             const lista = document.getElementById("sugerencias");
+
             if (!input.contains(event.target) && !lista.contains(event.target)) {
                 lista.classList.add("hidden");
             }
@@ -703,26 +661,26 @@
             document.body.classList.remove("overflow-hidden");
         });
 
-        document.getElementById("confirmarAgregarPedido").addEventListener("click", function () {
-            fetch("Pedidos", {
+        document.getElementById("confirmarAgregarInventario").addEventListener("click", function () {
+            fetch("Inventarios", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                body: new URLSearchParams(datosPedidoNuevo)
+                body: new URLSearchParams(datosInventarioNuevo)
             })
                     .then(res => res.json())
                     .then(data => {
                         if (data.exito) {
                             alert(data.mensaje);
                             cerrarModalAgregar();
-                            cargarPedidos();
+                            cargarInventarios();
                         } else {
                             alert("Error: " + data.mensaje);
                         }
                     })
                     .catch(error => {
-                        console.error("Error al registrar el pedido", error);
+                        console.error("Error al registrar el inventario", error);
                         alert("Ocurrió un error inesperado.");
                     });
 
@@ -734,20 +692,20 @@
             document.getElementById("modalConfirmarEditar").classList.add("hidden");
         });
 
-        document.getElementById("confirmarEditarPedido").addEventListener("click", function () {
-            fetch("Pedidos", {
+        document.getElementById("confirmarEditarInventario").addEventListener("click", function () {
+            fetch("Inventarios", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(datosPedidoEditado)
+                body: JSON.stringify(datosInventarioEditado)
             })
                     .then(res => res.json())
                     .then(data => {
                         if (data.exito) {
-                            alert("Pedido actualizado correctamente.");
+                            alert("Inventario actualizado correctamente.");
                             cerrarModalEditar();
-                            cargarPedidos();
+                            cargarInventarios();
                         } else {
                             alert("Error al actualizar: " + data.mensaje);
                         }
@@ -760,39 +718,39 @@
             document.getElementById("modalConfirmarEditar").classList.add("hidden");
         });
 
-        document.getElementById("formAgregarPedido").addEventListener("submit", function (e) {
+        document.getElementById("formAgregarInventario").addEventListener("submit", function (e) {
             e.preventDefault();
 
             const detalles = [];
-            document.querySelectorAll("#agregarDetallePedidoBody tr").forEach((fila, index) => {
-                const cantidadTexto = fila.children[4].textContent.trim();
-                const cantidad = parseInt(cantidadTexto);
+            document.querySelectorAll("#agregarDetalleInventarioBody tr").forEach((fila, index) => {
+                const cantidadSistemaTexto = fila.children[4].textContent.trim();
+                const cantidad_sistema = parseInt(cantidadSistemaTexto);
 
-                const costoTexto = fila.children[5].textContent.replace(/[^\d]/g, "");
-                const costo_unitario = parseInt(costoTexto);
+                const cantidadRegistradaTexto = fila.children[5].textContent.replace(/[^\d]/g, "");
+                const cantidad_registrada = parseInt(cantidadRegistradaTexto);
 
-                if (isNaN(cantidad) || isNaN(costo_unitario)) {
-                    console.error(`Fila ${index + 1} inválida. Cantidad: ${cantidadTexto}, Costo: ${costoTexto}`);
+                if (isNaN(cantidad_sistema) || isNaN(cantidad_registrada)) {
+                    console.error(`Fila ${index + 1} inválida. Cantidad en el Sistema: ${cantidad_sistema}, Cantidad existente: ${cantidad_registrada}`);
                     alert(`Error: Verifica los datos de la fila ${index + 1}.`);
                     return;
                 }
 
                 detalles.push({
                     codigo_prenda: fila.children[0].textContent.trim(),
-                    cantidad,
-                    costo_unitario
+                    observacion: fila.children[6].textContent.trim(),
+                    cantidad_registrada,
+                    cantidad_sistema
                 });
             });
 
-            datosPedidoNuevo = {
-                fechaPedido: document.getElementById("agregarFecha").value,
-                idProveedor: parseInt(document.getElementById("agregarProveedor").value),
-                estadoPedido: document.getElementById("agregarEstado").value === "true",
-                detallesPedidoJson: JSON.stringify(detalles)
+            datosInventarioNuevo = {
+                observacionInventario: document.getElementById("agregarObservacion").value,
+                idUsuario: parseInt(document.getElementById("agregarIdUsuario").value),
+                detallesInventarioJson: JSON.stringify(detalles)
             };
 
             if (detalles.length === 0) {
-                alert("Debes agregar al menos una prenda al pedido.");
+                alert("Debes agregar al menos una prenda al inventario.");
                 return;
             }
 
@@ -800,40 +758,40 @@
             document.body.classList.add("overflow-hidden");
         });
 
-        document.getElementById("formEditarPedido").addEventListener("submit", function (e) {
+        document.getElementById("formEditarInventario").addEventListener("submit", function (e) {
             e.preventDefault();
 
             const detalles = [];
-            document.querySelectorAll("#editarDetallePedidoBody tr").forEach((fila, index) => {
-                const cantidadTexto = fila.children[4].textContent.trim();
-                const cantidad = parseInt(cantidadTexto);
+            document.querySelectorAll("#editarDetalleInventarioBody tr").forEach((fila, index) => {
+                const cantidadSistemaTexto = fila.children[4].textContent.trim();
+                const cantidad_sistema = parseInt(cantidadSistemaTexto);
 
-                const costoTexto = fila.children[5].textContent.replace(/[^\d]/g, "");
-                const costo_unitario = parseInt(costoTexto);
+                const cantidadRegistradaTexto = fila.children[5].textContent.replace(/[^\d]/g, "");
+                const cantidad_registrada = parseInt(cantidadRegistradaTexto);
 
-                if (isNaN(cantidad) || isNaN(costo_unitario)) {
-                    console.error(`Fila ${index + 1} inválida. Cantidad: ${cantidadTexto}, Costo: ${costoTexto}`);
+                if (isNaN(cantidad_sistema) || isNaN(cantidad_registrada)) {
+                    console.error(`Fila ${index + 1} inválida. Cantidad en el Sistema: ${cantidad_sistema}, Cantidad existente: ${cantidad_registrada}`);
                     alert(`Error: Verifica los datos de la fila ${index + 1}.`);
                     return;
                 }
 
                 detalles.push({
                     codigo_prenda: fila.children[0].textContent.trim(),
-                    cantidad,
-                    costo_unitario
+                    observacion: fila.children[6].textContent.trim(),
+                    cantidad_registrada,
+                    cantidad_sistema
                 });
             });
 
-            datosPedidoEditado = {
-                idPedido: parseInt(document.getElementById("editarPedidoId").value),
-                fechaPedido: document.getElementById("editarFecha").value,
-                idProveedor: parseInt(document.getElementById("editarProveedor").value),
-                estadoPedido: document.getElementById("editarEstado").value === "true",
-                detallesPedidoJson: JSON.stringify(detalles)
+            datosInventarioEditado = {
+                idInventario: document.getElementById("editarInventarioId").value,
+                observacionInventario: document.getElementById("editarObservacion").value,
+                estadoInventario: document.getElementById("editarEstado").value === "true",
+                detallesInventarioJson: JSON.stringify(detalles)
             };
 
             if (detalles.length === 0) {
-                alert("Debes agregar al menos una prenda al pedido.");
+                alert("Debes agregar al menos una prenda al inventario.");
                 return;
             }
 
@@ -842,40 +800,41 @@
 
         function irAPagina(nuevaPagina) {
             currentPage = nuevaPagina;
-            cargarPedidos();
+            cargarInventarios();
         }
 
-        function cargarPedidos() {
+        function cargarInventarios() {
             const searchTerm = document.getElementById("searchInput").value.trim();
-            fetch("Pedidos?modo=ajax&searchTerm=" + encodeURIComponent(searchTerm) + "&numPage=" + currentPage + "&pageSize=" + pageSize).then(res => res.text()).then(html => {
+
+            fetch("Inventarios?searchTerm=" + encodeURIComponent(searchTerm) + "&numPage=" + currentPage + "&pageSize=" + pageSize).then(res => res.text()).then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, "text/html");
-                const nuevaTabla = doc.querySelector("#pedidosFiltrados");
-                const resumen = doc.querySelector("#resumenPedidos").textContent;
+                const nuevaTabla = doc.querySelector("#inventariosFiltrados");
+                const resumen = doc.querySelector("#resumenInventarios").textContent;
                 const nuevaPaginacion = doc.querySelector("nav[aria-label='Paginación']");
-                document.querySelector("#pedidosFiltrados").innerHTML = nuevaTabla.innerHTML;
-                document.querySelector("#resumenPedidos").textContent = resumen;
+
+                document.querySelector("#inventariosFiltrados").innerHTML = nuevaTabla.innerHTML;
+                document.querySelector("#resumenInventarios").textContent = resumen;
                 document.querySelector("nav[aria-label='Paginación']").innerHTML = nuevaPaginacion.innerHTML;
-                // actualizar totalPedidos si el servlet lo recalcula
-                totalPedidos = parseInt(doc.querySelector("body").dataset.totalpedidos) || totalPedidos;
-            }).catch(err => console.error("Error cargando pedidos", err));
+
+                // actualizar totalInventarios si el servlet lo recalcula
+                totalInventarios = parseInt(doc.querySelector("body").dataset.totalinventarios) || totalInventarios;
+            }).catch(err => console.error("Error cargando inventarios", err));
         }
 
         function mostrarModalDetalle(detalles) {
-            const tbody = document.getElementById("detallePedidoBody");
+            const tbody = document.getElementById("detalleInventarioBody");
+
             tbody.innerHTML = "";
             detalles.forEach(d => {
                 const tr = document.createElement("tr");
                 const campos = [
-                    d.prendacodigoDetallePedido,
-                    d.prendanombreDetallePedido,
-                    d.prendacolorDetallePedido,
-                    d.prendatallaDetallePedido,
-                    d.cantidadDetallePedido,
-                    "$" + Intl.NumberFormat("es-CO").format(d.costounitarioDetallePedido),
-                    "$" + Intl.NumberFormat("es-CO").format(d.subtotalDetallePedido),
-                    "$" + Intl.NumberFormat("es-CO").format(d.prendaprecioDetallePedido)
+                    d.prendacodigoDetalleInventario + " - " + d.prendanombreDetalleInventario,
+                    d.cantidadregistradaDetalleInventario,
+                    d.cantidadsistemaDetalleInventario,
+                    d.observacionDetalleInventario
                 ];
+
                 campos.forEach(valor => {
                     const td = document.createElement("td");
                     td.className = "px-3 py-2 border border-white";
@@ -884,32 +843,34 @@
                 });
                 tbody.appendChild(tr);
             });
-            document.getElementById("modalDetallePedido").classList.remove("hidden");
+            document.getElementById("modalDetalleInventario").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         }
-
-        function cerrarModalDetallePedido() {
-            document.getElementById("modalDetallePedido").classList.add("hidden");
-            document.body.classList.remove("overflow-hidden");
-        }
-
+        
         function editarModalDetalle(detalles) {
-            const tbody = document.getElementById("editarDetallePedidoBody");
+            const tbody = document.getElementById("editarDetalleInventarioBody");
             tbody.innerHTML = "";
 
             detalles.forEach(d => {
                 const tr = document.createElement("tr");
-                const campos = [
-                    d.prendacodigoDetallePedido,
-                    d.prendanombreDetallePedido,
-                    d.prendacolorDetallePedido,
-                    d.prendatallaDetallePedido,
-                    d.cantidadDetallePedido,
-                    "$" + Intl.NumberFormat("es-CO").format(d.costounitarioDetallePedido),
-                    "$" + Intl.NumberFormat("es-CO").format(d.subtotalDetallePedido)
+
+                // Separar prendaNombre: "Blusa - Manga larga - Talla S · Rojo"
+                const partes = d.prendanombreDetalleInventario.split(" - ");
+                const nombre = partes.length >= 2 ? partes[0] + " - " + partes[1] : d.prendanombreDetalleInventario;
+                const tallaYColor = d.prendanombreDetalleInventario.split("Talla ")[1] || "";
+                const [talla, color] = tallaYColor.split(" · ");
+
+                const columnas = [
+                    d.prendacodigoDetalleInventario, // Código
+                    nombre.trim(), // Nombre
+                    talla?.trim() ?? "--", // Talla
+                    color?.trim() ?? "--", // Color
+                    d.cantidadsistemaDetalleInventario, // Cantidad en el sistema
+                    d.cantidadregistradaDetalleInventario, // Cantidad registrada
+                    d.observacionDetalleInventario || "" // Observación
                 ];
 
-                campos.forEach(valor => {
+                columnas.forEach(valor => {
                     const td = document.createElement("td");
                     td.className = "px-3 py-2 border border-white";
                     td.textContent = valor;
@@ -926,13 +887,18 @@
                 btnEliminar.innerHTML = '<i class="fas fa-trash"></i>';
                 btnEliminar.addEventListener("click", () => {
                     tr.remove();
-                    actualizarTotalesPedido();
                 });
 
                 accionesTd.appendChild(btnEliminar);
                 tr.appendChild(accionesTd);
+
                 tbody.appendChild(tr);
             });
+        }
+
+        function cerrarModalDetalleInventario() {
+            document.getElementById("modalDetalleInventario").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
         }
 
         function abrirModalAgregarPrenda() {
@@ -947,8 +913,9 @@
             document.getElementById("infoPrendaSeleccionada").classList.add("hidden");
             document.getElementById("prendaSeleccionada").value = "";
             document.getElementById("codigoPrendaSeleccionada").value = "";
-            document.getElementById("cantidadPrenda").value = "";
-            document.getElementById("costoUnitarioPrenda").value = "";
+            document.getElementById("cantidadSistemaPrenda").value = "";
+            document.getElementById("cantidadExistentePrenda").value = "";
+            document.getElementById("observacionPrenda").value = "";
             document.getElementById("searchInputPrenda").value = "";
             document.getElementById("sugerencias").innerHTML = "";
             document.getElementById("sugerencias").classList.add("hidden");
@@ -974,7 +941,7 @@
         }
 
         function renderSugerencias(data) {
-            const tablaBody = document.getElementById("editarDetallePedidoBody");
+            const tablaBody = document.getElementById("editarDetalleInventarioBody");
             lista.innerHTML = "";
 
             if (!data || data.length === 0) {
@@ -992,7 +959,7 @@
                 const nombreSubcategoria = sub?.nombreSubcategoria ?? '--';
                 const nombreTalla = talla?.nombreTalla ?? '--';
                 const nombreColor = color?.nombreColor ?? '--';
-                const precio = sub?.prendaSubcategoria ?? '--';
+                const cantidad = prenda.stockPrenda;
 
                 const texto = document.createTextNode(codigo + " - " +
                         nombreCategoria + " - " + nombreSubcategoria + " · Talla " +
@@ -1008,6 +975,7 @@
 
                     document.getElementById("prendaSeleccionada").value = infoSeleccionada;
                     document.getElementById("codigoPrendaSeleccionada").value = codigo;
+                    document.getElementById("cantidadSistemaPrenda").value = cantidad;
                     document.getElementById("infoPrendaSeleccionada").classList.remove("hidden");
 
                     input.value = "";
@@ -1020,9 +988,10 @@
             lista.classList.remove("hidden");
         }
 
-        function agregarPrendaTabla( { codigo, nombreCategoria, nombreSubcategoria, nombreTalla, nombreColor, cantidad, costoUnitario, subtotal }, tablaBody) {
+        function agregarPrendaTabla( { codigo, nombreCategoria, nombreSubcategoria, nombreTalla, nombreColor, cantidadSistema, cantidadExistente, observacion }, tablaBody) {
             // Buscar si ya existe un <tr> con ese código
             const filas = tablaBody.querySelectorAll("tr");
+
             for (let fila of filas) {
                 const codigoCelda = fila.children[0].textContent.trim();
                 if (codigoCelda === codigo) {
@@ -1031,20 +1000,6 @@
                     cantidadActual += 1;
                     celdaCantidad.textContent = cantidadActual;
 
-                    // Recalcular el subtotal en la celda 6
-                    const celdaCosto = fila.children[5];
-                    const celdaSubtotal = fila.children[6];
-                    const costoTexto = celdaCosto.textContent.replace(/[^\d]/g, "");
-                    const costoUnitario = parseInt(costoTexto);
-                    const nuevoSubtotal = cantidadActual * costoUnitario;
-                    celdaSubtotal.textContent = "$" + Intl.NumberFormat("es-CO").format(nuevoSubtotal);
-
-                    // Actualizar totales generales
-                    if (origenAgregarPrenda === "editar") {
-                        actualizarTotalesPedido();
-                    } else if (origenAgregarPrenda === "agregar") {
-                        actualizarTotalesPedidoAgregar();
-                    }
                     return;
                 }
             }
@@ -1075,22 +1030,22 @@
             td4.appendChild(document.createTextNode(nombreColor));
             tr.appendChild(td4);
 
-            // Celda 5: Cantidad
+            // Celda 5: Cantidad Sistema
             const td5 = document.createElement("td");
             td5.className = "px-3 py-2 border border-white";
-            td5.appendChild(document.createTextNode(cantidad));
+            td5.appendChild(document.createTextNode(cantidadSistema));
             tr.appendChild(td5);
 
-            // Celda 6: Costo unitario
+            // Celda 6: Cantidad Existente
             const td6 = document.createElement("td");
             td6.className = "px-3 py-2 border border-white";
-            td6.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(costoUnitario)));
+            td6.appendChild(document.createTextNode(cantidadExistente));
             tr.appendChild(td6);
 
-            // Celda 7: Subtotal
+            // Celda 7: Observación
             const td7 = document.createElement("td");
             td7.className = "px-3 py-2 border border-white";
-            td7.appendChild(document.createTextNode("$" + Intl.NumberFormat("es-CO").format(subtotal)));
+            td7.appendChild(document.createTextNode(observacion));
             tr.appendChild(td7);
 
             // Celda 8: Botón eliminar con ícono
@@ -1108,36 +1063,26 @@
             btn.appendChild(icon);
             btn.onclick = function () {
                 this.closest('tr').remove();
-                if (origenAgregarPrenda === "editar") {
-                    actualizarTotalesPedido();
-                } else if (origenAgregarPrenda === "agregar") {
-                    actualizarTotalesPedidoAgregar();
-                }
             };
+
             td8.appendChild(btn);
             tr.appendChild(td8);
 
             tablaBody.appendChild(tr);
-
-            if (origenAgregarPrenda === "editar") {
-                actualizarTotalesPedido();
-            } else if (origenAgregarPrenda === "agregar") {
-                actualizarTotalesPedidoAgregar();
-        }
         }
 
-        function agregarPrendaAlPedido() {
+        function agregarPrendaAlInventario() {
             let tablaBody = null;
 
             if (origenAgregarPrenda === "editar") {
-                tablaBody = document.getElementById("editarDetallePedidoBody");
+                tablaBody = document.getElementById("editarDetalleInventarioBody");
             } else if (origenAgregarPrenda === "agregar") {
-                tablaBody = document.getElementById("agregarDetallePedidoBody");
+                tablaBody = document.getElementById("agregarDetalleInventarioBody");
             } else {
                 alert("No se pudo determinar a qué tabla agregar la prenda.");
                 return;
             }
-
+            
             const codigo = document.getElementById("codigoPrendaSeleccionada")?.value;
             const info = document.getElementById("prendaSeleccionada")?.value;
 
@@ -1146,12 +1091,12 @@
                 return;
             }
 
-            const cantidad = parseInt(document.getElementById("cantidadPrenda").value);
-            const costoUnitario = parseFloat(document.getElementById("costoUnitarioPrenda").value);
-            const subtotal = cantidad * costoUnitario;
+            const cantidadSistema = parseInt(document.getElementById("cantidadSistemaPrenda").value);
+            const cantidadExistente = parseInt(document.getElementById("cantidadExistentePrenda").value);
+            const observacion = document.getElementById("observacionPrenda").value.trim();
 
-            if (isNaN(cantidad) || isNaN(costoUnitario)) {
-                alert("Cantidad y costo unitario deben ser válidos.");
+            if (isNaN(cantidadSistema) || isNaN(cantidadExistente)) {
+                alert("Cantidad existente debe ser válida.");
                 return;
             }
 
@@ -1167,54 +1112,12 @@
                 nombreSubcategoria,
                 nombreTalla,
                 nombreColor,
-                cantidad,
-                costoUnitario,
-                subtotal
+                cantidadSistema,
+                cantidadExistente,
+                observacion
             }, tablaBody);
 
             cerrarModalAgregarPrenda();
-
-            if (origenAgregarPrenda === "editar") {
-                actualizarTotalesPedido();
-            } else if (origenAgregarPrenda === "agregar") {
-                actualizarTotalesPedidoAgregar();
-            }
-        }
-
-        function actualizarTotalesPedido() {
-            const filas = document.querySelectorAll("#editarDetallePedidoBody tr");
-            let totalCantidad = 0;
-            let totalPrecio = 0;
-
-            filas.forEach(fila => {
-                const cantidad = parseInt(fila.children[4]?.textContent.trim() || "0");
-                const subtotalTexto = fila.children[6]?.textContent.trim().replace(/[^\d]/g, "") || "0";
-                const subtotal = parseInt(subtotalTexto);
-
-                totalCantidad += cantidad;
-                totalPrecio += subtotal;
-            });
-
-            document.getElementById("editarCantidad").value = totalCantidad;
-            document.getElementById("editarPrecio").value = "$" + Intl.NumberFormat("es-CO").format(totalPrecio);
-        }
-
-        function actualizarTotalesPedidoAgregar() {
-            const filas = document.querySelectorAll("#agregarDetallePedidoBody tr");
-            let totalCantidad = 0;
-            let totalPrecio = 0;
-
-            filas.forEach(fila => {
-                const cantidad = parseInt(fila.children[4]?.textContent.trim() || "0");
-                const subtotalTexto = fila.children[6]?.textContent.trim().replace(/[^\d]/g, "") || "0";
-                const subtotal = parseInt(subtotalTexto);
-
-                totalCantidad += cantidad;
-                totalPrecio += subtotal;
-            });
-
-            document.getElementById("agregarCantidad").value = totalCantidad;
-            document.getElementById("agregarPrecio").value = "$" + Intl.NumberFormat("es-CO").format(totalPrecio);
         }
 
         function abrirModalAgregarPrendaDesdeAgregar() {
@@ -1235,17 +1138,17 @@
                 inputFecha.value = hoy;
             }
 
-            document.getElementById("modalAgregarPedido").classList.remove("hidden");
+            document.getElementById("modalAgregarInventario").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         }
 
         function cerrarModalAgregar() {
-            document.getElementById("modalAgregarPedido").classList.add("hidden");
+            document.getElementById("modalAgregarInventario").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
         }
 
         function cerrarModalEditar() {
-            document.getElementById("modalEditarPedido").classList.add("hidden");
+            document.getElementById("modalEditarInventario").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
         }
 

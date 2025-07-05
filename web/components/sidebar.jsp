@@ -22,6 +22,7 @@
         }
     }
 %>
+
 <%!
     public boolean tienePermiso(Set<Integer> permisos, int id)
     {
@@ -144,7 +145,7 @@
 
             <% if (tienePermiso(idsPermisos, 11))
                 {%>
-            <a href="${pageContext.request.contextPath}/Inventario" name="nav-item" class="flex items-center gap-2 text-black font-semibold px-4 py-2 rounded border-2 border-black bg-invehin-backgroundAlt hover:bg-invehin-primaryLighter
+            <a href="${pageContext.request.contextPath}/Inventarios" name="nav-item" class="flex items-center gap-2 text-black font-semibold px-4 py-2 rounded border-2 border-black bg-invehin-backgroundAlt hover:bg-invehin-primaryLighter
                <%= request.getRequestURI().endsWith("/Views/inventario/inventario.jsp") ? "bg-invehin-primaryLighter" : ""%>">
                 <i class="fas fa-warehouse text-xl" title="Inventario"></i>
                 <span class="sidebar-text">Inventario</span>

@@ -1,26 +1,22 @@
 package servlets;
 
-import Interfaces.IPedido;
-import Interfaces.IProveedor;
+import Interfaces.IInventario;
+import Logica.Inventario;
 import Logica.PaginacionResultado;
-import Logica.Pedido;
-import Logica.Proveedor;
 import com.google.gson.Gson;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  *
  * @author Ing. Sebastian Sierra
  */
-public class Pedidos extends HttpServlet
+public class Inventarios extends HttpServlet
 {
 
     @Override
@@ -29,10 +25,6 @@ public class Pedidos extends HttpServlet
     {
         try
         {
-            // Detectar si es una llamada AJAX
-            String modo = request.getParameter("modo");
-            boolean esAjax = "ajax".equalsIgnoreCase(modo);
-
             // Parámetros de búsqueda y paginación
             String paramSearchTerm = request.getParameter("searchTerm");
             String paramNumPage = request.getParameter("numPage");
@@ -42,27 +34,19 @@ public class Pedidos extends HttpServlet
             int numPage = (paramNumPage != null) ? Integer.parseInt(paramNumPage) : 1;
             int pageSize = (paramPageSize != null) ? Integer.parseInt(paramPageSize) : 10;
 
-            // Obtener pedidos
-            IPedido servicioPedido = new Pedido();
-            PaginacionResultado<Pedido> pedidos = servicioPedido.obtenerPedidos(searchTerm, numPage, pageSize);
-
-            // Solo en la carga inicial se obtienen los datos estáticos necesarios para la vista
-            if (!esAjax)
-            {
-                IProveedor servicioProveedor = new Proveedor();
-                List<Proveedor> proveedores = servicioProveedor.obtenerProveedores();
-                request.setAttribute("proveedores", proveedores);
-            }
+            // Obtener inventarios
+            IInventario servicioInventario = new Inventario();
+            PaginacionResultado<Inventario> inventarios = servicioInventario.obtenerInventarios(searchTerm, numPage, pageSize);
 
             // Atributos compartidos
-            request.setAttribute("pedidos", pedidos.getItems());
-            request.setAttribute("totalPedidos", pedidos.getTotal());
+            request.setAttribute("inventarios", inventarios.getItems());
+            request.setAttribute("totalInventarios", inventarios.getTotal());
             request.setAttribute("numPage", numPage);
             request.setAttribute("pageSize", pageSize);
             request.setAttribute("searchTerm", searchTerm);
 
             response.setContentType("text/html;charset=UTF-8");
-            request.getRequestDispatcher("Views/pedidos/pedidos.jsp").forward(request, response);
+            request.getRequestDispatcher("Views/inventario/inventario.jsp").forward(request, response);
         } catch (Exception e)
         {
             e.printStackTrace();
@@ -76,19 +60,17 @@ public class Pedidos extends HttpServlet
     {
         try
         {
-            String fechaPedidoStr = request.getParameter("fechaPedido");
-            Timestamp fechaPedido = Timestamp.valueOf(fechaPedidoStr + " 00:00:00");
-            int idProveedor = Integer.parseInt(request.getParameter("idProveedor"));
-            boolean estadoPedido = Boolean.parseBoolean(request.getParameter("estadoPedido"));
-            String detallesPedidoJson = request.getParameter("detallesPedidoJson");
+            String observacionInventario = request.getParameter("observacionInventario");
+            int idUsuario = Integer.parseInt(request.getParameter("idUsuario"));
+            String detallesInventarioJson = request.getParameter("detallesInventarioJson");
 
-            IPedido servicioPedido = new Pedido();
-            boolean exito = servicioPedido.crearPedido(fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
+            IInventario servicioInventario = new Inventario();
+            boolean exito = servicioInventario.crearInventario(observacionInventario, idUsuario, detallesInventarioJson);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
-            resultado.put("mensaje", exito ? "Pedido registrado correctamente." : "Error al registrar el pedido.");
+            resultado.put("mensaje", exito ? "Inventario registrado correctamente." : "Error al registrar el inventario.");
 
             response.getWriter().write(new Gson().toJson(resultado));
         } catch (Exception e)
@@ -98,7 +80,7 @@ public class Pedidos extends HttpServlet
 
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
-            error.put("mensaje", "Ocurrió un error al procesar el pedido.");
+            error.put("mensaje", "Ocurrió un error al procesar el inventario.");
 
             response.getWriter().write(new Gson().toJson(error));
         }
@@ -122,31 +104,28 @@ public class Pedidos extends HttpServlet
             Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
-            Object idPedidoRaw = body.get("idPedido");
-            Object fechaPedidoRaw = body.get("fechaPedido");
-            Object idProveedorRaw = body.get("idProveedor");
-            Object estadoPedidoRaw = body.get("estadoPedido");
-            Object detallesPedidoJsonRaw = body.get("detallesPedidoJson");
+            Object idInventarioRaw = body.get("idInventario");
+            Object observacionInventarioRaw = body.get("observacionInventario");
+            Object estadoInventarioRaw = body.get("estadoInventario");
+            Object detallesInventarioJsonRaw = body.get("detallesInventarioJson");
 
-            if (idPedidoRaw == null || fechaPedidoRaw == null || estadoPedidoRaw == null || idProveedorRaw == null || detallesPedidoJsonRaw == null)
+            if (idInventarioRaw == null || observacionInventarioRaw == null || estadoInventarioRaw == null || detallesInventarioJsonRaw == null)
             {
                 throw new IllegalArgumentException("Datos incompletos.");
             }
 
-            int idPedido = ((Double) idPedidoRaw).intValue();
-            String fechaPedidoStr = ((String) fechaPedidoRaw);
-            Timestamp fechaPedido = Timestamp.valueOf(fechaPedidoStr + " 00:00:00");
-            int idProveedor = ((Double) idProveedorRaw).intValue();
-            boolean estadoPedido = ((Boolean) estadoPedidoRaw);
-            String detallesPedidoJson = (String) detallesPedidoJsonRaw;
+            int idInventario = Integer.parseInt(idInventarioRaw.toString());
+            String observacionInventario = observacionInventarioRaw.toString();
+            boolean estadoInventario = Boolean.parseBoolean(estadoInventarioRaw.toString());
+            String detallesInventarioJson = detallesInventarioJsonRaw.toString();
 
-            IPedido servicioPedido = new Pedido();
-            boolean exito = servicioPedido.actualizarPedido(idPedido, fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
+            IInventario servicioInventario = new Inventario();
+            boolean exito = servicioInventario.actualizarInventario(idInventario, observacionInventario, estadoInventario, detallesInventarioJson);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
-            resultado.put("mensaje", exito ? "Pedido actualizado correctamente." : "Error al actualizar el pedido.");
+            resultado.put("mensaje", exito ? "Inventario actualizado correctamente." : "Error al actualizar el inventario.");
             response.getWriter().write(gson.toJson(resultado));
         } catch (Exception e)
         {
@@ -155,7 +134,7 @@ public class Pedidos extends HttpServlet
 
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
-            error.put("mensaje", "Ocurrió un error al actualizar el pedido.");
+            error.put("mensaje", "Ocurrió un error al actualizar el inventario.");
             response.getWriter().write(new Gson().toJson(error));
         }
     }

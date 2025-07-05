@@ -13,20 +13,22 @@ public class DetalleInventario implements IDetalleInventario
     public int cantidadregistradaDetalleInventario;
     public int cantidadsistemaDetalleInventario;
     public String observacionDetalleInventario;
-    public Prenda prendaDetalleInventario;
+    public String prendacodigoDetalleInventario;
+    public String prendanombreDetalleInventario;
     public int idinventarioDetalleInventario;
 
     public DetalleInventario()
     {
     }
 
-    public DetalleInventario(int idDetalleInventario, int cantidadregistradaDetalleInventario, int cantidadsistemaDetalleInventario, String observacionDetalleInventario, Prenda prendaDetalleInventario, int idinventarioDetalleInventario)
+    public DetalleInventario(int idDetalleInventario, int cantidadregistradaDetalleInventario, int cantidadsistemaDetalleInventario, String observacionDetalleInventario, String prendacodigoDetalleInventario, String prendanombreDetalleInventario, int idinventarioDetalleInventario)
     {
         this.idDetalleInventario = idDetalleInventario;
         this.cantidadregistradaDetalleInventario = cantidadregistradaDetalleInventario;
         this.cantidadsistemaDetalleInventario = cantidadsistemaDetalleInventario;
         this.observacionDetalleInventario = observacionDetalleInventario;
-        this.prendaDetalleInventario = prendaDetalleInventario;
+        this.prendacodigoDetalleInventario = prendacodigoDetalleInventario;
+        this.prendanombreDetalleInventario = prendanombreDetalleInventario;
         this.idinventarioDetalleInventario = idinventarioDetalleInventario;
     }
 

@@ -1,9 +1,8 @@
 package Interfaces;
 
-import Logica.DetalleInventario;
 import Logica.Inventario;
-import Logica.Usuario;
-import java.util.Date;
+import Logica.PaginacionResultado;
+import java.sql.Timestamp;
 import java.util.List;
 
 /**
@@ -13,11 +12,15 @@ import java.util.List;
 public interface IInventario
 {
 
-    boolean crearInventario(Date fechaInventario, String observacionInventario, boolean estadoInventario, int usuarioInventario, List<DetalleInventario> detallesinventarioInventario);
+    boolean crearInventario(String observacionInventario, int idUsuario, String detallesInventarioJson);
 
-    boolean actualizarInventario(int idInventario, Date fechaInventario, String observacionInventario, boolean estadoInventario, int usuarioInventario, List<DetalleInventario> detallesinventarioInventario);
+    boolean actualizarInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson);
 
     boolean eliminarInventario(int idInventario);
 
     Inventario obtenerInventario(int idInventario);
+
+    PaginacionResultado<Inventario> obtenerInventarios(String searchTerm, int numPage, int pageSize);
+
+    List<Inventario> obtenerReporteInventarios(Timestamp fechaInicio, Timestamp fechaFin, Boolean estadoInventario);
 }

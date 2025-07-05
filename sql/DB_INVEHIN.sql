@@ -34,7 +34,7 @@ BEGIN
 	FROM
 		detallepedido dp
 	WHERE
-		dp.id_detallepedido = pedidoId;
+		dp.fk_id_pedido = pedidoId;
 	
 	RETURN total;
 
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   CONSTRAINT `fk_cliente_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.cliente: ~8 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.cliente: ~10 rows (aproximadamente)
 INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente`, `estado_cliente`, `fk_id_persona`) VALUES
 	(1, 'Cra 1 #10-10', '2025-05-10 14:15:30', 1, 9),
 	(2, 'Cra 2 #20-20', '2025-06-10 10:32:00', 1, 10),
@@ -586,7 +586,7 @@ DELIMITER ;
 -- Volcando estructura para tabla db_invehin.detalleinventario
 CREATE TABLE IF NOT EXISTS `detalleinventario` (
   `id_detalleinventario` int NOT NULL AUTO_INCREMENT,
-  `observacion_detalleinventario` varchar(100) DEFAULT NULL,
+  `observacion_detalleinventario` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `cantidadregistrada_detalleinventario` int NOT NULL,
   `cantidadsistema_detalleinventario` int NOT NULL,
   `fk_id_inventario` int NOT NULL,
@@ -596,7 +596,7 @@ CREATE TABLE IF NOT EXISTS `detalleinventario` (
   KEY `fk_inventarioprenda_prenda_idx` (`fk_codigo_prenda`),
   CONSTRAINT `fk_inventarioprenda_inventario` FOREIGN KEY (`fk_id_inventario`) REFERENCES `inventario` (`id_inventario`) ON UPDATE CASCADE,
   CONSTRAINT `fk_inventarioprenda_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detalleinventario: ~24 rows (aproximadamente)
 INSERT INTO `detalleinventario` (`id_detalleinventario`, `observacion_detalleinventario`, `cantidadregistrada_detalleinventario`, `cantidadsistema_detalleinventario`, `fk_id_inventario`, `fk_codigo_prenda`) VALUES
@@ -623,7 +623,8 @@ INSERT INTO `detalleinventario` (`id_detalleinventario`, `observacion_detalleinv
 	(21, 'Estado inactivo', 27, 27, 9, 'PR008'),
 	(22, 'Faltan 2', 2, 4, 9, 'PR006'),
 	(23, 'Sin inventario', 0, 0, 10, 'PR001'),
-	(24, 'Revisión de stock', 11, 12, 10, 'PR004');
+	(24, 'Revisión de stock', 11, 12, 10, 'PR004'),
+	(46, 'Pero que ha pasao?', 120, 127, 23, 'PR005');
 
 -- Volcando estructura para tabla db_invehin.detallepedido
 CREATE TABLE IF NOT EXISTS `detallepedido` (
@@ -637,7 +638,7 @@ CREATE TABLE IF NOT EXISTS `detallepedido` (
   KEY `fk_pedidoprenda_prenda_idx` (`fk_codigo_prenda`),
   CONSTRAINT `fk_pedidoprenda_pedido` FOREIGN KEY (`fk_id_pedido`) REFERENCES `pedido` (`id_pedido`) ON UPDATE CASCADE,
   CONSTRAINT `fk_pedidoprenda_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detallepedido: ~22 rows (aproximadamente)
 INSERT INTO `detallepedido` (`id_detallepedido`, `cantidad_detallepedido`, `costounitario_detallepedido`, `fk_id_pedido`, `fk_codigo_prenda`) VALUES
@@ -661,8 +662,10 @@ INSERT INTO `detallepedido` (`id_detallepedido`, `cantidad_detallepedido`, `cost
 	(40, 7, 32500, 8, 'PR007'),
 	(41, 18, 59000, 8, 'PR005'),
 	(42, 10, 41000, 9, 'PR003'),
-	(43, 13, 30000, 10, 'PR002'),
-	(44, 5, 28500, 10, 'PR006');
+	(54, 1, 30000, 10, 'FM001'),
+	(55, 14, 30000, 10, 'PR002'),
+	(56, 2, 23100, 11, 'SC001'),
+	(57, 6, 21300, 11, 'CM001');
 
 -- Volcando estructura para tabla db_invehin.detalleventa
 CREATE TABLE IF NOT EXISTS `detalleventa` (
@@ -935,6 +938,7 @@ DELIMITER //
 CREATE PROCEDURE `insert_pedido`(
 	IN `fecha` DATE,
 	IN `proveedor_id` INT,
+	IN `estado` TINYINT,
 	IN `detalles_pedido` JSON
 )
 BEGIN
@@ -950,9 +954,11 @@ BEGIN
 		
 	INSERT INTO pedido (
 		pedido.fecha_pedido,
+		pedido.estado_pedido,
 		pedido.fk_id_proveedor
 	) VALUES (
 		fecha,
+		estado,
 		proveedor_id
 	);
 	
@@ -1323,7 +1329,7 @@ CREATE TABLE IF NOT EXISTS `inventario` (
   PRIMARY KEY (`id_inventario`),
   KEY `fk_inventario_usuario_idx` (`fk_id_usuario`),
   CONSTRAINT `fk_inventario_usuario` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.inventario: ~10 rows (aproximadamente)
 INSERT INTO `inventario` (`id_inventario`, `fecha_inventario`, `observacion_inventario`, `estado_inventario`, `fk_id_usuario`) VALUES
@@ -1336,7 +1342,8 @@ INSERT INTO `inventario` (`id_inventario`, `fecha_inventario`, `observacion_inve
 	(7, '2025-05-23 23:38:23', 'Inventario automático 7', 1, 4),
 	(8, '2025-05-22 23:38:23', 'Inventario automático 8', 1, 4),
 	(9, '2025-05-21 23:38:23', 'Inventario automático 9', 1, 4),
-	(10, '2025-05-23 23:38:23', 'Inventario automático 10', 1, 4);
+	(10, '2025-05-23 23:38:23', 'Inventario automático 10', 1, 4),
+	(23, '2025-07-04 18:49:10', 'Todo good', 0, 1);
 
 -- Volcando estructura para procedimiento db_invehin.login
 DELIMITER //
@@ -1412,20 +1419,21 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   PRIMARY KEY (`id_pedido`),
   KEY `fk_pedido_proveedor_idx` (`fk_id_proveedor`),
   CONSTRAINT `fk_pedido_proveedor` FOREIGN KEY (`fk_id_proveedor`) REFERENCES `proveedor` (`id_proveedor`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.pedido: ~10 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.pedido: ~11 rows (aproximadamente)
 INSERT INTO `pedido` (`id_pedido`, `fecha_pedido`, `estado_pedido`, `fk_id_proveedor`) VALUES
 	(1, '2025-05-01', 1, 1),
-	(2, '2025-05-02', 1, 1),
-	(3, '2025-05-03', 1, 1),
+	(2, '2025-05-02', 1, 7),
+	(3, '2025-05-03', 1, 4),
 	(4, '2025-05-04', 1, 1),
-	(5, '2025-05-05', 1, 1),
+	(5, '2025-05-05', 1, 11),
 	(6, '2025-05-06', 1, 1),
 	(7, '2025-05-07', 1, 1),
-	(8, '2025-05-08', 1, 1),
+	(8, '2025-05-08', 1, 7),
 	(9, '2025-05-09', 1, 1),
-	(10, '2025-05-10', 1, 1);
+	(10, '2025-05-10', 0, 2),
+	(11, '2025-07-04', 0, 11);
 
 -- Volcando estructura para tabla db_invehin.permiso
 CREATE TABLE IF NOT EXISTS `permiso` (
@@ -1434,7 +1442,7 @@ CREATE TABLE IF NOT EXISTS `permiso` (
   PRIMARY KEY (`id_permiso`)
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.permiso: ~13 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.permiso: ~11 rows (aproximadamente)
 INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`) VALUES
 	(1, 'Gestionar categorias'),
 	(2, 'Gestionar subcategorias'),
@@ -1461,7 +1469,7 @@ CREATE TABLE IF NOT EXISTS `permisorol` (
   CONSTRAINT `fk_permisorol_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.permisorol: ~27 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.permisorol: ~24 rows (aproximadamente)
 INSERT INTO `permisorol` (`id_permisorol`, `estado_permisorol`, `fk_id_permiso`, `fk_id_rol`) VALUES
 	(1, 1, 1, 1),
 	(2, 1, 2, 1),
@@ -1547,19 +1555,19 @@ CREATE TABLE IF NOT EXISTS `prenda` (
 -- Volcando datos para la tabla db_invehin.prenda: ~14 rows (aproximadamente)
 INSERT INTO `prenda` (`codigo_prenda`, `stock_prenda`, `stockminimo_prenda`, `fk_id_color`, `fk_id_estadoprenda`, `fk_id_subcategoria`, `fk_id_talla`) VALUES
 	('1', 1, 1, 7, 3, 17, 1),
-	('CM001', 30, 7, 8, 1, 21, 5),
-	('FM001', 45, 10, 7, 1, 13, 1),
+	('CM001', 36, 7, 8, 1, 21, 5),
+	('FM001', 49, 10, 7, 1, 13, 1),
 	('PR001', 5, 10, 1, 1, 1, 1),
-	('PR002', 105, 10, 2, 1, 2, 2),
+	('PR002', 184, 10, 2, 1, 2, 2),
 	('PR003', 71, 5, 3, 2, 3, 3),
 	('PR004', 32, 5, 4, 1, 4, 4),
 	('PR005', 127, 15, 5, 1, 5, 5),
-	('PR006', 42, 5, 1, 1, 1, 1),
+	('PR006', 47, 5, 1, 1, 1, 1),
 	('PR007', 57, 5, 2, 1, 2, 2),
 	('PR008', 53, 5, 3, 2, 3, 3),
 	('PR009', 87, 5, 4, 1, 4, 4),
 	('PR010', 16, 15, 5, 3, 5, 5),
-	('SC001', 10, 5, 4, 1, 36, 3),
+	('SC001', 12, 5, 4, 1, 36, 3),
 	('SH001', 5, 5, 1, 1, 27, 2);
 
 -- Volcando estructura para tabla db_invehin.promocion
@@ -1593,7 +1601,7 @@ CREATE TABLE IF NOT EXISTS `proveedor` (
   CONSTRAINT `fk_proveedor_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.proveedor: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.proveedor: ~10 rows (aproximadamente)
 INSERT INTO `proveedor` (`id_proveedor`, `nombre_proveedor`, `direccion_proveedor`, `correo_proveedor`, `estado_proveedor`, `fk_id_persona`) VALUES
 	(1, 'Koaj', 'Calle 1 #100', 'proveedorA@example.com', 1, 1),
 	(2, 'Proveedor B', 'Calle 2 #200', 'proveedorB@example.com', 1, 2),
@@ -1606,6 +1614,84 @@ INSERT INTO `proveedor` (`id_proveedor`, `nombre_proveedor`, `direccion_proveedo
 	(9, 'Proveedor D', 'Calle 4 #400', 'proveedorD@example.com', 1, 4),
 	(10, 'Proveedor E', 'Calle 5 #500', 'proveedorE@example.com', 1, 5),
 	(11, 'Todo Prendas', 'Las avenidas', 'todoprendas@gmail.com', 1, 20);
+
+-- Volcando estructura para procedimiento db_invehin.reporte_inventarios
+DELIMITER //
+CREATE PROCEDURE `reporte_inventarios`(
+	IN `fecha_inicio` DATE,
+	IN `fecha_fin` DATE,
+	IN `estado` TINYINT
+)
+BEGIN
+	
+	START TRANSACTION;
+	
+	-- inventarios
+	SELECT
+		i.id_inventario AS id,
+		i.fecha_inventario AS fecha,
+		i.observacion_inventario AS observacion,
+		i.estado_inventario AS estado,
+		i.fk_id_usuario AS usuario_id,
+		CONCAT(p.nombres_persona, ' ', p.apellidos_persona) AS usuario_nombre
+	FROM
+		inventario i
+	INNER JOIN usuario u ON i.fk_id_usuario = u.id_usuario
+	INNER JOIN persona p ON u.fk_id_persona = p.id_persona
+	WHERE
+		i.fecha_inventario BETWEEN fecha_inicio AND fecha_fin
+		AND (estado IS NULL OR i.estado_inventario = estado)
+	ORDER BY
+		i.fecha_inventario DESC,
+		p.nombres_persona ASC,
+		p.apellidos_persona ASC;
+	
+   COMMIT;
+    
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.reporte_pedidos
+DELIMITER //
+CREATE PROCEDURE `reporte_pedidos`(
+	IN `fecha_inicio` DATE,
+	IN `fecha_fin` DATE,
+	IN `proveedor_id` INT,
+	IN `estado` TINYINT
+)
+BEGIN
+	
+	START TRANSACTION;
+	
+	-- pedidos
+	SELECT
+		vp.id,
+		vp.fecha,
+		vp.proveedor_id,
+		vp.proveedor_nombre,
+		calcular_total_pedido(vp.id) AS precio_total,
+		(
+	  		SELECT 
+				SUM(dp.cantidad_detallepedido)
+			FROM 
+				detallepedido dp
+			WHERE 
+				dp.fk_id_pedido = vp.id
+		) AS cantidad,
+		vp.estado
+	FROM
+		view_pedido vp
+	WHERE
+		vp.fecha BETWEEN fecha_inicio AND fecha_fin
+		AND (proveedor_id IS NULL OR vp.proveedor_id = proveedor_id)
+		AND (estado IS NULL OR vp.estado = estado)
+	ORDER BY
+		vp.fecha DESC;
+	
+   COMMIT;
+    
+END//
+DELIMITER ;
 
 -- Volcando estructura para procedimiento db_invehin.reporte_prendas
 DELIMITER //
@@ -1723,7 +1809,7 @@ CREATE TABLE IF NOT EXISTS `rol` (
   PRIMARY KEY (`id_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.rol: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.rol: ~6 rows (aproximadamente)
 INSERT INTO `rol` (`id_rol`, `nombre_rol`, `estado_rol`) VALUES
 	(1, 'SuperAdmin', 1),
 	(2, 'Invitado', 1),
@@ -2164,20 +2250,98 @@ DELIMITER ;
 
 -- Volcando estructura para procedimiento db_invehin.select_inventarios
 DELIMITER //
-CREATE PROCEDURE `select_inventarios`()
+CREATE PROCEDURE `select_inventarios`(
+	IN `search_term` VARCHAR(50),
+	IN `num_page` INT,
+	IN `page_size` INT
+)
 BEGIN
 
+	DECLARE offset_value INT;
+	SET offset_value = (num_page - 1) * page_size;
+	
+	START TRANSACTION;
+	
+	-- tabla temporal de inventarios
+	CREATE TEMPORARY TABLE temp_inventarios (id INT PRIMARY KEY);
+	INSERT INTO temp_inventarios (id)
+	SELECT
+		i.id_inventario AS id
+	FROM
+		inventario i
+	INNER JOIN usuario u ON i.fk_id_usuario = u.id_usuario
+	INNER JOIN persona p ON u.fk_id_persona = p.id_persona
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR i.fecha_inventario LIKE CONCAT('%', search_term, '%')
+		OR i.observacion_inventario LIKE CONCAT('%', search_term, '%')
+		OR p.nombres_persona LIKE CONCAT('%', search_term, '%')
+		OR p.apellidos_persona LIKE CONCAT('%', search_term, '%')
+	ORDER BY
+		i.fecha_inventario DESC
+	LIMIT page_size OFFSET offset_value;
+	
+	-- inventarios
 	SELECT
 		i.id_inventario AS id,
 		i.fecha_inventario AS fecha,
 		i.observacion_inventario AS observacion,
-		i.fk_id_usuario AS usuario_id
+		i.estado_inventario AS estado,
+		i.fk_id_usuario AS usuario_id,
+		CONCAT(p.nombres_persona, ' ', p.apellidos_persona) AS usuario_nombre
 	FROM
 		inventario i
+	INNER JOIN usuario u ON i.fk_id_usuario = u.id_usuario
+	INNER JOIN persona p ON u.fk_id_persona = p.id_persona
+	WHERE
+		i.id_inventario IN (SELECT ti.id FROM temp_inventarios ti)
 	ORDER BY
 		i.fecha_inventario DESC,
-		i.estado_inventario ASC;
+		p.nombres_persona ASC,
+		p.apellidos_persona ASC,
+		i.observacion_inventario ASC;
 
+	-- total inventarios
+	SELECT
+		COUNT(i.id_inventario) AS total_entries
+	FROM
+		inventario i
+	INNER JOIN usuario u ON i.fk_id_usuario = u.id_usuario
+	INNER JOIN persona p ON u.fk_id_persona = p.id_persona
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR i.fecha_inventario LIKE CONCAT('%', search_term, '%')
+		OR i.observacion_inventario LIKE CONCAT('%', search_term, '%')
+		OR p.nombres_persona LIKE CONCAT('%', search_term, '%')
+		OR p.apellidos_persona LIKE CONCAT('%', search_term, '%');
+	
+	-- detallesinventario
+	SELECT
+		di.id_detalleinventario AS id,
+		di.observacion_detalleinventario AS observacion,
+		di.cantidadregistrada_detalleinventario AS cantidad_registrada,
+		di.cantidadsistema_detalleinventario AS cantidad_sistema,
+		di.fk_id_inventario AS inventario_id,
+		di.fk_codigo_prenda AS prenda_codigo,
+		CONCAT(c.nombre_categoria, ' - ', s.nombre_subcategoria, ' - Talla ', t.nombre_talla, ' · ', co.nombre_color) AS prenda_nombre
+	FROM
+		detalleinventario di
+	INNER JOIN inventario i ON di.fk_id_inventario = i.id_inventario
+	INNER JOIN prenda p ON di.fk_codigo_prenda = p.codigo_prenda
+	INNER JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+	INNER JOIN categoria c ON s.fk_id_categoria = c.id_categoria
+	INNER JOIN color co ON p.fk_id_color = co.id_color
+	INNER JOIN talla t ON p.fk_id_talla = t.id_talla
+	WHERE
+		di.fk_id_inventario IN (SELECT ti.id FROM temp_inventarios ti)
+	ORDER BY
+		i.fecha_inventario DESC;
+	
+	-- Eliminar la tabla temporal
+    DROP TEMPORARY TABLE IF EXISTS temp_inventarios;
+    
+    COMMIT;
+    
 END//
 DELIMITER ;
 
@@ -2241,21 +2405,98 @@ DELIMITER ;
 
 -- Volcando estructura para procedimiento db_invehin.select_pedidos
 DELIMITER //
-CREATE PROCEDURE `select_pedidos`()
+CREATE PROCEDURE `select_pedidos`(
+	IN `search_term` VARCHAR(50),
+	IN `num_page` INT,
+	IN `page_size` INT
+)
 BEGIN
 
+	DECLARE offset_value INT;
+	SET offset_value = (num_page - 1) * page_size;
+	
+	START TRANSACTION;
+	
+	-- tabla temporal de pedidos
+	CREATE TEMPORARY TABLE temp_pedidos (id INT PRIMARY KEY);
+	INSERT INTO temp_pedidos (id)
 	SELECT
-		p.id_pedido AS id,
-		p.fecha_pedido AS fecha,
-		p.estado_pedido AS estado,
-		p.fk_id_proveedor AS proveedor_id,
-		calcular_total_pedido(p.id_pedido) AS percio_total
+		vp.id
 	FROM
-		pedido p
+		view_pedido vp
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR vp.fecha LIKE CONCAT('%', search_term, '%')
+		OR vp.proveedor_nombre LIKE CONCAT('%', search_term, '%')
 	ORDER BY
-		p.fecha_pedido DESC,
-		p.fk_id_proveedor ASC;
+		vp.fecha DESC
+	LIMIT page_size OFFSET offset_value;
+	
+	-- pedidos
+	SELECT
+		vp.id,
+		vp.fecha,
+		vp.estado,
+		vp.proveedor_id,
+		vp.proveedor_nombre,
+		calcular_total_pedido(vp.id) AS precio_total,
+		(
+	  		SELECT 
+				SUM(dp.cantidad_detallepedido)
+			FROM 
+				detallepedido dp
+			WHERE 
+				dp.fk_id_pedido = vp.id
+		) AS cantidad
+	FROM
+		view_pedido vp
+	WHERE
+		vp.id IN (SELECT tp.id FROM temp_pedidos tp)
+	ORDER BY
+		vp.fecha DESC,
+		vp.proveedor_nombre ASC;
 
+	-- total pedidos
+	SELECT
+		COUNT(vp.id) AS total_entries
+	FROM
+		view_pedido vp
+	WHERE
+		search_term IS NULL OR search_term = ''
+		OR vp.fecha LIKE CONCAT('%', search_term, '%')
+		OR vp.proveedor_nombre LIKE CONCAT('%', search_term, '%');
+	
+	-- detallespedido
+	SELECT
+		dp.id_detallepedido AS id,
+		dp.cantidad_detallepedido AS cantidad,
+		dp.costounitario_detallepedido AS costo_unitario,
+		dp.cantidad_detallepedido * dp.costounitario_detallepedido AS subtotal,
+		dp.fk_codigo_prenda AS prenda_codigo,
+		CONCAT(c.nombre_categoria, ' - ', s.nombre_subcategoria) AS prenda_nombre,
+		co.nombre_color AS prenda_color,
+		t.nombre_talla AS prenda_talla,
+		s.precio_subcategoria AS prenda_precio,
+		dp.fk_id_pedido AS pedido_id
+	FROM
+		detallepedido dp
+	INNER JOIN prenda p ON dp.fk_codigo_prenda = p.codigo_prenda
+	INNER JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+	INNER JOIN categoria c ON s.fk_id_categoria = c.id_categoria
+	INNER JOIN color co ON p.fk_id_color = co.id_color
+	INNER JOIN talla t ON p.fk_id_talla = t.id_talla
+	INNER JOIN pedido pe ON dp.fk_id_pedido = pe.id_pedido
+	WHERE
+		dp.fk_id_pedido IN (SELECT tp.id FROM temp_pedidos tp)
+	ORDER BY
+		pe.fecha_pedido DESC,
+		pe.id_pedido ASC;
+	
+	-- Eliminar la tabla temporal
+    DROP TEMPORARY TABLE IF EXISTS temp_pedidos;
+    
+    COMMIT;
+    
 END//
 DELIMITER ;
 
@@ -2623,6 +2864,24 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Volcando estructura para procedimiento db_invehin.select_proveedores_estaticos
+DELIMITER //
+CREATE PROCEDURE `select_proveedores_estaticos`()
+BEGIN
+
+	SELECT
+		vp.id,
+		vp.nombre
+	FROM
+		view_proveedor vp
+	WHERE
+		vp.estado = 1
+	ORDER BY
+		vp.nombre ASC;
+
+END//
+DELIMITER ;
+
 -- Volcando estructura para procedimiento db_invehin.select_proveedor_by_id
 DELIMITER //
 CREATE PROCEDURE `select_proveedor_by_id`(
@@ -2971,6 +3230,7 @@ BEGIN
 	SET offset_value = (num_page - 1) * page_size;
 	
 	START TRANSACTION;
+	
 	-- tabla temporal de ventas
 	CREATE TEMPORARY TABLE temp_ventas (id INT PRIMARY KEY);
 	INSERT INTO temp_ventas (id)
@@ -3309,7 +3569,6 @@ CREATE PROCEDURE `update_inventario`(
 	IN `id` INT,
 	IN `observacion` VARCHAR(500),
 	IN `estado` TINYINT,
-	IN `usuario_id` INT,
 	IN `detalles_inventario` JSON
 )
 BEGIN
@@ -3327,8 +3586,7 @@ BEGIN
 		inventario i
 	SET
 		i.observacion_inventario = observacion,
-		i.estado_inventario = estado,
-		i.fk_id_usuario = usuario_id
+		i.estado_inventario = estado
 	WHERE
 		i.id_inventario = id;
 		
@@ -3354,7 +3612,7 @@ BEGIN
 			detalle_observacion,
 			cantidad_registrada,
 			cantidad_sistema,
-			inventario_id,
+			id,
 			prenda_codigo
 		);
 		
@@ -3832,6 +4090,16 @@ CREATE TABLE `view_cliente` (
 	`genero` TINYINT(1) NULL
 ) ENGINE=MyISAM;
 
+-- Volcando estructura para vista db_invehin.view_pedido
+-- Creando tabla temporal para superar errores de dependencia de VIEW
+CREATE TABLE `view_pedido` (
+	`id` INT NOT NULL,
+	`fecha` DATE NOT NULL,
+	`estado` TINYINT(1) NOT NULL,
+	`proveedor_id` INT NOT NULL,
+	`proveedor_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_0900_ai_ci'
+) ENGINE=MyISAM;
+
 -- Volcando estructura para vista db_invehin.view_prenda
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `view_prenda` (
@@ -3950,6 +4218,10 @@ SET SQL_MODE=@OLDTMP_SQL_MODE;
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `view_cliente`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_cliente` AS select `c`.`id_cliente` AS `id`,`c`.`fecharegistro_cliente` AS `fecha_registro`,`c`.`direccion_cliente` AS `direccion`,`c`.`estado_cliente` AS `estado`,`p`.`id_persona` AS `persona_id`,`p`.`nombres_persona` AS `nombres`,`p`.`apellidos_persona` AS `apellidos`,`p`.`numeroidentificacion_persona` AS `numero_identificacion`,`p`.`telefono_persona` AS `telefono`,`p`.`genero_persona` AS `genero` from (`cliente` `c` join `persona` `p` on((`c`.`fk_id_persona` = `p`.`id_persona`))) order by `p`.`nombres_persona`,`p`.`apellidos_persona`;
+
+-- Eliminando tabla temporal y crear estructura final de VIEW
+DROP TABLE IF EXISTS `view_pedido`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `view_pedido` AS select `p`.`id_pedido` AS `id`,`p`.`fecha_pedido` AS `fecha`,`p`.`estado_pedido` AS `estado`,`pr`.`id_proveedor` AS `proveedor_id`,`pr`.`nombre_proveedor` AS `proveedor_nombre` from (`pedido` `p` join `proveedor` `pr` on((`p`.`fk_id_proveedor` = `pr`.`id_proveedor`)));
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `view_prenda`;
