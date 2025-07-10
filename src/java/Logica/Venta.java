@@ -4,6 +4,7 @@ import Entidades.EVenta;
 import Interfaces.IVenta;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -66,6 +67,14 @@ public class Venta implements IVenta
     }
 
     @Override
+    public double promedioVentas(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        EVenta result = new EVenta();
+        
+        return result.getPromedioVentas(fechaInicio, fechaFin);
+    }
+
+    @Override
     public PaginacionResultado<Venta> obtenerVentas(String searchTerm, int numPage, int pageSize)
     {
         EVenta result = new EVenta();
@@ -79,5 +88,13 @@ public class Venta implements IVenta
         EVenta result = new EVenta();
 
         return result.selectReporteVentas(fechaInicio, fechaFin);
+    }
+
+    @Override
+    public Map<Timestamp, Integer> totalVentasPorDia(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        EVenta result = new EVenta();
+        
+        return result.getTotalVentasPorDia(fechaInicio, fechaFin);
     }
 }

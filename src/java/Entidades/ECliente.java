@@ -3,8 +3,10 @@ package Entidades;
 import Logica.Cliente;
 import Logica.PaginacionResultado;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,6 +145,53 @@ public class ECliente
         }
 
         return exito;
+    }
+
+    
+    public int getTotalClientes(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        int total = 0;
+        System.out.println("FECHA INICIO" + fechaInicio);
+
+        String sql = "SELECT cantidad_clientes_por_rango(?, ?) AS total_clientes";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (PreparedStatement ps = db.obtener().prepareStatement(sql))
+            {
+                ps.setTimestamp(1, fechaInicio);
+                ps.setTimestamp(2, fechaFin);
+
+                try (ResultSet rs = ps.executeQuery())
+                {
+                    if (rs.next())
+                    {
+                        total = rs.getInt("total_clientes");
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return total;
     }
 
     public PaginacionResultado<Cliente> selectClientesPorTerminoBusqueda(String searchTerm, int numPage, int pageSize)

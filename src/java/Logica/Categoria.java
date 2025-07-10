@@ -3,6 +3,7 @@ package Logica;
 import Entidades.ECategoria;
 import Interfaces.ICategoria;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -66,5 +67,13 @@ public class Categoria implements ICategoria
         ECategoria result = new ECategoria();
 
         return result.selectCategorias();
+    }
+
+    @Override
+    public Map<String, Integer> valorCategorias()
+    {
+        ECategoria result = new ECategoria();
+        
+        return result.getValorCategorias();
     }
 }

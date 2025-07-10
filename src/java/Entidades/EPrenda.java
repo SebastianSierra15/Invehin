@@ -242,6 +242,73 @@ public class EPrenda
         return cantidad;
     }
 
+    public List<Prenda> getPrendasMasVendidas(int cantidad, Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        List<Prenda> prendas = new ArrayList<>();
+        String sql = "{CALL get_prendas_mas_vendidas_por_rango(?, ?, ?)}";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setInt(1, cantidad);
+                cs.setTimestamp(2, fechaInicio);
+                cs.setTimestamp(3, fechaFin);
+
+                try (ResultSet rs = cs.executeQuery())
+                {
+                    while (rs.next())
+                    {
+                        Color color = new Color(0, rs.getString("color_nombre"));
+                        Talla talla = new Talla(0, rs.getString("talla_nombre"));
+                        Categoria categoria = new Categoria(0, rs.getString("categoria_nombre"), true, new ArrayList<>());
+
+                        Subcategoria subcategoria = new Subcategoria(
+                                0,
+                                rs.getString("subcategoria_nombre"),
+                                0,
+                                "",
+                                true,
+                                categoria);
+
+                        Prenda prenda = new Prenda(
+                                rs.getString("codigo"),
+                                rs.getInt("cantidad_total"), // Se pasa la cantidad que se ha vendido en el stock para no crear otra variable
+                                0,
+                                color,
+                                new EstadoPrenda(),
+                                talla,
+                                subcategoria
+                        );
+
+                        prendas.add(prenda);
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return prendas;
+    }
+    
     public PaginacionResultado<Prenda> selectPrendasPorTerminoBusqueda(String searchTerm, int numPage, int pageSize)
     {
         List<Prenda> prendas = new ArrayList<>();

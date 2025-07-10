@@ -155,6 +155,96 @@ public class EVenta
         return total;
     }
 
+    public double getPromedioVentas(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        double promedio = 0;
+        System.out.println("FECHA INICIO" + fechaInicio);
+
+        String sql = "SELECT promedio_venta_por_rango(?, ?) AS promedio_ventas";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (PreparedStatement ps = db.obtener().prepareStatement(sql))
+            {
+                ps.setTimestamp(1, fechaInicio);
+                ps.setTimestamp(2, fechaFin);
+
+                try (ResultSet rs = ps.executeQuery())
+                {
+                    if (rs.next())
+                    {
+                        promedio = rs.getInt("promedio_ventas");
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return promedio;
+    }
+
+    public Map<Timestamp, Integer> getTotalVentasPorDia(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        Map<Timestamp, Integer> ventas = new HashMap<>();
+        String sql = "{CALL get_ventas_por_dia_por_rango(?, ?)}";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                cs.setTimestamp(1, fechaInicio);
+                cs.setTimestamp(2, fechaFin);
+
+                try (ResultSet rs = cs.executeQuery())
+                {
+                    while (rs.next())
+                    {
+                        ventas.put(rs.getTimestamp("fecha"), rs.getInt("total"));
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return ventas;
+    }
+
     public PaginacionResultado<Venta> selectVentasPorTerminoBusqueda(String searchTerm, int numPage, int pageSize)
     {
         List<Venta> ventas = new ArrayList<>();

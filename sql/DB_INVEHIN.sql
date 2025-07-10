@@ -159,6 +159,29 @@ BEGIN
 END//
 DELIMITER ;
 
+-- Volcando estructura para función db_invehin.cantidad_clientes_por_rango
+DELIMITER //
+CREATE FUNCTION `cantidad_clientes_por_rango`(
+	`fecha_inicio` DATE,
+	`fecha_fin` DATE
+) RETURNS int
+    DETERMINISTIC
+BEGIN
+	
+	DECLARE total INT;
+
+	SELECT
+		COUNT(c.id_cliente) INTO total
+	FROM
+		cliente c
+	WHERE
+		c.fecharegistro_cliente BETWEEN fecha_inicio AND fecha_fin;
+	
+	RETURN total;
+
+END//
+DELIMITER ;
+
 -- Volcando estructura para función db_invehin.cantidad_prendas_bajo_stock
 DELIMITER //
 CREATE FUNCTION `cantidad_prendas_bajo_stock`() RETURNS int
@@ -234,7 +257,7 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   PRIMARY KEY (`id_cliente`),
   KEY `fk_cliente_persona_idx` (`fk_id_persona`),
   CONSTRAINT `fk_cliente_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.cliente: ~10 rows (aproximadamente)
 INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente`, `estado_cliente`, `fk_id_persona`) VALUES
@@ -247,7 +270,8 @@ INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente
 	(7, 'Cra 7 #70-70', '2025-05-02 21:44:54', 1, 15),
 	(8, 'las avenidas', '2025-06-15 21:49:44', 0, 18),
 	(9, 'Los angeles', '2025-06-20 22:16:38', 1, 21),
-	(10, 'California', '2025-06-20 22:22:10', 1, 22);
+	(10, 'California', '2025-06-20 22:22:10', 1, 22),
+	(11, 'Florencia', '2025-07-05 14:13:09', 1, 23);
 
 -- Volcando estructura para tabla db_invehin.color
 CREATE TABLE IF NOT EXISTS `color` (
@@ -598,7 +622,7 @@ CREATE TABLE IF NOT EXISTS `detalleinventario` (
   CONSTRAINT `fk_inventarioprenda_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.detalleinventario: ~24 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.detalleinventario: ~25 rows (aproximadamente)
 INSERT INTO `detalleinventario` (`id_detalleinventario`, `observacion_detalleinventario`, `cantidadregistrada_detalleinventario`, `cantidadsistema_detalleinventario`, `fk_id_inventario`, `fk_codigo_prenda`) VALUES
 	(1, 'Stock agotado', 0, 0, 1, 'PR001'),
 	(2, 'Faltan 1', 28, 29, 2, 'PR002'),
@@ -678,7 +702,7 @@ CREATE TABLE IF NOT EXISTS `detalleventa` (
   KEY `fk_prendaventa_venta_idx` (`fk_id_venta`),
   CONSTRAINT `fk_prendaventa_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE,
   CONSTRAINT `fk_prendaventa_venta` FOREIGN KEY (`fk_id_venta`) REFERENCES `venta` (`id_venta`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detalleventa: ~32 rows (aproximadamente)
 INSERT INTO `detalleventa` (`id_detalleventa`, `cantidad_detalleventa`, `fk_codigo_prenda`, `fk_id_venta`) VALUES
@@ -720,7 +744,9 @@ INSERT INTO `detalleventa` (`id_detalleventa`, `cantidad_detalleventa`, `fk_codi
 	(36, 1, 'PR005', 25),
 	(37, 2, 'PR007', 26),
 	(38, 1, 'PR002', 27),
-	(39, 2, 'CM001', 28);
+	(39, 2, 'CM001', 28),
+	(40, 2, 'PR005', 29),
+	(41, 1, 'FM001', 29);
 
 -- Volcando estructura para tabla db_invehin.estadoprenda
 CREATE TABLE IF NOT EXISTS `estadoprenda` (
@@ -735,32 +761,87 @@ INSERT INTO `estadoprenda` (`id_estadoprenda`, `nombre_estadoprenda`) VALUES
 	(2, 'Descontinuado'),
 	(3, 'Inactiva');
 
--- Volcando estructura para procedimiento db_invehin.get_estadisticas_inicio
+-- Volcando estructura para procedimiento db_invehin.get_prendas_mas_vendidas_por_rango
 DELIMITER //
-CREATE PROCEDURE `get_estadisticas_inicio`()
+CREATE PROCEDURE `get_prendas_mas_vendidas_por_rango`(
+	IN `cantidad` INT,
+	IN `fecha_inicio` DATE,
+	IN `fecha_fin` DATE
+)
 BEGIN
 
 	SELECT
-		calcular_total_ventas_por_rango(CONCAT(CURDATE(), ' 00:00:00'), CONCAT(CURDATE(), ' 23:59:59')) AS ventas_dia,
-		cantidad_prendas_vendidas_por_rango(CONCAT(CURDATE(), ' 00:00:00'), CONCAT(CURDATE(), ' 23:59:59')) AS prendas_vendidas_dia,
-		cantidad_prendas_bajo_stock() AS prendas_bajo_stock,
-		calcular_total_ventas_por_rango(DATE_FORMAT(CURDATE(), '%Y-%m-01'), LAST_DAY(CURDATE())) AS ventas_mes;
+		p.codigo_prenda AS codigo,
+		c.nombre_categoria AS categoria_nombre,
+		s.nombre_subcategoria AS subcategoria_nombre,
+		t.nombre_talla AS talla_nombre,
+		co.nombre_color AS color_nombre,
+		SUM(dv.cantidad_detalleventa) AS cantidad_total
+	FROM
+		venta v
+	INNER JOIN detalleventa dv ON v.id_venta = dv.fk_id_venta
+	INNER JOIN prenda p ON dv.fk_codigo_prenda = p.codigo_prenda
+	INNER JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+	INNER JOIN categoria c ON s.fk_id_categoria = c.id_categoria
+	INNER JOIN color co ON p.fk_id_color = co.id_color
+	INNER JOIN talla t ON p.fk_id_talla = t.id_talla
+   WHERE
+   	v.fecha_venta BETWEEN fecha_inicio AND fecha_fin
+   GROUP BY
+   	p.codigo_prenda
+	ORDER BY
+		cantidad_total DESC,
+		c.nombre_categoria ASC,
+		s.nombre_subcategoria ASC,
+		t.nombre_talla ASC,
+		co.nombre_color ASC
+	LIMIT cantidad;
+
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.get_valor_prendas_por_categoria
+DELIMITER //
+CREATE PROCEDURE `get_valor_prendas_por_categoria`()
+BEGIN
 
 	SELECT
-		vp.codigo,
-		SUM(dv.cantidad_detalleventa) AS cantidad_vendida
+		c.nombre_categoria AS nombre,
+		SUM(p.stock_prenda * s.precio_subcategoria) AS total
 	FROM
-		view_prenda vp
-	INNER JOIN detalleventa dv ON vp.codigo = dv.fk_codigo_prenda
-	INNER JOIN venta v ON dv.fk_id_venta = v.id_venta
-	WHERE
-		YEAR(v.fecha_venta) = YEAR(CURDATE())
-		AND MONTH(v.fecha_venta) = MONTH(CURDATE())
+		prenda p
+	INNER JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+	INNER JOIN categoria c ON s.fk_id_categoria = c.id_categoria
 	GROUP BY
-		vp.codigo
+		c.nombre_categoria
 	ORDER BY
-		cantidad_vendida DESC
-	LIMIT 10;
+		c.nombre_categoria ASC;
+
+END//
+DELIMITER ;
+
+-- Volcando estructura para procedimiento db_invehin.get_ventas_por_dia_por_rango
+DELIMITER //
+CREATE PROCEDURE `get_ventas_por_dia_por_rango`(
+	IN `fecha_inicio` DATE,
+	IN `fecha_fin` DATE
+)
+BEGIN
+
+	SELECT
+		DATE(v.fecha_venta) AS fecha,
+		SUM(dv.cantidad_detalleventa * s.precio_subcategoria) AS total
+	FROM
+		venta v
+	INNER JOIN detalleventa dv ON v.id_venta = dv.fk_id_venta
+	INNER JOIN prenda p ON dv.fk_codigo_prenda = p.codigo_prenda
+	INNER JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+	WHERE
+      v.fecha_venta BETWEEN fecha_inicio AND fecha_fin
+	GROUP BY
+		DATE(v.fecha_venta)
+	ORDER BY
+		DATE(v.fecha_venta) ASC;
 
 END//
 DELIMITER ;
@@ -1505,7 +1586,7 @@ CREATE TABLE IF NOT EXISTS `persona` (
   `genero_persona` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_persona`),
   UNIQUE KEY `id_persona_UNIQUE` (`id_persona`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.persona: ~19 rows (aproximadamente)
 INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `numeroidentificacion_persona`, `telefono_persona`, `genero_persona`) VALUES
@@ -1527,9 +1608,10 @@ INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `nu
 	(17, 'Sebastian', 'Sierra', '1006506525', '3112929178', 1),
 	(18, 'Elias', 'Sierra', '1006506524', '3152919218', 1),
 	(19, 'Fernanda', 'Vargas', '1002603659', '3152926356', 0),
-	(20, 'Sebastian', 'Sierra Perdomo', NULL, '3112929178', NULL),
+	(20, 'Sebastian', 'Sierra', NULL, '3112929178', 1),
 	(21, 'Fabian', 'Garcia', '12131515', '312569486', 1),
-	(22, 'Fabian', 'Castro', '15555255', '3254805555', 1);
+	(22, 'Fabian', 'Castro', '15555255', '3254805555', 1),
+	(23, 'Juanito', 'Perez', '1500003', '3112659584', 1);
 
 -- Volcando estructura para tabla db_invehin.prenda
 CREATE TABLE IF NOT EXISTS `prenda` (
@@ -1556,19 +1638,93 @@ CREATE TABLE IF NOT EXISTS `prenda` (
 INSERT INTO `prenda` (`codigo_prenda`, `stock_prenda`, `stockminimo_prenda`, `fk_id_color`, `fk_id_estadoprenda`, `fk_id_subcategoria`, `fk_id_talla`) VALUES
 	('1', 1, 1, 7, 3, 17, 1),
 	('CM001', 36, 7, 8, 1, 21, 5),
-	('FM001', 49, 10, 7, 1, 13, 1),
+	('FM001', 48, 10, 7, 1, 13, 1),
 	('PR001', 5, 10, 1, 1, 1, 1),
 	('PR002', 184, 10, 2, 1, 2, 2),
 	('PR003', 71, 5, 3, 2, 3, 3),
 	('PR004', 32, 5, 4, 1, 4, 4),
-	('PR005', 127, 15, 5, 1, 5, 5),
+	('PR005', 125, 15, 5, 1, 5, 5),
 	('PR006', 47, 5, 1, 1, 1, 1),
 	('PR007', 57, 5, 2, 1, 2, 2),
 	('PR008', 53, 5, 3, 2, 3, 3),
 	('PR009', 87, 5, 4, 1, 4, 4),
 	('PR010', 16, 15, 5, 3, 5, 5),
+	('PR011', 35, 10, 1, 1, 1, 1),
+	('PR012', 65, 15, 2, 1, 2, 2),
+	('PR013', 45, 12, 3, 1, 3, 3),
+	('PR014', 28, 10, 4, 1, 4, 4),
+	('PR015', 150, 20, 5, 1, 5, 5),
+	('PR016', 90, 25, 1, 1, 6, 1),
+	('PR017', 120, 30, 2, 2, 7, 2),
+	('PR018', 110, 25, 3, 2, 8, 3),
+	('PR019', 80, 20, 4, 1, 9, 4),
+	('PR020', 95, 18, 5, 1, 10, 5),
+	('PR021', 65, 12, 1, 1, 11, 1),
+	('PR022', 75, 15, 2, 1, 12, 2),
+	('PR023', 105, 20, 3, 2, 13, 3),
+	('PR024', 55, 10, 4, 1, 14, 4),
+	('PR025', 95, 25, 5, 1, 15, 5),
+	('PR026', 50, 15, 1, 2, 16, 1),
+	('PR027', 60, 18, 2, 2, 17, 2),
+	('PR028', 70, 20, 3, 2, 18, 3),
+	('PR029', 50, 12, 4, 2, 19, 4),
+	('PR030', 120, 28, 5, 1, 20, 5),
+	('PR031', 55, 10, 1, 2, 21, 1),
+	('PR032', 65, 15, 2, 1, 22, 2),
+	('PR033', 75, 20, 3, 2, 23, 3),
+	('PR034', 100, 25, 4, 1, 24, 4),
+	('PR035', 90, 22, 5, 1, 25, 5),
+	('PR036', 110, 30, 1, 1, 26, 1),
+	('PR037', 120, 25, 2, 1, 27, 2),
+	('PR038', 80, 18, 3, 2, 28, 3),
+	('PR039', 55, 12, 4, 1, 29, 4),
+	('PR040', 70, 15, 5, 2, 30, 5),
+	('PR041', 50, 10, 1, 1, 31, 1),
+	('PR042', 60, 18, 2, 2, 32, 2),
+	('PR043', 40, 12, 3, 1, 33, 3),
+	('PR044', 100, 25, 4, 1, 34, 4),
+	('PR045', 55, 12, 5, 2, 35, 5),
+	('PR046', 75, 20, 1, 1, 36, 1),
+	('PR047', 90, 22, 2, 2, 37, 2),
+	('PR048', 80, 18, 3, 1, 38, 3),
+	('PR049', 110, 30, 4, 2, 39, 4),
+	('PR050', 95, 25, 5, 1, 40, 5),
 	('SC001', 12, 5, 4, 1, 36, 3),
 	('SH001', 5, 5, 1, 1, 27, 2);
+
+-- Volcando estructura para función db_invehin.promedio_venta_por_rango
+DELIMITER //
+CREATE FUNCTION `promedio_venta_por_rango`(
+	`fecha_inicio` DATE,
+	`fecha_fin` DATE
+) RETURNS double
+    DETERMINISTIC
+BEGIN
+
+	DECLARE promedio DOUBLE;
+	
+	SELECT 
+        ROUND(AVG(total_dia), 0) INTO promedio
+    FROM (
+		SELECT 
+		   DATE(v.fecha_venta) AS fecha,
+		   SUM(dv.cantidad_detalleventa * s.precio_subcategoria) AS total_dia
+		FROM
+			venta v
+		JOIN detalleventa dv ON v.id_venta = dv.fk_id_venta
+		JOIN prenda p ON dv.fk_codigo_prenda = p.codigo_prenda
+		JOIN subcategoria s ON p.fk_id_subcategoria = s.id_subcategoria
+		WHERE
+			v.fecha_venta BETWEEN fecha_inicio AND fecha_fin
+		GROUP BY
+			DATE(v.fecha_venta)
+    ) AS subconsulta;
+
+	
+	RETURN promedio;
+
+END//
+DELIMITER ;
 
 -- Volcando estructura para tabla db_invehin.promocion
 CREATE TABLE IF NOT EXISTS `promocion` (
@@ -4017,7 +4173,8 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   UNIQUE KEY `correo_usuario` (`correo_usuario`),
   KEY `fk_usuario_persona_idx` (`fk_id_persona`),
   KEY `fk_usuario_rol_idx` (`fk_id_rol`),
-  CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
+  CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.usuario: ~5 rows (aproximadamente)
@@ -4025,7 +4182,7 @@ INSERT INTO `usuario` (`id_usuario`, `correo_usuario`, `contrasenia_usuario`, `e
 	(1, 'sebsirra13@gmail.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 17, 1),
 	(2, 'empleado@invehin.com', 'hashed_password_2', 1, 7, 4),
 	(3, 'contador@invehin.com', 'hashed_password_4', 1, 8, 5),
-	(4, 'admin@invehin.com', 'hashed_password_1', 1, 6, 2),
+	(4, 'admin@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 20, 3),
 	(5, 'recepcionista@email.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 0, 19, 4);
 
 -- Volcando estructura para tabla db_invehin.venta
@@ -4044,26 +4201,26 @@ CREATE TABLE IF NOT EXISTS `venta` (
   CONSTRAINT `fk_venta_cliente` FOREIGN KEY (`fk_id_cliente`) REFERENCES `cliente` (`id_cliente`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_metodopago` FOREIGN KEY (`fk_id_metodopago`) REFERENCES `metodopago` (`id_metodopago`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_usuario` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.venta: ~25 rows (aproximadamente)
 INSERT INTO `venta` (`id_venta`, `fecha_venta`, `montorecibido_venta`, `estado_venta`, `fk_id_cliente`, `fk_id_metodopago`, `fk_id_usuario`) VALUES
-	(1, '2025-05-22 19:28:30', 100000, 0, 2, 1, 4),
+	(1, '2025-07-22 19:28:30', 100000, 0, 2, 1, 4),
 	(2, '2025-05-21 19:28:30', 250000, 1, 2, 1, 2),
 	(3, '2025-05-22 19:28:30', 180000, 1, 3, 1, 3),
-	(4, '2025-05-23 19:28:30', 90000, 1, 4, 1, 1),
+	(4, '2025-07-23 19:28:30', 90000, 1, 4, 1, 1),
 	(5, '2025-05-22 19:28:30', 300000, 1, 5, 1, 4),
 	(6, '2025-05-21 19:28:30', 150000, 1, 1, 1, 2),
 	(7, '2025-05-22 19:28:30', 220000, 1, 2, 1, 3),
 	(8, '2025-05-21 19:28:30', 120000, 1, 3, 1, 1),
 	(9, '2025-05-22 19:28:30', 400000, 1, 4, 1, 4),
 	(10, '2025-05-23 19:28:30', 95000, 1, 5, 1, 2),
-	(11, '2025-05-21 19:28:30', 170000, 1, 1, 1, 3),
+	(11, '2025-07-21 19:28:30', 170000, 1, 1, 1, 3),
 	(12, '2025-05-21 19:28:30', 210000, 1, 2, 1, 1),
 	(13, '2025-05-21 19:28:30', 80000, 1, 3, 1, 4),
 	(14, '2025-05-22 19:28:30', 260000, 1, 4, 1, 2),
 	(15, '2025-05-23 19:28:30', 110000, 1, 5, 1, 3),
-	(16, '2025-05-21 19:28:30', 300000, 1, 1, 1, 1),
+	(16, '2025-07-21 19:28:30', 300000, 1, 1, 1, 1),
 	(17, '2025-05-22 19:28:30', 90000, 1, 2, 1, 4),
 	(18, '2025-05-23 19:28:30', 140000, 1, 3, 1, 2),
 	(19, '2025-05-23 19:28:30', 50000, 1, 4, 1, 3),
@@ -4073,7 +4230,8 @@ INSERT INTO `venta` (`id_venta`, `fecha_venta`, `montorecibido_venta`, `estado_v
 	(25, '2025-06-05 22:28:52', 30000, 1, 4, 1, 1),
 	(26, '2025-06-05 22:32:36', 50000, 1, 3, 2, 1),
 	(27, '2025-06-14 18:37:44', 30000, 1, 2, 1, 1),
-	(28, '2025-06-20 17:28:01', 80000, 1, 10, 1, 1);
+	(28, '2025-06-20 17:28:01', 80000, 1, 10, 1, 1),
+	(29, '2025-07-05 09:13:22', 100000, 1, 11, 1, 1);
 
 -- Volcando estructura para vista db_invehin.view_cliente
 -- Creando tabla temporal para superar errores de dependencia de VIEW

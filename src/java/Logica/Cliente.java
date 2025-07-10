@@ -63,6 +63,14 @@ public class Cliente extends Persona implements ICliente
     }
 
     @Override
+    public int totalClientes(Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        ECliente result = new ECliente();
+        
+        return result.getTotalClientes(fechaInicio, fechaFin);
+    }
+
+    @Override
     public PaginacionResultado<Cliente> obtenerClientes(String searchTerm, int numPage, int pageSize)
     {
         ECliente result = new ECliente();

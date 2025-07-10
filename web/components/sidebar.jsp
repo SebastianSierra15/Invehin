@@ -195,7 +195,7 @@
             <a href="<%= request.getContextPath() + "/Perfil?id=" + idUsuarioSesion%>" name="nav-item" class="flex items-center gap-4 text-black font-semibold px-4 py-2 rounded hover:bg-invehin-backgroundAlt
                <%= request.getRequestURI().endsWith("/Views/perfil/perfil.jsp") ? "bg-invehin-backgroundAlt" : ""%>">
                 <i class="fas fa-user" title="Perfil"></i>
-                <span class="sidebar-text">Sebastián Sierra</span>
+                <span class="sidebar-text"><%= (sesion != null ? sesion.nombresPersona : "") + " " + (sesion != null ? sesion.apellidosPersona : "")%></span>
             </a>
 
             <a href="${pageContext.request.contextPath}/Logout" name="nav-item" class="flex items-center gap-4 text-black font-semibold px-4 py-2 rounded bg-invehin-primary text-white hover:bg-invehin-primaryLight transition-colors">

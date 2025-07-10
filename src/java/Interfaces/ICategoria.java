@@ -3,6 +3,7 @@ package Interfaces;
 import Logica.Categoria;
 import Logica.PaginacionResultado;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -20,4 +21,6 @@ public interface ICategoria
     PaginacionResultado<Categoria> obtenerCategorias(String searchTerm, int numPage, int pageSize);
 
     List<Categoria> obtenerCategorias();
+    
+    Map<String, Integer> valorCategorias();
 }

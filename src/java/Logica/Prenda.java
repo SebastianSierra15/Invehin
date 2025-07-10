@@ -74,6 +74,14 @@ public class Prenda implements IPrenda
         
         return result.getPrendasVendidas(fechaInicio, fechaFin);
     }
+
+    @Override
+    public List<Prenda> cantidadPrendasMasVendidas(int cantidad, Timestamp fechaInicio, Timestamp fechaFin)
+    {
+        EPrenda result = new EPrenda();
+        
+        return result.getPrendasMasVendidas(cantidad, fechaInicio, fechaFin);
+    }
     
     @Override
     public PaginacionResultado<Prenda> obtenerPrendas(String searchTerm, int numPage, int pageSize)

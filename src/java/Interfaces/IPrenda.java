@@ -21,6 +21,8 @@ public interface IPrenda
     int cantidadPrendasBajoStock();
 
     int cantidadPrendasVendidas(Timestamp fechaInicio, Timestamp fechaFin);
+    
+    List<Prenda> cantidadPrendasMasVendidas(int cantidad, Timestamp fechaInicio, Timestamp fechaFin);
 
     PaginacionResultado<Prenda> obtenerPrendas(String searchTerm, int numPage, int pageSize);
 

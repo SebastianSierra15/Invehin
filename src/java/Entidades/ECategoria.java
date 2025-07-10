@@ -323,4 +323,50 @@ public class ECategoria
 
         return categorias;
     }
+
+    public Map<String, Integer> getValorCategorias()
+    {
+        Map<String, Integer> categorias = new HashMap<>();
+        String sql = "{CALL get_valor_prendas_por_categoria()}";
+        DBConexion db = null;
+
+        try
+        {
+            db = new DBConexion();
+            db.conectar();
+
+            try (CallableStatement cs = db.obtener().prepareCall(sql))
+            {
+                boolean hasResults = cs.execute();
+
+                if (hasResults)
+                {
+                    try (ResultSet rs = cs.getResultSet())
+                    {
+                        while (rs.next())
+                        {
+                            categorias.put(rs.getString("nombre"), rs.getInt("total"));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        } finally
+        {
+            if (db != null)
+            {
+                try
+                {
+                    db.cerrar();
+                } catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return categorias;
+    }
 }
