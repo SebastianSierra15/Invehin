@@ -21,8 +21,8 @@ Este sistema se encuentra actualmente en desarrollo activo y en proceso de mejor
 ## 📄 Documentación
 
 - [📸 Capturas del sistema](docs/Capturas.md)
-- [🧠 Manual técnico (desarrolladores)](docs/ManualTecnico.md) *(próximamente)*
-- [👥 Manual de usuario (uso del sistema)](docs/ManualUsuario.md) *(próximamente)*
+- [🧠 Manual técnico (desarrolladores)](docs/ManualTecnico.md)
+- [👥 Manual de usuario (uso del sistema)](docs/ManualUsuario.md)
 - [🧑 Autores y créditos](docs/Autores.md)
 
 ---
@@ -61,9 +61,9 @@ Este sistema se encuentra actualmente en desarrollo activo y en proceso de mejor
 
 ## 💥 Vistas principales
 
-| Login                         | Dashboard                      | Registrar Venta                |
+| Dashboard                         | Listado de Prendas                      | Registrar Venta                |
 |------------------------------|--------------------------------|--------------------------------|
-| ![Login](assets/login.png)   | ![Dashboard](assets/dashboard.png) | ![Registrar Venta](assets/registrar-venta.png) |
+| ![Dashboard](assets/dashboard.png)   | ![Dashboard](assets/listado-prendas.png) | ![Registrar Venta](assets/registrar-venta.png) |
 
 ---
 
@@ -76,5 +76,25 @@ Para más información o colaboración: [sebsirra13@gmail.com](mailto\:sebsirra1
 
 ## 📜 Licencia
 
-Proyecto realizado como ejercicio de desarrollo y consolidación de habilidades en el diseño de sistemas de información empresariales.\
-Se prohíbe su uso con fines comerciales sin autorización expresa.
+Este proyecto está realizado como un ejercicio de desarrollo y consolidación de habilidades en el diseño de sistemas de información empresariales.
+
+### Términos y Condiciones
+
+El uso de este software está permitido únicamente con fines educativos y no comerciales. El proyecto es de **código abierto**, pero se prohíbe su uso con fines comerciales sin una **autorización expresa** de los autores.
+
+### Licencia
+
+Este proyecto se distribuye bajo la **Licencia Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0)**.
+
+#### Condiciones principales de la licencia CC BY-NC 4.0:
+
+1. **Uso del código**: Puedes usar, modificar y distribuir el código **siempre que sea con fines no comerciales**.
+2. **Propiedad intelectual**: El software no transfiere derechos de propiedad intelectual, y se mantiene la autoría de los desarrolladores.
+3. **Distribución**: Si distribuyes el código, debes incluir un archivo de licencia que detalle los términos de la **Licencia CC BY-NC 4.0**.
+4. **Marca registrada**: El uso de la marca o nombre del proyecto está prohibido sin permiso por escrito.
+
+### Limitación de responsabilidad
+
+El proyecto se ofrece "tal cual" y no ofrece garantías explícitas ni implícitas de ningún tipo. Los autores no se hacen responsables de ningún daño, pérdida o inconveniente resultante del uso del software.
+
+Para más detalles sobre la licencia, consulta el archivo completo en [Creative Commons BY-NC 4.0 License](https://creativecommons.org/licenses/by-nc/4.0/) o el archivo [**`LICENSE.txt`**](LICENSE.txt) incluido en este repositorio.

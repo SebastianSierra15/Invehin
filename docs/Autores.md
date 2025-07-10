@@ -6,7 +6,7 @@
 
 Desarrollador principal del sistema.
 
-- 🎓 Estudiante de 8º semestre de Ingeniería de Sistemas
+- 🎓 Estudiante de Ingeniería de Sistemas
 - 🎓 Técnico en Sistemas
 - 🧠 Experiencia en desarrollo backend, frontend y bases de datos
 - 🏆 Participante en competencias de programación a nivel nacional y latinoamericano

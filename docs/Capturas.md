@@ -4,17 +4,17 @@ A continuación se presenta una galería de las principales interfaces del siste
 
 ---
 
-## 🔐 Pantalla de Inicio de Sesión
+## 🏠 Dashboard de Inicio
 
-![Login](../assets/login.png)
+Visualización de estadísticas clave: ventas del día, stock bajo, ventas del mes, entre otras.
+
+![Dashboard](../assets/dashboard.png)
 
 ---
 
-## 🏠 Dashboard de Inicio
+## 🔐 Pantalla de Inicio de Sesión
 
-Visualización de estadísticas clave: ventas del día, stock bajo, ventas del mes.
-
-![Dashboard](../assets/dashboard.png)
+![Login](../assets/login.png)
 
 ---
 
@@ -39,5 +39,37 @@ Listado completo de ventas con paginación, generación de reportes y filtros.
 Formulario modal para agregar nuevos clientes.
 
 ![Clientes](../assets/clientes.png)
+
+---
+
+## 📦 Inventario
+
+Vista del inventario de productos, con información de existencias.
+
+![Inventario](../assets/inventario.png)
+
+---
+
+## 👕 Listado de Prendas
+
+Visualización de las prendas disponibles con detalles.
+
+![Listado de Prendas](../assets/listado-prendas.png)
+
+---
+
+## 🛍️ Pedidos
+
+Módulo para gestionar los pedidos realizados por los clientes.
+
+![Pedidos](../assets/pedidos.png)
+
+---
+
+## 🏷️ Categorías
+
+Visualización y gestión de las categorías de productos.
+
+![Categorías](../assets/categorias.png)
 
 ---
