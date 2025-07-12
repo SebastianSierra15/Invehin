@@ -3,6 +3,7 @@ package Entidades;
 import Logica.Proveedor;
 import Logica.PaginacionResultado;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,8 +20,9 @@ public class EProveedor
     {
     }
 
-    public boolean insertProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona)
+    public boolean insertProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_proveedor(?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -30,6 +32,14 @@ public class EProveedor
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, nombreProveedor);
@@ -62,8 +72,9 @@ public class EProveedor
         return exito;
     }
 
-    public boolean updateProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona)
+    public boolean updateProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_proveedor(?, ?, ?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -73,6 +84,14 @@ public class EProveedor
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idProveedor);
@@ -107,8 +126,9 @@ public class EProveedor
         return exito;
     }
 
-    public boolean deleteProveedor(int idProveedor)
+    public boolean deleteProveedor(int idProveedor, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL desactivar_proveedor(?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -118,6 +138,14 @@ public class EProveedor
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idProveedor);

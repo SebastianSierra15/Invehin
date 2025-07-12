@@ -43,19 +43,19 @@ public class Venta implements IVenta
     }
 
     @Override
-    public boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson)
+    public boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson, int idUsuarioAuditor)
     {
         EVenta result = new EVenta();
 
-        return result.insertVenta(montoRecibido, clienteId, metodoPagoId, usuarioId, detallesVentaJson);
+        return result.insertVenta(montoRecibido, clienteId, metodoPagoId, usuarioId, detallesVentaJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta)
+    public boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta, int idUsuarioAuditor)
     {
         EVenta result = new EVenta();
 
-        return result.updateVenta(idVenta, idClienteVenta, idMetodopagoVenta, estadoVenta);
+        return result.updateVenta(idVenta, idClienteVenta, idMetodopagoVenta, estadoVenta, idUsuarioAuditor);
     }
 
     @Override

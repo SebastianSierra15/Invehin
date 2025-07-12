@@ -12,11 +12,11 @@ import java.util.List;
 public interface IInventario
 {
 
-    boolean crearInventario(String observacionInventario, int idUsuario, String detallesInventarioJson);
+    boolean crearInventario(String observacionInventario, int idUsuario, String detallesInventarioJson, int idUsuarioAuditor);
 
-    boolean actualizarInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson);
+    boolean actualizarInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson, int idUsuarioAuditor);
 
-    boolean eliminarInventario(int idInventario);
+    boolean eliminarInventario(int idInventario, int idUsuarioAuditor);
 
     Inventario obtenerInventario(int idInventario);
 

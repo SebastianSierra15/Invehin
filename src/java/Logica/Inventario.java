@@ -37,23 +37,23 @@ public class Inventario implements IInventario
     }
 
     @Override
-    public boolean crearInventario(String observacionInventario, int idUsuario, String detallesInventarioJson)
+    public boolean crearInventario(String observacionInventario, int idUsuario, String detallesInventarioJson, int idUsuarioAuditor)
     {
         EInventario result = new EInventario();
         
-        return result.insertInventario(observacionInventario, idUsuario, detallesInventarioJson);
+        return result.insertInventario(observacionInventario, idUsuario, detallesInventarioJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson)
+    public boolean actualizarInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson, int idUsuarioAuditor)
     {
         EInventario result = new EInventario();
         
-        return result.updateInventario(idInventario, observacionInventario, estadoInventario, detallesInventarioJson);
+        return result.updateInventario(idInventario, observacionInventario, estadoInventario, detallesInventarioJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean eliminarInventario(int idInventario)
+    public boolean eliminarInventario(int idInventario, int idUsuarioAuditor)
     {
         return true;
     }

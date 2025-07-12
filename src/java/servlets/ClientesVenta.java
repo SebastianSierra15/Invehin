@@ -2,13 +2,17 @@ package servlets;
 
 import Interfaces.ICliente;
 import Logica.Cliente;
+import Logica.Usuario;
+import com.google.gson.Gson;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -21,6 +25,34 @@ public class ClientesVenta extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 6 || p.idPermiso == 23);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para buscar clientes.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             String searchTerm = request.getParameter("searchTerm");

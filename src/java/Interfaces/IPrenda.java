@@ -12,11 +12,11 @@ import java.util.List;
 public interface IPrenda
 {
 
-    boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla);
+    boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla, int idUsuarioAuditor);
 
-    boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla);
+    boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla, int idUsuarioAuditor);
 
-    boolean eliminarPrenda(String codigoPrenda);
+    boolean eliminarPrenda(String codigoPrenda, int idUsuarioAuditor);
 
     int cantidadPrendasBajoStock();
 

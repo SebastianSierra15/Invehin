@@ -20,17 +20,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerRoles = false;
+    boolean puedeAgregarRol = false;
+    boolean puedeEditarRol = false;
+    boolean puedeEliminarRol = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 5)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 5:
+                puedeVerRoles = true;
+                break;
+            case 14:
+                puedeAgregarRol = true;
+                break;
+            case 22:
+                puedeEditarRol = true;
+                break;
+            case 30:
+                puedeEliminarRol = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerRoles)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -132,7 +146,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarRol ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar roles.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Agregar Rol
                         </button>
                     </div>
@@ -180,18 +195,38 @@
                             <td class="px-3 py-2 border border-white"><%= rol.nombreRol%></td>
                             <td class="px-3 py-2 border border-white"><%= rol.permisosRol.stream().map(p -> p.nombrePermiso).collect(java.util.stream.Collectors.joining(", "))%> </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarRol)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar rol" class="text-blue-600 hover:text-blue-500 transition editar-rol-btn"
                                         data-id="<%= rol.idRol%>"
                                         data-nombre="<%= rol.nombreRol%>"
                                         data-permisos='<%= gson.toJson(rol.permisosRol)%>'>
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar roles.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                             <td title="Eliminar rol" class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEliminarRol)
+                                    {%>
+                                <!-- botón normal -->
                                 <button class="text-red-600 hover:text-red-500 transition eliminar-rol-btn"
                                         data-id="<%= rol.idRol%>">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para eliminar roles.')" class="text-red-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <% } %>
                             </td>
                         </tr>
                         <%
@@ -366,7 +401,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Modal confirmación eliminar rol -->
         <div id="modalConfirmarEliminar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg max-w-md w-11/12 p-6 text-center">

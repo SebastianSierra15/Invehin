@@ -2,7 +2,6 @@ package Interfaces;
 
 import Logica.PaginacionResultado;
 import Logica.Pedido;
-import Logica.Proveedor;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -13,11 +12,11 @@ import java.util.List;
 public interface IPedido
 {
 
-    public boolean crearPedido(Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson);
+    public boolean crearPedido(Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson, int idUsuarioAuditor);
 
-    public boolean actualizarPedido(int idPedido, Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson);
+    public boolean actualizarPedido(int idPedido, Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson, int idUsuarioAuditor);
 
-    public boolean eliminaredido(int idPedido);
+    public boolean eliminaredido(int idPedido, int idUsuarioAuditor);
 
     public Pedido obtenerPedido(int idPedido);
 

@@ -4,6 +4,7 @@ import Logica.DetalleInventario;
 import Logica.Inventario;
 import Logica.PaginacionResultado;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -24,8 +25,9 @@ public class EInventario
     }
     
     
-    public boolean insertInventario(String observacionInventario, int idUsuario, String detallesInventarioJson)
+    public boolean insertInventario(String observacionInventario, int idUsuario, String detallesInventarioJson, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_inventario(?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -35,6 +37,14 @@ public class EInventario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, observacionInventario);
@@ -64,8 +74,9 @@ public class EInventario
         return exito;
     }
     
-    public boolean updateInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson)
+    public boolean updateInventario(int idInventario, String observacionInventario, boolean estadoInventario, String detallesInventarioJson, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_inventario(?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -75,6 +86,14 @@ public class EInventario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idInventario);

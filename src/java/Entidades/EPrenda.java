@@ -26,8 +26,9 @@ public class EPrenda
     {
     }
 
-    public boolean insertPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla)
+    public boolean insertPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_prenda(?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -37,6 +38,14 @@ public class EPrenda
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, codigoPrenda);
@@ -69,8 +78,9 @@ public class EPrenda
         return exito;
     }
 
-    public boolean updatePrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla)
+    public boolean updatePrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_prenda(?, ?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -80,6 +90,14 @@ public class EPrenda
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, codigoPrenda);
@@ -113,8 +131,9 @@ public class EPrenda
         return exito;
     }
 
-    public boolean deletePrenda(String codigoPrenda)
+    public boolean deletePrenda(String codigoPrenda, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL desactivar_prenda(?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -124,6 +143,14 @@ public class EPrenda
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, codigoPrenda);
@@ -308,7 +335,7 @@ public class EPrenda
 
         return prendas;
     }
-    
+
     public PaginacionResultado<Prenda> selectPrendasPorTerminoBusqueda(String searchTerm, int numPage, int pageSize)
     {
         List<Prenda> prendas = new ArrayList<>();

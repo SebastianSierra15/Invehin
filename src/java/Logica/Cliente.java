@@ -39,27 +39,27 @@ public class Cliente extends Persona implements ICliente
     }
 
     @Override
-    public boolean crearCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente)
+    public boolean crearCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente, int idUsuarioAuditor)
     {
         ECliente result = new ECliente();
 
-        return result.insertCliente(nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, direccionCliente);
+        return result.insertCliente(nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, direccionCliente, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean actualizarCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
         ECliente result = new ECliente();
 
-        return result.updateCliente(idCliente, direccionCliente, idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+        return result.updateCliente(idCliente, direccionCliente, idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean eliminarCliente(int idCliente)
+    public boolean eliminarCliente(int idCliente, int idUsuarioAuditor)
     {
         ECliente result = new ECliente();
 
-        return result.deleteCliente(idCliente);
+        return result.deleteCliente(idCliente, idUsuarioAuditor);
     }
 
     @Override

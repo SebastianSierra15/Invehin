@@ -18,17 +18,27 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerUsuarios = false;
+    boolean puedeAgregarUsuario = false;
+    boolean puedeEditarUsuario = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 3)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 3:
+                puedeVerUsuarios = true;
+                break;
+            case 12:
+                puedeAgregarUsuario = true;
+                break;
+            case 20:
+                puedeEditarUsuario = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerUsuarios)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -127,7 +137,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarUsuario ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar usuarios.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Registrar Usuario
                         </button>
                     </div>
@@ -186,6 +197,9 @@
                             <td class="px-3 py-2 border border-white"><%= (usuario.generoPersona ? "Masculino" : "Femenino")%></td>
                             <td class="px-3 py-2 border border-white"><%= (usuario.estadoUsuario ? "Activo" : "Inactivo")%></td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarUsuario)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar usuario" class="text-blue-600 hover:text-blue-500 transition editar-usuario-btn"
                                         data-id="<%= usuario.idUsuario%>"
                                         data-correo="<%= usuario.getCorreoUsuario()%>"
@@ -199,6 +213,13 @@
                                         data-genero="<%= usuario.generoPersona%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar usuarios.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                         </tr>
                         <%
@@ -259,7 +280,7 @@
         </main>
 
         <%@ include file="/components/footer.jsp" %>
-        
+
         <!-- Modal agregar usuario -->
         <div id="modalAgregarUsuario" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
             <div class="bg-white border border-black rounded-lg shadow-lg sm:w-full sm:max-w-xl w-11/12 max-h-[90vh] flex flex-col relative overflow-hidden">

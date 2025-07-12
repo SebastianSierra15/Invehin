@@ -74,6 +74,20 @@ Para más información o colaboración: [sebsirra13@gmail.com](mailto\:sebsirra1
 
 ---
 
+## 👤 Usuarios de prueba
+
+Puedes acceder al sistema con los siguientes usuarios incluidos en la base de datos:
+
+| Rol         | Correo                    | Contraseña |
+|-------------|---------------------------|------------|
+| Superadmin  | superadmin@invehin.com    | 12345      |
+| Invitado    | invitado@invehin.com      | 12345      |
+| Otros       | Varios usuarios ya cargados en la base de datos con la misma contraseña: **12345** |
+
+> ⚠️ Estos usuarios tienen propósitos demostrativos y pueden ser modificados desde el sistema una vez iniciado.
+
+---
+
 ## 📜 Licencia
 
 Este proyecto está realizado como un ejercicio de desarrollo y consolidación de habilidades en el diseño de sistemas de información empresariales.

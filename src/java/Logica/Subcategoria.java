@@ -32,26 +32,26 @@ public class Subcategoria implements ISubcategoria
     }
 
     @Override
-    public boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int idCategoria)
+    public boolean crearSubcategoria(String nombreSubcategoria, int precioSubcategoria, int idCategoria, int idUsuarioAuditor)
     {
         ESubcategoria result = new ESubcategoria();
 
-        return result.insertSubcategoria(nombreSubcategoria, precioSubcategoria, idCategoria);
+        return result.insertSubcategoria(nombreSubcategoria, precioSubcategoria, idCategoria, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int idCategoria)
+    public boolean actualizarSubcategoria(int idSubcategoria, String nombreSubcategoria, int precioSubcategoria, int idCategoria, int idUsuarioAuditor)
     {
         ESubcategoria result = new ESubcategoria();
 
-        return result.updateSubcategoria(idSubcategoria, nombreSubcategoria, precioSubcategoria, idCategoria);
+        return result.updateSubcategoria(idSubcategoria, nombreSubcategoria, precioSubcategoria, idCategoria, idUsuarioAuditor);
     }
 
     @Override
-    public boolean cambiarEstadoSubcategoria(int idSubcategoria, boolean estadoSubcategoria)
+    public boolean cambiarEstadoSubcategoria(int idSubcategoria, boolean estadoSubcategoria, int idUsuarioAuditor)
     {
         ESubcategoria result = new ESubcategoria();
 
-        return result.cambiarEstadoSubcategoria(idSubcategoria, estadoSubcategoria);
+        return result.cambiarEstadoSubcategoria(idSubcategoria, estadoSubcategoria, idUsuarioAuditor);
     }
 }

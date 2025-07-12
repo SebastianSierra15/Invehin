@@ -4,6 +4,7 @@ import Logica.PaginacionResultado;
 import Logica.Permiso;
 import Logica.Rol;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,8 +23,9 @@ public class ERol
     {
     }
 
-    public boolean insertRol(String nombreRol, String permisosRolJson)
+    public boolean insertRol(String nombreRol, String permisosRolJson, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_rol(?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -33,6 +35,14 @@ public class ERol
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, nombreRol);
@@ -61,8 +71,9 @@ public class ERol
         return exito;
     }
 
-    public boolean updateRol(int idRol, String nombreRol, String permisosRolJson)
+    public boolean updateRol(int idRol, String nombreRol, String permisosRolJson, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_rol(?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -72,6 +83,14 @@ public class ERol
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idRol);
@@ -101,8 +120,9 @@ public class ERol
         return exito;
     }
 
-    public boolean deleteRol(int idRol)
+    public boolean deleteRol(int idRol, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL delete_rol(?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -112,6 +132,14 @@ public class ERol
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idRol);

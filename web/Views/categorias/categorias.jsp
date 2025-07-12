@@ -20,17 +20,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerCategorias = false;
+    boolean puedeAgregarCategoria = false;
+    boolean puedeEditarCategoria = false;
+    boolean puedeCambiarEstadoCategoria = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 1)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 1:
+                puedeVerCategorias = true;
+                break;
+            case 2:
+                puedeAgregarCategoria = true;
+                break;
+            case 19:
+                puedeEditarCategoria = true;
+                break;
+            case 28:
+                puedeCambiarEstadoCategoria = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerCategorias)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -126,7 +140,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalAgregarCategoria()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarCategoria ? "abrirModalAgregarCategoria()" : "alert('No tienes permiso para agregar categorias.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Agregar Categoría
                         </button>
                     </div>
@@ -180,12 +195,21 @@
                                     <span><%= sub.nombreSubcategoria%> - $<%= String.format("%,d", sub.precioSubcategoria)%></span>
 
                                     <div class="flex gap-1">
+                                        <% if (puedeCambiarEstadoCategoria)
+                                            {%>
                                         <button title="Cambiar estado" class="cambiar-estado-subcategoria-btn"
                                                 data-id="<%= sub.idSubcategoria%>"
                                                 data-estado="<%= sub.estadoSubcategoria%>">
                                             <i class="fas fa-circle <%= sub.estadoSubcategoria ? "text-green-500 hover:text-green-400" : "text-red-500 hover:text-red-400"%>"></i>
                                         </button>
-
+                                        <% } else
+                                        {%>
+                                        <button title="Sin permiso" onclick="alert('No tienes permiso para cambiar estado.')" class="cursor-not-allowed text-gray-400" disabled>
+                                            <i class="fas fa-circle <%= sub.estadoSubcategoria ? "text-green-300" : "text-red-300"%>"></i>
+                                        </button>
+                                        <% } %>
+                                        <% if (puedeEditarCategoria)
+                                            {%>
                                         <button title="Editar" class="text-blue-600 hover:text-blue-400 editar-subcategoria-btn"
                                                 data-id="<%= sub.idSubcategoria%>"
                                                 data-idcategoria="<%= categoria.idCategoria%>"
@@ -194,6 +218,13 @@
                                                 data-precio="<%= sub.precioSubcategoria%>">
                                             <i class="fas fa-pencil-alt"></i>
                                         </button>
+                                        <% } else
+                                        { %>
+                                        <button title="Sin permiso" onclick="alert('No tienes permiso para editar subcategorías.')"
+                                                class="text-blue-300 cursor-not-allowed" disabled>
+                                            <i class="fas fa-pencil-alt"></i>
+                                        </button>
+                                        <% } %>
                                     </div>
                                 </div>
                                 <% }
@@ -201,12 +232,22 @@
                                 { %>
                                 <span class="text-gray-400">Sin subcategorías</span>
                                 <% }%>
+                                <% if (puedeAgregarCategoria)
+                                    {%>
                                 <button class="text-sm mt-1 text-green-600 hover:underline agregar-subcategoria-btn" data-id="<%= categoria.idCategoria%>" data-nombre="<%= categoria.nombreCategoria%>">
                                     <i class="fas fa-plus-circle mr-1"></i>Agregar Subcategoría
                                 </button>
+                                <% } else
+                                { %>
+                                <button class="text-sm mt-1 text-gray-400 cursor-not-allowed" onclick="alert('No tienes permiso para agregar subcategorías.')" disabled>
+                                    <i class="fas fa-plus-circle mr-1"></i>Agregar Subcategoría
+                                </button>
+                                <% } %>
                             </td>
 
                             <td title="Cambiar estado" class="px-3 py-2 border border-white text-center align-middle">
+                                <% if (puedeCambiarEstadoCategoria)
+                                    {%>
                                 <button type="button"
                                         class="cambiar-estado-categoria-btn group flex items-center gap-1 justify-center w-full cursor-pointer"
                                         data-id="<%= categoria.idCategoria%>"
@@ -220,14 +261,33 @@
                                         <%= categoria.estadoCategoria ? "Activo" : "Inactivo"%>
                                     </span>
                                 </button>
+                                <% } else
+                                {%>
+                                <div class="flex items-center gap-1 justify-center cursor-not-allowed">
+                                    <i class="fas fa-circle text-xl 
+                                       <%= categoria.estadoCategoria ? "text-green-300" : "text-red-300"%>"></i>
+                                    <span class="text-sm font-semibold 
+                                          <%= categoria.estadoCategoria ? "text-green-400" : "text-red-400"%>"><%= categoria.estadoCategoria ? "Activo" : "Inactivo"%></span>
+                                </div>
+                                <% } %>
                             </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarCategoria)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar categoría" class="text-blue-600 hover:text-blue-500 transition editar-categoria-btn"
                                         data-id="<%= categoria.idCategoria%>"
                                         data-nombre="<%= categoria.nombreCategoria%>"
                                         data-subcategorias='<%= gson.toJson(categoria.subcategoriasCategoria)%>'>
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar categorias.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                         </tr>
                         <%

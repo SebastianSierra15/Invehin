@@ -13,13 +13,13 @@ public interface IUsuario
 
     Usuario iniciarSesion(String correo, String contrasenia);
 
-    boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
+    boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor);
 
-    boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
+    boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor);
 
-    boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
+    boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor);
 
-    boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva);
+    boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva, int idUsuarioAuditor);
 
     Usuario obtenerUsuario(int idUsuario);
 

@@ -17,6 +17,16 @@
     }
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
+
+    boolean puedeGestionarPerfil = false;
+
+    for (var permiso : sesion.rolUsuario.permisosRol)
+    {
+        if (permiso.idPermiso == 37)
+        {
+            puedeGestionarPerfil = true;
+        }
+    }
 %>
 
 <!DOCTYPE html>
@@ -129,6 +139,8 @@
                         </div>
                     </div>
 
+                    <% if (puedeGestionarPerfil)
+                        {%>
                     <div class="flex flex-col sm:flex-row justify-center sm:justify-between mt-8 gap-2">
                         <button id="cambiar-contrasenia-btn" type="button" onclick="abrirModalContrasenia()"
                                 class="bg-gray-400 px-8 py-2 font-semibold rounded-lg hover:bg-gray-500 transition-all shadow-md">
@@ -139,6 +151,7 @@
                             Guardar Cambios
                         </button>
                     </div>
+                    <% }%>
                 </form>
             </div>
         </main>

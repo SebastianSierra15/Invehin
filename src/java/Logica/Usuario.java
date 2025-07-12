@@ -53,35 +53,35 @@ public class Usuario extends Persona implements IUsuario
     }
 
     @Override
-    public boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean crearUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
         EUsuario result = new EUsuario();
 
-        return result.insertUsuario(correoUsuario, idRol, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+        return result.insertUsuario(correoUsuario, idRol, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean actualizarUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
         EUsuario result = new EUsuario();
 
-        return result.updateUsuario(idUsuario, idRol, estadoUsuario, idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+        return result.updateUsuario(idUsuario, idRol, estadoUsuario, idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean actualizarPerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
         EUsuario result = new EUsuario();
 
-        return result.updatePerfil(idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+        return result.updatePerfil(idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva)
+    public boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva, int idUsuarioAuditor)
     {
         EUsuario result = new EUsuario();
 
-        return result.cambiarContrasenia(idUsuario, contraseniaActual, contraseniaNueva);
+        return result.cambiarContrasenia(idUsuario, contraseniaActual, contraseniaNueva, idUsuarioAuditor);
     }
 
     @Override

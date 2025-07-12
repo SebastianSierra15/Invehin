@@ -12,11 +12,11 @@ import java.util.Map;
 public interface ICategoria
 {
 
-    boolean crearCategoria(String nombreCategoria);
+    boolean crearCategoria(String nombreCategoria, int idUsuarioAuditor);
 
-    boolean actualizarCategoria(int idCategoria, String nombreCategoria);
+    boolean actualizarCategoria(int idCategoria, String nombreCategoria, int idUsuarioAuditor);
 
-    boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria);
+    boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria, int idUsuarioAuditor);
 
     PaginacionResultado<Categoria> obtenerCategorias(String searchTerm, int numPage, int pageSize);
 

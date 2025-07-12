@@ -4,6 +4,7 @@ import Interfaces.IMetodoPago;
 import Interfaces.IVenta;
 import Logica.MetodoPago;
 import Logica.PaginacionResultado;
+import Logica.Usuario;
 import Logica.Venta;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -26,6 +27,34 @@ public class Ventas extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 7);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para visualizar ventas.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             // Detectar si es una llamada AJAX
@@ -73,6 +102,36 @@ public class Ventas extends HttpServlet
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 6);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para registrar ventas.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             int montoRecibido = Integer.parseInt(request.getParameter("montoRecibido"));
@@ -82,7 +141,7 @@ public class Ventas extends HttpServlet
             String detallesVentaJson = request.getParameter("detallesVentaJson");
 
             IVenta servicioVenta = new Venta();
-            boolean exito = servicioVenta.crearVenta(montoRecibido, clienteId, metodoPagoId, usuarioId, detallesVentaJson);
+            boolean exito = servicioVenta.crearVenta(montoRecibido, clienteId, metodoPagoId, usuarioId, detallesVentaJson, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
@@ -107,6 +166,36 @@ public class Ventas extends HttpServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 23);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para editar ventas.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -117,8 +206,6 @@ public class Ventas extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idVentaRaw = body.get("idVenta");
@@ -136,7 +223,7 @@ public class Ventas extends HttpServlet
             boolean estadoVenta = Boolean.parseBoolean(body.get("estado").toString());
 
             IVenta servicioVenta = new Venta();
-            boolean exito = servicioVenta.actualizarVenta(idVenta, idClienteVenta, idMetodopagoVenta, estadoVenta);
+            boolean exito = servicioVenta.actualizarVenta(idVenta, idClienteVenta, idMetodopagoVenta, estadoVenta, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

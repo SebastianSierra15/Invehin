@@ -41,27 +41,27 @@ public class Proveedor extends Persona implements IProveedor
     }
 
     @Override
-    public boolean crearProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona)
+    public boolean crearProveedor(String nombreProveedor, String correoProveedor, String direccionProveedor, String nombresPersona, String apellidosPersona, String telefonoPersona, int idUsuarioAuditor)
     {
         EProveedor result = new EProveedor();
         
-        return result.insertProveedor(nombreProveedor, correoProveedor, direccionProveedor, nombresPersona, apellidosPersona, telefonoPersona);
+        return result.insertProveedor(nombreProveedor, correoProveedor, direccionProveedor, nombresPersona, apellidosPersona, telefonoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona)
+    public boolean actualizarProveedor(int idProveedor, String nombreProveedor, String correoProveedor, String direccionProveedor, int idPersona, String nombresPersona, String apellidosPersona, String telefonoPersona, int idUsuarioAuditor)
     {
         EProveedor result = new EProveedor();
         
-        return result.updateProveedor(idProveedor, nombreProveedor, correoProveedor, direccionProveedor, idPersona, nombresPersona, apellidosPersona, telefonoPersona);
+        return result.updateProveedor(idProveedor, nombreProveedor, correoProveedor, direccionProveedor, idPersona, nombresPersona, apellidosPersona, telefonoPersona, idUsuarioAuditor);
     }
 
     @Override
-    public boolean eliminarProveedor(int idProveedor)
+    public boolean eliminarProveedor(int idProveedor, int idUsuarioAuditor)
     {
         EProveedor result = new EProveedor();
         
-        return result.deleteProveedor(idProveedor);
+        return result.deleteProveedor(idProveedor, idUsuarioAuditor);
     }
 
     @Override

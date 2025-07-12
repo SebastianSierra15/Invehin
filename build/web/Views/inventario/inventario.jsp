@@ -19,17 +19,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerInventarios = false;
+    boolean puedeAgregarInventario = false;
+    boolean puedeEditarInventario = false;
+    boolean puedeGenerarReporte = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 11)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 11:
+                puedeVerInventarios = true;
+                break;
+            case 18:
+                puedeAgregarInventario = true;
+                break;
+            case 27:
+                puedeEditarInventario = true;
+                break;
+            case 36:
+                puedeGenerarReporte = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerInventarios)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -126,11 +140,13 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalReporte()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeGenerarReporte ? "abrirModalReporte()" : "alert('No tienes permiso para generar reportes.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fa-solid fa-file-lines mr-2"></i>Generar Reporte
                         </button>
 
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarInventario ? "abrirModalAgregar()" : "alert('No tienes permiso para realizar inventario.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Nuevo Inventario
                         </button>
                     </div>
@@ -190,6 +206,9 @@
                                 </button>
                             </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarInventario)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar inventario" class="text-blue-600 hover:text-blue-500 transition editar-inventario-btn"
                                         data-id="<%= inventario.idInventario%>"
                                         data-fecha="<%= inventario.fechaInventario%>"
@@ -199,6 +218,13 @@
                                         data-detalles="<%= detallesJson%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar inventarios.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                         </tr>
                         <%
@@ -846,7 +872,7 @@
             document.getElementById("modalDetalleInventario").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         }
-        
+
         function editarModalDetalle(detalles) {
             const tbody = document.getElementById("editarDetalleInventarioBody");
             tbody.innerHTML = "";
@@ -1082,7 +1108,7 @@
                 alert("No se pudo determinar a qué tabla agregar la prenda.");
                 return;
             }
-            
+
             const codigo = document.getElementById("codigoPrendaSeleccionada")?.value;
             const info = document.getElementById("prendaSeleccionada")?.value;
 

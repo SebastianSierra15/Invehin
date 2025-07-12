@@ -13,9 +13,9 @@ import java.util.Map;
 public interface IVenta
 {
 
-    boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson);
+    boolean crearVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson, int idUsuarioAuditor);
 
-    boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta);
+    boolean actualizarVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta, int idUsuarioAuditor);
 
     int totalVentas(Timestamp fechaInicio, Timestamp fechaFin);
 

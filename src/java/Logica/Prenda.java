@@ -36,27 +36,27 @@ public class Prenda implements IPrenda
     }
     
     @Override
-    public boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla)
+    public boolean crearPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idSubcategoria, int idTalla, int idUsuarioAuditor)
     {
         EPrenda result = new EPrenda();
         
-        return result.insertPrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idSubcategoria, idTalla);
+        return result.insertPrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idSubcategoria, idTalla, idUsuarioAuditor);
     }
     
     @Override
-    public boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla)
+    public boolean actualizarPrenda(String codigoPrenda, int stockPrenda, int stockminimoPrenda, int idColor, int idEstadoPrenda, int idSubcategoria, int idTalla, int idUsuarioAuditor)
     {
         EPrenda result = new EPrenda();
         
-        return result.updatePrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idEstadoPrenda, idSubcategoria, idTalla);
+        return result.updatePrenda(codigoPrenda, stockPrenda, stockminimoPrenda, idColor, idEstadoPrenda, idSubcategoria, idTalla, idUsuarioAuditor);
     }
     
     @Override
-    public boolean eliminarPrenda(String codigoPrenda)
+    public boolean eliminarPrenda(String codigoPrenda, int idUsuarioAuditor)
     {
         EPrenda result = new EPrenda();
         
-        return result.deletePrenda(codigoPrenda);
+        return result.deletePrenda(codigoPrenda, idUsuarioAuditor);
     }
     
     @Override

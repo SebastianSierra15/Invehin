@@ -26,6 +26,34 @@ public class Usuarios extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 3);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para visualizar usuarios.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             // Detectar si es una llamada AJAX
@@ -75,6 +103,34 @@ public class Usuarios extends HttpServlet
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
 
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 12);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para agregar usuarios.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             String correoUsuario = request.getParameter("correo");
@@ -97,11 +153,11 @@ public class Usuarios extends HttpServlet
             boolean generoPersona = Boolean.parseBoolean(generoStr);
 
             IUsuario servicioUsuario = new Usuario();
-            boolean exito = servicioUsuario.crearUsuario(correoUsuario, rolUsuario, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+            boolean exito = servicioUsuario.crearUsuario(correoUsuario, rolUsuario, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
 
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
-            resultado.put("mensaje", exito ? "Usuario registrado correctamente." : "Error al registrar usuario.");
+            resultado.put("mensaje", exito ? "Usuario registrado correctamente. La contraseña es el número de cédula: " + numeroidentificacionPersona : "Error al registrar usuario.");
             response.getWriter().write(gson.toJson(resultado));
         } catch (Exception e)
         {
@@ -120,6 +176,36 @@ public class Usuarios extends HttpServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 20);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para editar usuarios.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -130,8 +216,6 @@ public class Usuarios extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idUsuarioRaw = body.get("idUsuario");
@@ -160,7 +244,7 @@ public class Usuarios extends HttpServlet
             boolean generoPersona = "true".equals(String.valueOf(generoPersonaRaw));
 
             IUsuario servicioUsuario = new Usuario();
-            boolean exito = servicioUsuario.actualizarUsuario(idUsuario, idRol, estadoUsuario, idPerseona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona);
+            boolean exito = servicioUsuario.actualizarUsuario(idUsuario, idRol, estadoUsuario, idPerseona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

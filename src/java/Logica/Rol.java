@@ -29,26 +29,26 @@ public class Rol implements IRol
     }
 
     @Override
-    public boolean crearRol(String nombreRol, String permisosRolJson)
+    public boolean crearRol(String nombreRol, String permisosRolJson, int idUsuarioAuditor)
     {
         ERol result = new ERol();
         
-        return result.insertRol(nombreRol, permisosRolJson);
+        return result.insertRol(nombreRol, permisosRolJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarRol(int idRol, String nombreRol, String permisosRolJson)
+    public boolean actualizarRol(int idRol, String nombreRol, String permisosRolJson, int idUsuarioAuditor)
     {
         ERol result = new ERol();
         
-        return result.updateRol(idRol, nombreRol, permisosRolJson);
+        return result.updateRol(idRol, nombreRol, permisosRolJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean eliminarRol(int idRol)
+    public boolean eliminarRol(int idRol, int idUsuarioAuditor)
     {
         ERol result = new ERol();
-        return result.deleteRol(idRol);
+        return result.deleteRol(idRol, idUsuarioAuditor);
     }
 
     @Override

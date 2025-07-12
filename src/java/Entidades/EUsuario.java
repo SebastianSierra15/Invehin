@@ -114,8 +114,9 @@ public class EUsuario
         return usuario;
     }
 
-    public boolean insertUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean insertUsuario(String correoUsuario, int idRol, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_usuario(?, ?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -125,6 +126,14 @@ public class EUsuario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, correoUsuario);
@@ -158,8 +167,9 @@ public class EUsuario
         return exito;
     }
 
-    public boolean updateUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean updateUsuario(int idUsuario, int idRol, boolean estadoUsuario, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_usuario(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -169,6 +179,14 @@ public class EUsuario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idUsuario);
@@ -204,8 +222,9 @@ public class EUsuario
         return exito;
     }
 
-    public boolean updatePerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean updatePerfil(int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_persona(?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -215,6 +234,14 @@ public class EUsuario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idPersona);
@@ -248,8 +275,9 @@ public class EUsuario
         return exito;
     }
 
-    public boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva)
+    public boolean cambiarContrasenia(int idUsuario, String contraseniaActual, String contraseniaNueva, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL cambiar_contrasenia(?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -259,6 +287,14 @@ public class EUsuario
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idUsuario);

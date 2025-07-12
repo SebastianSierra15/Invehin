@@ -18,17 +18,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerProveedores = false;
+    boolean puedeAgregarProveedor = false;
+    boolean puedeEditarProveedor = false;
+    boolean puedeEliminarProveedor = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 10)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 10:
+                puedeVerProveedores = true;
+                break;
+            case 17:
+                puedeAgregarProveedor = true;
+                break;
+            case 26:
+                puedeEditarProveedor = true;
+                break;
+            case 32:
+                puedeEliminarProveedor = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerProveedores)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -125,7 +139,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarProveedor ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar proveedores.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Registrar Proveedor
                         </button>
                     </div>
@@ -179,6 +194,9 @@
                             <td class="px-3 py-2 border border-white"><%= proveedor.direccionProveedor%></td>
                             <td class="px-3 py-2 border border-white"><%= proveedor.nombresPersona%> <%= proveedor.apellidosPersona%> </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarProveedor)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar proveedor" class="text-blue-600 hover:text-blue-500 transition editar-proveedor-btn"
                                         data-id="<%= proveedor.idProveedor%>"
                                         data-nombre="<%= proveedor.nombreProveedor%>"
@@ -190,12 +208,29 @@
                                         data-apellidos="<%= proveedor.apellidosPersona%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar proveedores.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                             <td title="Eliminar proveedor" class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEliminarProveedor)
+                                    {%>
+                                <!-- botón normal -->
                                 <button class="text-red-600 hover:text-red-500 transition eliminar-proveedor-btn"
                                         data-id="<%= proveedor.idProveedor%>">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para eliminar proveedores.')" class="text-red-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <% } %>
                             </td>
                         </tr>
                         <%
@@ -254,7 +289,7 @@
                 </nav>
             </div>
         </main>
-                            
+
         <%@ include file="/components/footer.jsp" %>
 
         <!-- Modal agregar proveedor -->
@@ -611,7 +646,7 @@
             document.getElementById("modalAgregarProveedor").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");
         }
-        
+
         function cerrarModalEditar() {
             document.getElementById("modalEditarProveedor").classList.add("hidden");
             document.body.classList.remove("overflow-hidden");

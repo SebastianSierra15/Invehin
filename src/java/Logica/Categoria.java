@@ -30,27 +30,27 @@ public class Categoria implements ICategoria
     }
 
     @Override
-    public boolean crearCategoria(String nombreCategoria)
+    public boolean crearCategoria(String nombreCategoria,  int idUsuarioAuditor)
     {
         ECategoria result = new ECategoria();
 
-        return result.insertCategoria(nombreCategoria);
+        return result.insertCategoria(nombreCategoria, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarCategoria(int idCategoria, String nombreCategoria)
+    public boolean actualizarCategoria(int idCategoria, String nombreCategoria,  int idUsuarioAuditor)
     {
         ECategoria result = new ECategoria();
 
-        return result.updateCategoria(idCategoria, nombreCategoria);
+        return result.updateCategoria(idCategoria, nombreCategoria, idUsuarioAuditor);
     }
 
     @Override
-    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria)
+    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria,  int idUsuarioAuditor)
     {
         ECategoria result = new ECategoria();
 
-        return result.cambiarEstadoCategoria(idCategoria, estadoCategoria);
+        return result.cambiarEstadoCategoria(idCategoria, estadoCategoria, idUsuarioAuditor);
     }
 
     @Override

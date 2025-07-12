@@ -2,6 +2,7 @@ package servlets;
 
 import Interfaces.ISubcategoria;
 import Logica.Subcategoria;
+import Logica.Usuario;
 import com.google.gson.Gson;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -25,6 +26,34 @@ public class Subcategorias extends HttpServlet
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
 
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 2);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para agregar subcategorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             String nombreSubcategoria = request.getParameter("nombre");
@@ -41,7 +70,7 @@ public class Subcategorias extends HttpServlet
             int idCategoria = Integer.parseInt(idCategoriaStr);
 
             ISubcategoria servicioSubcategoria = new Subcategoria();
-            boolean exito = servicioSubcategoria.crearSubcategoria(nombreSubcategoria, precioSubcategoria, idCategoria);
+            boolean exito = servicioSubcategoria.crearSubcategoria(nombreSubcategoria, precioSubcategoria, idCategoria, idUsuarioAuditor);
 
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
@@ -64,6 +93,36 @@ public class Subcategorias extends HttpServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 19);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para editar subcategorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -74,8 +133,6 @@ public class Subcategorias extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idSubcategoriaRaw = body.get("idSubcategoria");
@@ -94,7 +151,7 @@ public class Subcategorias extends HttpServlet
             int idCategoria = Integer.parseInt(idCategoriaRaw.toString());
 
             ISubcategoria servicioSubcategoria = new Subcategoria();
-            boolean exito = servicioSubcategoria.actualizarSubcategoria(idSubcategoria, nombreSubcategoria, precioSubcategoria, idCategoria);
+            boolean exito = servicioSubcategoria.actualizarSubcategoria(idSubcategoria, nombreSubcategoria, precioSubcategoria, idCategoria, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
@@ -117,6 +174,36 @@ public class Subcategorias extends HttpServlet
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 28);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para cambiar estado de subcategorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -127,8 +214,6 @@ public class Subcategorias extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idSubcategoriaRaw = body.get("idSubcategoria");
@@ -142,7 +227,7 @@ public class Subcategorias extends HttpServlet
             boolean estadoSubcategoria = Boolean.parseBoolean(estadoSubcategoriaRaw.toString());
 
             ISubcategoria servicioSubcategoria = new Subcategoria();
-            boolean exito = servicioSubcategoria.cambiarEstadoSubcategoria(idSubcategoria, !estadoSubcategoria);
+            boolean exito = servicioSubcategoria.cambiarEstadoSubcategoria(idSubcategoria, !estadoSubcategoria, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

@@ -17,17 +17,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerClientes = false;
+    boolean puedeAgregarCliente = false;
+    boolean puedeEditarCliente = false;
+    boolean puedeEliminarCliente = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 4)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 4:
+                puedeVerClientes = true;
+                break;
+            case 13:
+                puedeAgregarCliente = true;
+                break;
+            case 21:
+                puedeEditarCliente = true;
+                break;
+            case 29:
+                puedeEliminarCliente = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerClientes)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -124,7 +138,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarCliente ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar clientes.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Registrar Cliente
                         </button>
                     </div>
@@ -182,6 +197,9 @@
                             <td class="px-3 py-2 border border-white"><%= (cliente.generoPersona ? "Masculino" : "Femenino")%></td>
                             <td class="px-3 py-2 border border-white"><%= cliente.direccionCliente%></td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarCliente)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar cliente" class="text-blue-600 hover:text-blue-500 transition editar-cliente-btn"
                                         data-id="<%= cliente.idCliente%>"
                                         data-direccion="<%= cliente.direccionCliente%>"
@@ -193,12 +211,29 @@
                                         data-genero="<%= cliente.generoPersona%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                    { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar clientes.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                             <td title="Eliminar cliente" class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEliminarCliente)
+                                    {%>
+                                <!-- botón normal -->
                                 <button class="text-red-600 hover:text-red-500 transition eliminar-cliente-btn"
                                         data-id="<%= cliente.idCliente%>">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <% } else
+                                    { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para eliminar clientes.')" class="text-red-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <% } %>
                             </td>
                         </tr>
                         <%

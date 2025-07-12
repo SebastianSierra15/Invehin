@@ -22,6 +22,21 @@ public class Perfil extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             String idUsuarioTerm = request.getParameter("id");
@@ -32,6 +47,17 @@ public class Perfil extends HttpServlet
             }
 
             int idUsuario = Integer.parseInt(idUsuarioTerm);
+
+            // Validar que sea el mismo usuario de la sesión
+            if (idUsuario != sesion.idUsuario)
+            {
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+                Map<String, Object> error = new HashMap<>();
+                error.put("exito", false);
+                error.put("mensaje", "No puedes acceder al perfil de otro usuario.");
+                response.getWriter().write(gson.toJson(error));
+                return;
+            }
 
             // Obtener usuario
             IUsuario servicioUsuario = new Usuario();
@@ -55,6 +81,34 @@ public class Perfil extends HttpServlet
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
 
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 37);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para modificar el perfil.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             String idPersonaStr = request.getParameter("idPersona");
@@ -76,7 +130,7 @@ public class Perfil extends HttpServlet
             boolean generoPersona = Boolean.parseBoolean(generoStr);
 
             IUsuario servicioUsuario = new Usuario();
-            boolean exito = servicioUsuario.actualizarPerfil(idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona);
+            boolean exito = servicioUsuario.actualizarPerfil(idPersona, nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
 
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
@@ -99,6 +153,36 @@ public class Perfil extends HttpServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 37);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para cambiar la contraseña de este perfil.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -109,8 +193,6 @@ public class Perfil extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idUsuarioRaw = body.get("idUsuario");
@@ -127,7 +209,7 @@ public class Perfil extends HttpServlet
             String contraseniaNueva = String.valueOf(contraseniaNuevaRaw);
 
             IUsuario servicioUsuario = new Usuario();
-            boolean exito = servicioUsuario.cambiarContrasenia(idUsuario, contraseniaActual, contraseniaNueva);
+            boolean exito = servicioUsuario.cambiarContrasenia(idUsuario, contraseniaActual, contraseniaNueva, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

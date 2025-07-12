@@ -1,7 +1,6 @@
 package Interfaces;
 
 import Logica.PaginacionResultado;
-import Logica.Permiso;
 import Logica.Rol;
 import java.util.List;
 
@@ -12,11 +11,11 @@ import java.util.List;
 public interface IRol
 {
 
-    boolean crearRol(String nombreRol, String permisosRolJson);
+    boolean crearRol(String nombreRol, String permisosRolJson, int idUsuarioAuditor);
 
-    boolean actualizarRol(int idRol, String nombreRol, String permisosRolJson);
+    boolean actualizarRol(int idRol, String nombreRol, String permisosRolJson, int idUsuarioAuditor);
 
-    boolean eliminarRol(int idRol);
+    boolean eliminarRol(int idRol, int idUsuarioAuditor);
 
     PaginacionResultado<Rol> obtenerRoles(String searchTerm, int numPage, int pageSize);
 

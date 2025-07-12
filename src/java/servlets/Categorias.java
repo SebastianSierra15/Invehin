@@ -3,6 +3,7 @@ package servlets;
 import Interfaces.ICategoria;
 import Logica.Categoria;
 import Logica.PaginacionResultado;
+import Logica.Usuario;
 import com.google.gson.Gson;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,34 @@ public class Categorias extends HttpServlet
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 1);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para visualizar las categorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             // Parámetros de búsqueda y paginación
@@ -61,6 +90,34 @@ public class Categorias extends HttpServlet
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
 
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 2);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para agregar categorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             String nombreCategoria = request.getParameter("nombre");
@@ -71,7 +128,7 @@ public class Categorias extends HttpServlet
             }
 
             ICategoria servicioCategoria = new Categoria();
-            boolean exito = servicioCategoria.crearCategoria(nombreCategoria);
+            boolean exito = servicioCategoria.crearCategoria(nombreCategoria, idUsuarioAuditor);
 
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
@@ -94,6 +151,37 @@ public class Categorias extends HttpServlet
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        // Parsear JSON recibido
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 19);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para editar categorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -104,8 +192,6 @@ public class Categorias extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idCategoriaRaw = body.get("idCategoria");
@@ -120,7 +206,7 @@ public class Categorias extends HttpServlet
             String nombreCategoria = String.valueOf(nombreCategoriaRaw);
 
             ICategoria servicioCategoria = new Categoria();
-            boolean exito = servicioCategoria.actualizarCategoria(idCategoria, nombreCategoria);
+            boolean exito = servicioCategoria.actualizarCategoria(idCategoria, nombreCategoria, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
@@ -143,6 +229,37 @@ public class Categorias extends HttpServlet
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        // Parsear JSON recibido
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 28);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para cambiar el estado de las categorías.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -153,8 +270,6 @@ public class Categorias extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
 
             Object idCategoriaRaw = body.get("idCategoria");
@@ -168,7 +283,7 @@ public class Categorias extends HttpServlet
             boolean estadoCategoria = Boolean.parseBoolean(estadoCategoriaRaw.toString());
 
             ICategoria servicioCategoria = new Categoria();
-            boolean exito = servicioCategoria.cambiarEstadoCategoria(idCategoria, !estadoCategoria);
+            boolean exito = servicioCategoria.cambiarEstadoCategoria(idCategoria, !estadoCategoria, idUsuarioAuditor);
 
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();

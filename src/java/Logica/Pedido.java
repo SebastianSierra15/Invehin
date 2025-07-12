@@ -36,23 +36,23 @@ public class Pedido implements IPedido
     }
 
     @Override
-    public boolean crearPedido(Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson)
+    public boolean crearPedido(Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson, int idUsuarioAuditor)
     {
         EPedido result = new EPedido();
         
-        return result.insertPedido(fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
+        return result.insertPedido(fechaPedido, estadoPedido, idProveedor, detallesPedidoJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean actualizarPedido(int idPedido, Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson)
+    public boolean actualizarPedido(int idPedido, Timestamp fechaPedido, boolean estadoPedido, int idProveedor, String detallesPedidoJson, int idUsuarioAuditor)
     {
         EPedido result = new EPedido();
         
-        return result.updatePedido(idPedido, fechaPedido, estadoPedido, idProveedor, detallesPedidoJson);
+        return result.updatePedido(idPedido, fechaPedido, estadoPedido, idProveedor, detallesPedidoJson, idUsuarioAuditor);
     }
 
     @Override
-    public boolean eliminaredido(int idPedido)
+    public boolean eliminaredido(int idPedido, int idUsuarioAuditor)
     {
         return true;
     }

@@ -12,11 +12,11 @@ import java.util.List;
 public interface ICliente
 {
 
-    boolean crearCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente);
+    boolean crearCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente, int idUsuarioAuditor);
 
-    boolean actualizarCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona);
+    boolean actualizarCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor);
 
-    boolean eliminarCliente(int idCliente);
+    boolean eliminarCliente(int idCliente, int idUsuarioAuditor);
     
     int totalClientes(Timestamp fechaInicio, Timestamp fechaFin);
 

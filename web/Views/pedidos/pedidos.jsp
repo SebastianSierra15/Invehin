@@ -20,17 +20,31 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerPedidos = false;
+    boolean puedeAgregarPedido = false;
+    boolean puedeEditarPedido = false;
+    boolean puedeGenerarReporte = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 9)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 9:
+                puedeVerPedidos = true;
+                break;
+            case 16:
+                puedeAgregarPedido = true;
+                break;
+            case 25:
+                puedeEditarPedido = true;
+                break;
+            case 34:
+                puedeGenerarReporte = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerPedidos)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -127,11 +141,13 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalReporte()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeGenerarReporte ? "abrirModalReporte()" : "alert('No tienes permiso para generar reportes.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fa-solid fa-file-lines mr-2"></i>Generar Reporte
                         </button>
 
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarPedido ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar pedidos.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Registrar Pedido
                         </button>
                     </div>
@@ -193,6 +209,9 @@
                                 </button>
                             </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarPedido)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar pedido" class="text-blue-600 hover:text-blue-500 transition editar-pedido-btn"
                                         data-id="<%= pedido.idPedido%>"
                                         data-fecha="<%= pedido.fechaPedido%>"
@@ -203,6 +222,13 @@
                                         data-detalles="<%= detallesJson%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                    { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar prendas.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                         </tr>
                         <%
@@ -573,9 +599,9 @@
                         <select name="proveedor" class="block w-full px-2 border border-black/50 rounded-md shadow-sm">
                             <option value="">Todos los proveedores</option>
                             <% if (proveedores != null && !proveedores.isEmpty())
-                        { %>
+                                { %>
                             <% for (Proveedor proveedor : proveedores)
-                            {%>
+                                {%>
                             <option value="<%= proveedor.idProveedor%>"><%= proveedor.nombreProveedor%></option>
                             <% } %>
                             <% }%>

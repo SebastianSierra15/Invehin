@@ -3,6 +3,7 @@ package servlets;
 import Interfaces.ICliente;
 import Logica.Cliente;
 import Logica.PaginacionResultado;
+import Logica.Usuario;
 import com.google.gson.Gson;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -18,18 +19,46 @@ import java.util.Map;
  */
 public class Clientes extends HttpServlet
 {
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 4);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para ver clientes.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
         try
         {
             // Parámetros de búsqueda y paginación
             String paramSearchTerm = request.getParameter("searchTerm");
             String paramNumPage = request.getParameter("numPage");
             String paramPageSize = request.getParameter("pageSize");
-            
+
             String searchTerm = (paramSearchTerm != null) ? paramSearchTerm : "";
             int numPage = (paramNumPage != null) ? Integer.parseInt(paramNumPage) : 1;
             int pageSize = (paramPageSize != null) ? Integer.parseInt(paramPageSize) : 10;
@@ -44,7 +73,7 @@ public class Clientes extends HttpServlet
             request.setAttribute("numPage", numPage);
             request.setAttribute("pageSize", pageSize);
             request.setAttribute("searchTerm", searchTerm);
-            
+
             response.setContentType("text/html;charset=UTF-8");
             request.getRequestDispatcher("Views/clientes/clientes.jsp").forward(request, response);
         } catch (Exception e)
@@ -53,14 +82,42 @@ public class Clientes extends HttpServlet
             response.sendRedirect(request.getContextPath() + "/500.jsp");
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
         response.setContentType("application/json;charset=UTF-8");
         Gson gson = new Gson();
-        
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 13);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para agregar clientes.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             String nombresPersona = request.getParameter("nombres");
@@ -69,7 +126,7 @@ public class Clientes extends HttpServlet
             String telefonoPersona = request.getParameter("telefono");
             String generoStr = request.getParameter("genero");
             String direccionCliente = request.getParameter("direccion");
-            
+
             if (nombresPersona == null || apellidosPersona == null || numeroidentificacionPersona == null
                     || telefonoPersona == null || generoStr == null || direccionCliente == null
                     || nombresPersona.isEmpty() || apellidosPersona.isEmpty() || numeroidentificacionPersona.isEmpty()
@@ -77,12 +134,12 @@ public class Clientes extends HttpServlet
             {
                 throw new IllegalArgumentException("Datos incompletos.");
             }
-            
+
             boolean generoPersona = Boolean.parseBoolean(generoStr);
-            
+
             ICliente servicioCliente = new Cliente();
-            boolean exito = servicioCliente.crearCliente(nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, direccionCliente);
-            
+            boolean exito = servicioCliente.crearCliente(nombresPersona, apellidosPersona, numeroidentificacionPersona, telefonoPersona, generoPersona, direccionCliente, idUsuarioAuditor);
+
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
             resultado.put("mensaje", exito ? "Cliente registrado correctamente." : "Error al registrar cliente.");
@@ -91,19 +148,49 @@ public class Clientes extends HttpServlet
         {
             e.printStackTrace();
             response.setContentType("application/json;charset=UTF-8");
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
             error.put("mensaje", "Ocurrió un error al procesar el cliente.");
-            
+
             response.getWriter().write(new Gson().toJson(error));
         }
     }
-    
+
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 21);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para editar clientes.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -114,10 +201,8 @@ public class Clientes extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
-            
+
             Object idClienteRaw = body.get("idCliente");
             Object direccionClienteRaw = body.get("direccionCliente");
             Object idPersonaRaw = body.get("idPersona");
@@ -126,12 +211,12 @@ public class Clientes extends HttpServlet
             Object identificacionPersonaRaw = body.get("identificacionPersona");
             Object telefonoPersonaRaw = body.get("telefonoPersona");
             Object generoPersonaRaw = body.get("generoPersona");
-            
+
             if (idClienteRaw == null || direccionClienteRaw == null || idPersonaRaw == null || nombresPersonaRaw == null || apellidosPersonaRaw == null || identificacionPersonaRaw == null || telefonoPersonaRaw == null || generoPersonaRaw == null)
             {
                 throw new IllegalArgumentException("Datos incompletos.");
             }
-            
+
             int idCliente = Integer.parseInt(idClienteRaw.toString());
             String direccionCliente = String.valueOf(direccionClienteRaw);
             int idPersona = Integer.parseInt(idPersonaRaw.toString());
@@ -140,10 +225,10 @@ public class Clientes extends HttpServlet
             String identificacionPersona = String.valueOf(identificacionPersonaRaw);
             String telefonoPersona = String.valueOf(telefonoPersonaRaw);
             boolean generoPersona = "true".equals(String.valueOf(generoPersonaRaw));
-            
+
             ICliente servicioCliente = new Cliente();
-            boolean exito = servicioCliente.actualizarCliente(idCliente, direccionCliente, idPersona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona);
-            
+            boolean exito = servicioCliente.actualizarCliente(idCliente, direccionCliente, idPersona, nombresPersona, apellidosPersona, identificacionPersona, telefonoPersona, generoPersona, idUsuarioAuditor);
+
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
@@ -153,18 +238,48 @@ public class Clientes extends HttpServlet
         {
             e.printStackTrace();
             response.setContentType("application/json;charset=UTF-8");
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
             error.put("mensaje", "Ocurrió un error al actualizar el cliente.");
             response.getWriter().write(new Gson().toJson(error));
         }
     }
-    
+
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException
     {
+        Gson gson = new Gson();
+
+        Usuario sesion = (Usuario) request.getSession().getAttribute("sesion");
+
+        // Validar sesión nula por seguridad
+        if (sesion == null)
+        {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "Sesión no válida.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        boolean tienePermiso = sesion.rolUsuario.permisosRol.stream()
+                .anyMatch(p -> p.idPermiso == 29);
+
+        if (!tienePermiso)
+        {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            Map<String, Object> error = new HashMap<>();
+            error.put("exito", false);
+            error.put("mensaje", "No tienes permiso para eliminar clientes.");
+            response.getWriter().write(gson.toJson(error));
+            return;
+        }
+
+        int idUsuarioAuditor = sesion.idUsuario;
+
         try
         {
             // Leer datos del cuerpo de la solicitud
@@ -175,21 +290,19 @@ public class Clientes extends HttpServlet
                 sb.append(linea);
             }
 
-            // Parsear JSON recibido
-            Gson gson = new Gson();
             Map<String, Object> body = gson.fromJson(sb.toString(), Map.class);
-            
+
             Object idClienteRaw = body.get("idCliente");
             if (idClienteRaw == null)
             {
                 throw new IllegalArgumentException("Datos incompletos.");
             }
-            
+
             int idCliente = Integer.parseInt(idClienteRaw.toString());
-            
+
             ICliente servicioCliente = new Cliente();
-            boolean exito = servicioCliente.eliminarCliente(idCliente);
-            
+            boolean exito = servicioCliente.eliminarCliente(idCliente, idUsuarioAuditor);
+
             response.setContentType("application/json;charset=UTF-8");
             Map<String, Object> resultado = new HashMap<>();
             resultado.put("exito", exito);
@@ -199,7 +312,7 @@ public class Clientes extends HttpServlet
         {
             e.printStackTrace();
             response.setContentType("application/json;charset=UTF-8");
-            
+
             Map<String, Object> error = new HashMap<>();
             error.put("exito", false);
             error.put("mensaje", "Ocurrió un error al eliminar el cliente.");

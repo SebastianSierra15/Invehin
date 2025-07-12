@@ -21,17 +21,27 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerVentas = false;
+    boolean puedeEditarVenta = false;
+    boolean puedeGenerarReporte = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 7)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 7:
+                puedeVerVentas = true;
+                break;
+            case 23:
+                puedeEditarVenta = true;
+                break;
+            case 33:
+                puedeGenerarReporte = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerVentas)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -131,7 +141,8 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalReporte()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeGenerarReporte ? "abrirModalReporte()" : "alert('No tienes permiso para generar reportes.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fa-solid fa-file-lines mr-2"></i>Generar Reporte
                         </button>
 
@@ -205,6 +216,9 @@
                                 </button>
                             </td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarVenta)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar venta" class="text-blue-600 hover:text-blue-500 transition editar-venta-btn"
                                         data-id="<%= venta.idVenta%>"
                                         data-clienteid="<%= venta.clienteVenta.idCliente%>"
@@ -213,6 +227,13 @@
                                         data-estado="<%= venta.estadoVenta%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                    <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar ventas.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                         </tr>
                         <%

@@ -21,8 +21,9 @@ public class ECliente
     {
     }
 
-    public boolean insertCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente)
+    public boolean insertCliente(String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, String direccionCliente, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_cliente(?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -32,6 +33,14 @@ public class ECliente
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, nombresPersona);
@@ -64,8 +73,9 @@ public class ECliente
         return exito;
     }
 
-    public boolean updateCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona)
+    public boolean updateCliente(int idCliente, String direccionCliente, int idPersona, String nombresPersona, String apellidosPersona, String numeroidentificacionPersona, String telefonoPersona, boolean generoPersona, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_cliente(?, ?, ?, ?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -75,6 +85,14 @@ public class ECliente
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idCliente);
@@ -109,8 +127,9 @@ public class ECliente
         return exito;
     }
 
-    public boolean deleteCliente(int idCliente)
+    public boolean deleteCliente(int idCliente, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL desactivar_cliente(?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -120,6 +139,14 @@ public class ECliente
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idCliente);
@@ -147,7 +174,6 @@ public class ECliente
         return exito;
     }
 
-    
     public int getTotalClientes(Timestamp fechaInicio, Timestamp fechaFin)
     {
         int total = 0;

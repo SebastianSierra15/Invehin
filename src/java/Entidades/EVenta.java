@@ -26,8 +26,9 @@ public class EVenta
     {
     }
 
-    public boolean insertVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson)
+    public boolean insertVenta(int montoRecibido, int clienteId, int metodoPagoId, int usuarioId, String detallesVentaJson, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_venta(?, ?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -37,6 +38,14 @@ public class EVenta
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, montoRecibido);
@@ -68,8 +77,9 @@ public class EVenta
         return exito;
     }
 
-    public boolean updateVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta)
+    public boolean updateVenta(int idVenta, int idClienteVenta, int idMetodopagoVenta, boolean estadoVenta, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_venta(?, ?, ?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -79,6 +89,14 @@ public class EVenta
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idVenta);

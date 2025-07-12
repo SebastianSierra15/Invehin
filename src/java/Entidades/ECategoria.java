@@ -4,6 +4,7 @@ import Logica.Categoria;
 import Logica.PaginacionResultado;
 import Logica.Subcategoria;
 import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,8 +23,9 @@ public class ECategoria
     {
     }
 
-    public boolean insertCategoria(String nombreCategoria)
+    public boolean insertCategoria(String nombreCategoria, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL insert_categoria(?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -33,6 +35,14 @@ public class ECategoria
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer el ID de usuario auditor en la sesión de MySQL
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setString(1, nombreCategoria);
@@ -60,8 +70,9 @@ public class ECategoria
         return exito;
     }
 
-    public boolean updateCategoria(int idCategoria, String nombreCategoria)
+    public boolean updateCategoria(int idCategoria, String nombreCategoria, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL update_categoria(?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -71,6 +82,14 @@ public class ECategoria
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer variable de auditoría en la sesión
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idCategoria);
@@ -99,8 +118,9 @@ public class ECategoria
         return exito;
     }
 
-    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria)
+    public boolean cambiarEstadoCategoria(int idCategoria, boolean estadoCategoria, int idUsuarioAuditor)
     {
+        String sqlSetAuditor = "SET @id_usuario_auditoria = ?";
         String sql = "{CALL cambiar_estado_categoria(?, ?)}";
         DBConexion db = null;
         boolean exito = false;
@@ -110,6 +130,14 @@ public class ECategoria
             db = new DBConexion();
             db.conectar();
 
+            // 1. Establecer variable de auditoría en la sesión
+            try (PreparedStatement ps = db.obtener().prepareStatement(sqlSetAuditor))
+            {
+                ps.setInt(1, idUsuarioAuditor);
+                ps.execute();
+            }
+
+            // 2. Ejecutar el procedimiento almacenado
             try (CallableStatement cs = db.obtener().prepareCall(sql))
             {
                 cs.setInt(1, idCategoria);

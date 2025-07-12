@@ -248,11 +248,12 @@
 
             const labelsVentasDia = [
         <%
-            int diasMes = java.time.LocalDate.now().lengthOfMonth();
-            for (int i = 1; i <= diasMes; i++)
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+            int diaActual = hoy.getDayOfMonth();
+            for (int i = 1; i <= diaActual; i++)
             {
                 out.print("\"" + i + "\"");
-                if (i < diasMes)
+                if (i < diaActual)
                 {
                     out.print(", ");
                 }
@@ -262,16 +263,15 @@
 
             const dataVentasDia = [
         <%
-            java.util.Map<java.sql.Timestamp, Integer> ventasPorDia
-                    = (java.util.Map<java.sql.Timestamp, Integer>) request.getAttribute("totalVentasPorDia");
+            java.util.Map<java.sql.Timestamp, Integer> ventasPorDia = (java.util.Map<java.sql.Timestamp, Integer>) request.getAttribute("totalVentasPorDia");
             java.time.LocalDate inicio = java.time.LocalDate.now().withDayOfMonth(1);
-            for (int i = 1; i <= diasMes; i++)
+            for (int i = 1; i <= diaActual; i++)
             {
                 java.time.LocalDate dia = inicio.withDayOfMonth(i);
                 java.sql.Timestamp ts = java.sql.Timestamp.valueOf(dia.atStartOfDay());
                 int valor = ventasPorDia.getOrDefault(ts, 0);
                 out.print(valor);
-                if (i < diasMes)
+                if (i < diaActual)
                 {
                     out.print(", ");
                 }
@@ -394,11 +394,13 @@
                         },
                         tooltip: {
                             callbacks: {
+                                title: function (tooltipItems) {
+                                    return "Día " + tooltipItems[0].label;
+                                },
                                 label: function (tooltipItem) {
-                                    // Formatear el valor con puntos de mil
                                     const valor = tooltipItem.raw;
                                     const valorFormateado = valor.toLocaleString('es-CO');
-                                    return (tooltipItem.label + ": $" + valorFormateado);
+                                    return "Día " + tooltipItem.label + ": $" + valorFormateado;
                                 }
                             }
                         }

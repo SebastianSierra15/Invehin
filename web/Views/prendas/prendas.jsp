@@ -22,17 +22,35 @@
 
     Usuario sesion = (Usuario) session.getAttribute("sesion");
 
-    boolean tienePermiso = false;
+    boolean puedeVerPrendas = false;
+    boolean puedeAgregarPrenda = false;
+    boolean puedeEditarPrenda = false;
+    boolean puedeEliminarPrenda = false;
+    boolean puedeGenerarReporte = false;
+
     for (var permiso : sesion.rolUsuario.permisosRol)
     {
-        if (permiso.idPermiso == 8)
+        switch (permiso.idPermiso)
         {
-            tienePermiso = true;
-            break;
+            case 8:
+                puedeVerPrendas = true;
+                break;
+            case 15:
+                puedeAgregarPrenda = true;
+                break;
+            case 24:
+                puedeEditarPrenda = true;
+                break;
+            case 31:
+                puedeEliminarPrenda = true;
+                break;
+            case 35:
+                puedeGenerarReporte = true;
+                break;
         }
     }
 
-    if (!tienePermiso)
+    if (!puedeVerPrendas)
     {
         response.sendRedirect(request.getContextPath() + "/Views/sin-permiso.jsp");
         return;
@@ -135,11 +153,13 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row w-full sm:w-auto sm:justify-between gap-2 text-sm">
-                        <button onclick="abrirModalReporte()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeGenerarReporte ? "abrirModalReporte()" : "alert('No tienes permiso para generar reportes.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fa-solid fa-file-lines mr-2"></i>Generar Reporte
                         </button>
 
-                        <button onclick="abrirModalAgregar()" class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
+                        <button onclick="<%= puedeAgregarPrenda ? "abrirModalAgregar()" : "alert('No tienes permiso para agregar prendas.')"%>"
+                                class="bg-invehin-primary text-white font-medium px-4 py-1 rounded shadow hover:bg-invehin-primaryLight transition whitespace-nowrap">
                             <i class="fas fa-plus mr-2"></i>Agregar Prenda
                         </button>
                     </div>
@@ -200,6 +220,9 @@
                             <td class="px-3 py-2 border border-white"><%= prenda.stockminimoPrenda%></td>
                             <td class="px-3 py-2 border border-white"><%= prenda.estadoprendaPrenda.nombreEstadoPrenda%></td>
                             <td class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEditarPrenda)
+                                    {%>
+                                <!-- botón normal -->
                                 <button title="Editar prenda" class="text-blue-600 hover:text-blue-500 transition editar-prenda-btn"
                                         data-id="<%= prenda.codigoPrenda%>"
                                         data-estado="<%= prenda.estadoprendaPrenda.idEstadoPrenda%>"
@@ -212,12 +235,29 @@
                                         data-stockminimo="<%= prenda.stockminimoPrenda%>">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para editar prendas.')" class="text-blue-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <% }%>
                             </td>
                             <td title="Eliminar prenda" class="px-3 py-2 border border-white text-center">
+                                <% if (puedeEliminarPrenda)
+                                    {%>
+                                <!-- botón normal -->
                                 <button class="text-red-600 hover:text-red-500 transition eliminar-prenda-btn"
                                         data-id="<%= prenda.codigoPrenda%>">
                                     <i class="fas fa-trash"></i>
                                 </button>
+                                <% } else
+                                { %>
+                                <!-- botón deshabilitado con alerta -->
+                                <button title="Sin permiso" onclick="alert('No tienes permiso para eliminar prendas.')" class="text-red-300 cursor-not-allowed" disabled>
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <% } %>
                             </td>
                         </tr>
                         <%
@@ -310,7 +350,10 @@
                                     { %>
                                 <% for (Categoria categoria : categorias)
                                     {%>
+                                <% if (categoria.estadoCategoria)
+                                    {%>
                                 <option value="<%= categoria.idCategoria%>"><%= categoria.nombreCategoria%></option>
+                                <% } %>
                                 <% } %>
                                 <% }%>
                             </select>
@@ -319,6 +362,7 @@
                         <div class="gap-1">
                             <label for="agregarSubcategoria" class="block font-semibold text-black">Subcategoría</label>
                             <select id="agregarSubcategoria" name="subcategoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" disabled>
+                                <option value="">Seleccione una subcategoría</option>
                                 <% if (categorias != null)
                                     {
                                         for (Categoria categoria : categorias)
@@ -326,7 +370,10 @@
                                             for (var sub : categoria.subcategoriasCategoria)
                                             {
                                 %>
+                                <% if (sub.estadoSubcategoria)
+                                    {%>
                                 <option value="<%= sub.idSubcategoria%>" data-categoria="<%= categoria.idCategoria%>"  data-precio="<%= sub.precioSubcategoria%>"><%= sub.nombreSubcategoria%></option>
+                                <% } %>
                                 <%      }
                                         }
                                     } %>
@@ -433,7 +480,10 @@
                                     { %>
                                 <% for (Categoria categoria : categorias)
                                     {%>
+                                <% if (categoria.estadoCategoria)
+                                    {%>
                                 <option value="<%= categoria.idCategoria%>"><%= categoria.nombreCategoria%></option>
+                                <% } %>
                                 <% } %>
                                 <% }%>
                             </select>
@@ -444,6 +494,7 @@
                         <div class="gap-1">
                             <label for="editarSubcategoria" class="block font-semibold text-black">Subcategoria</label>
                             <select id="editarSubcategoria" name="subcategoria" class="block w-full px-2 border border-black/50 rounded-md shadow-sm" disabled>
+                                <option value="">Seleccione una subcategoría</option>
                                 <% if (categorias != null)
                                     {
                                         for (Categoria categoria : categorias)
@@ -451,7 +502,10 @@
                                             for (var sub : categoria.subcategoriasCategoria)
                                             {
                                 %>
+                                <% if (sub.estadoSubcategoria)
+                                    {%>
                                 <option value="<%= sub.idSubcategoria%>" data-categoria="<%= categoria.idCategoria%>"  data-precio="<%= sub.precioSubcategoria%>"><%= sub.nombreSubcategoria%></option>
+                                <% } %>
                                 <%      }
                                         }
                                     } %>
@@ -860,6 +914,12 @@
             const formData = new FormData(this);
             datosPrendaNueva = new URLSearchParams(formData);
 
+            const subcatValue = document.getElementById("agregarSubcategoria").value;
+            if (!subcatValue) {
+                alert("Debes seleccionar una subcategoría válida.");
+                return;
+            }
+
             document.getElementById("modalConfirmarAgregar").classList.remove("hidden");
             document.body.classList.add("overflow-hidden");
         });
@@ -876,6 +936,12 @@
                 idSubcategoria: parseInt(document.getElementById("editarSubcategoriaId").value),
                 idTalla: parseInt(document.getElementById("editarTalla").value)
             };
+
+            const subcatValueEdit = document.getElementById("editarSubcategoria").value;
+            if (!subcatValueEdit) {
+                alert("Debes seleccionar una subcategoría válida.");
+                return;
+            }
 
             document.getElementById("modalConfirmarEditar").classList.remove("hidden");
         });

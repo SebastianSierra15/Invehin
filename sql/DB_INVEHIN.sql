@@ -19,6 +19,23 @@
 CREATE DATABASE IF NOT EXISTS `db_invehin` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `db_invehin`;
 
+-- Volcando estructura para tabla db_invehin.auditoria
+CREATE TABLE IF NOT EXISTS `auditoria` (
+  `id_auditoria` int NOT NULL AUTO_INCREMENT,
+  `tabla_auditoria` varchar(100) NOT NULL,
+  `operacion_auditoria` enum('INSERT','UPDATE','DELETE') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `idregistro_auditoria` varchar(50) NOT NULL DEFAULT '0',
+  `fecha_auditoria` timestamp NOT NULL DEFAULT (now()),
+  `detalleanterior_auditoria` text,
+  `detallenuevo_auditoria` text,
+  `usuario_auditoria` int DEFAULT NULL,
+  PRIMARY KEY (`id_auditoria`),
+  KEY `usuario_auditoria` (`usuario_auditoria`),
+  CONSTRAINT `fk_auditoria_usuario` FOREIGN KEY (`usuario_auditoria`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla db_invehin.auditoria: ~0 rows (aproximadamente)
+
 -- Volcando estructura para función db_invehin.calcular_total_pedido
 DELIMITER //
 CREATE FUNCTION `calcular_total_pedido`(
@@ -232,7 +249,7 @@ CREATE TABLE IF NOT EXISTS `categoria` (
   `nombre_categoria` varchar(50) NOT NULL,
   `estado_categoria` tinyint NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_categoria`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.categoria: ~9 rows (aproximadamente)
 INSERT INTO `categoria` (`id_categoria`, `nombre_categoria`, `estado_categoria`) VALUES
@@ -244,8 +261,7 @@ INSERT INTO `categoria` (`id_categoria`, `nombre_categoria`, `estado_categoria`)
 	(6, 'Short', 1),
 	(7, 'Abrigo', 0),
 	(8, 'Suéter', 1),
-	(9, 'Chaqueta', 1),
-	(10, 'Sombreroooooo', 0);
+	(9, 'Chaqueta', 1);
 
 -- Volcando estructura para tabla db_invehin.cliente
 CREATE TABLE IF NOT EXISTS `cliente` (
@@ -257,7 +273,7 @@ CREATE TABLE IF NOT EXISTS `cliente` (
   PRIMARY KEY (`id_cliente`),
   KEY `fk_cliente_persona_idx` (`fk_id_persona`),
   CONSTRAINT `fk_cliente_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.cliente: ~10 rows (aproximadamente)
 INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente`, `estado_cliente`, `fk_id_persona`) VALUES
@@ -271,7 +287,8 @@ INSERT INTO `cliente` (`id_cliente`, `direccion_cliente`, `fecharegistro_cliente
 	(8, 'las avenidas', '2025-06-15 21:49:44', 0, 18),
 	(9, 'Los angeles', '2025-06-20 22:16:38', 1, 21),
 	(10, 'California', '2025-06-20 22:22:10', 1, 22),
-	(11, 'Florencia', '2025-07-05 14:13:09', 1, 23);
+	(11, 'Florencia', '2025-07-05 14:13:09', 1, 23),
+	(12, 'Florencia', '2025-07-11 22:37:51', 1, 24);
 
 -- Volcando estructura para tabla db_invehin.color
 CREATE TABLE IF NOT EXISTS `color` (
@@ -620,7 +637,7 @@ CREATE TABLE IF NOT EXISTS `detalleinventario` (
   KEY `fk_inventarioprenda_prenda_idx` (`fk_codigo_prenda`),
   CONSTRAINT `fk_inventarioprenda_inventario` FOREIGN KEY (`fk_id_inventario`) REFERENCES `inventario` (`id_inventario`) ON UPDATE CASCADE,
   CONSTRAINT `fk_inventarioprenda_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detalleinventario: ~25 rows (aproximadamente)
 INSERT INTO `detalleinventario` (`id_detalleinventario`, `observacion_detalleinventario`, `cantidadregistrada_detalleinventario`, `cantidadsistema_detalleinventario`, `fk_id_inventario`, `fk_codigo_prenda`) VALUES
@@ -662,7 +679,7 @@ CREATE TABLE IF NOT EXISTS `detallepedido` (
   KEY `fk_pedidoprenda_prenda_idx` (`fk_codigo_prenda`),
   CONSTRAINT `fk_pedidoprenda_pedido` FOREIGN KEY (`fk_id_pedido`) REFERENCES `pedido` (`id_pedido`) ON UPDATE CASCADE,
   CONSTRAINT `fk_pedidoprenda_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detallepedido: ~22 rows (aproximadamente)
 INSERT INTO `detallepedido` (`id_detallepedido`, `cantidad_detallepedido`, `costounitario_detallepedido`, `fk_id_pedido`, `fk_codigo_prenda`) VALUES
@@ -702,7 +719,7 @@ CREATE TABLE IF NOT EXISTS `detalleventa` (
   KEY `fk_prendaventa_venta_idx` (`fk_id_venta`),
   CONSTRAINT `fk_prendaventa_prenda` FOREIGN KEY (`fk_codigo_prenda`) REFERENCES `prenda` (`codigo_prenda`) ON UPDATE CASCADE,
   CONSTRAINT `fk_prendaventa_venta` FOREIGN KEY (`fk_id_venta`) REFERENCES `venta` (`id_venta`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.detalleventa: ~32 rows (aproximadamente)
 INSERT INTO `detalleventa` (`id_detalleventa`, `cantidad_detalleventa`, `fk_codigo_prenda`, `fk_id_venta`) VALUES
@@ -1410,7 +1427,7 @@ CREATE TABLE IF NOT EXISTS `inventario` (
   PRIMARY KEY (`id_inventario`),
   KEY `fk_inventario_usuario_idx` (`fk_id_usuario`),
   CONSTRAINT `fk_inventario_usuario` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.inventario: ~10 rows (aproximadamente)
 INSERT INTO `inventario` (`id_inventario`, `fecha_inventario`, `observacion_inventario`, `estado_inventario`, `fk_id_usuario`) VALUES
@@ -1500,7 +1517,7 @@ CREATE TABLE IF NOT EXISTS `pedido` (
   PRIMARY KEY (`id_pedido`),
   KEY `fk_pedido_proveedor_idx` (`fk_id_proveedor`),
   CONSTRAINT `fk_pedido_proveedor` FOREIGN KEY (`fk_id_proveedor`) REFERENCES `proveedor` (`id_proveedor`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.pedido: ~11 rows (aproximadamente)
 INSERT INTO `pedido` (`id_pedido`, `fecha_pedido`, `estado_pedido`, `fk_id_proveedor`) VALUES
@@ -1521,21 +1538,47 @@ CREATE TABLE IF NOT EXISTS `permiso` (
   `id_permiso` int NOT NULL AUTO_INCREMENT,
   `nombre_permiso` varchar(50) NOT NULL,
   PRIMARY KEY (`id_permiso`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.permiso: ~11 rows (aproximadamente)
 INSERT INTO `permiso` (`id_permiso`, `nombre_permiso`) VALUES
-	(1, 'Gestionar categorias'),
-	(2, 'Gestionar subcategorias'),
-	(3, 'Gestionar usuarios'),
-	(4, 'Gestionar clientes'),
-	(5, 'Gestionar roles'),
+	(1, 'Consultar categorias'),
+	(2, 'Registrar categorias'),
+	(3, 'Consultar usuarios'),
+	(4, 'Consultar clientes'),
+	(5, 'Consultar roles'),
 	(6, 'Registrar venta'),
-	(7, 'Gestionar ventas'),
-	(8, 'Gestionar prendas'),
-	(9, 'Gestionar pedidos'),
-	(10, 'Gestionar proveedores'),
-	(11, 'Gestionar inventario');
+	(7, 'Consultar ventas'),
+	(8, 'Consultar prendas'),
+	(9, 'Consultar pedidos'),
+	(10, 'Consultar proveedores'),
+	(11, 'Consultar inventario'),
+	(12, 'Registrar usuarios'),
+	(13, 'Registrar clientes'),
+	(14, 'Registrar roles'),
+	(15, 'Registrar prendas'),
+	(16, 'Registrar pedidos'),
+	(17, 'Registrar proveedores'),
+	(18, 'Registrar inventario'),
+	(19, 'Editar categorias'),
+	(20, 'Editar usuarios'),
+	(21, 'Editar clientes'),
+	(22, 'Editar roles'),
+	(23, 'Editar ventas'),
+	(24, 'Editar prendas'),
+	(25, 'Editar pedidos'),
+	(26, 'Editar proveedores'),
+	(27, 'Editar inventario'),
+	(28, 'Desactivar categorias'),
+	(29, 'Eliminar clientes'),
+	(30, 'Eliminar roles'),
+	(31, 'Eliminar prendas'),
+	(32, 'Eliminar proveedores'),
+	(33, 'Reporte ventas'),
+	(34, 'Reporte pedidos'),
+	(35, 'Reporte prendas'),
+	(36, 'Reporte inventario'),
+	(37, 'Gestionar perfil');
 
 -- Volcando estructura para tabla db_invehin.permisorol
 CREATE TABLE IF NOT EXISTS `permisorol` (
@@ -1548,33 +1591,109 @@ CREATE TABLE IF NOT EXISTS `permisorol` (
   KEY `fk_permisorol_rol_idx` (`fk_id_rol`),
   CONSTRAINT `fk_permisorol_permiso` FOREIGN KEY (`fk_id_permiso`) REFERENCES `permiso` (`id_permiso`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_permisorol_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=252 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.permisorol: ~24 rows (aproximadamente)
 INSERT INTO `permisorol` (`id_permisorol`, `estado_permisorol`, `fk_id_permiso`, `fk_id_rol`) VALUES
-	(1, 1, 1, 1),
-	(2, 1, 2, 1),
-	(3, 1, 3, 1),
-	(4, 1, 4, 1),
-	(5, 1, 5, 1),
-	(6, 1, 6, 1),
-	(7, 1, 7, 1),
-	(8, 1, 8, 1),
-	(9, 1, 9, 1),
-	(10, 1, 10, 1),
-	(11, 1, 11, 1),
-	(14, 1, 4, 4),
-	(15, 1, 6, 4),
-	(16, 1, 7, 4),
-	(37, 1, 1, 3),
-	(38, 1, 4, 3),
-	(39, 1, 11, 3),
-	(40, 1, 9, 3),
-	(41, 1, 8, 3),
-	(42, 1, 2, 3),
-	(43, 1, 7, 3),
-	(44, 1, 6, 3),
-	(45, 1, 7, 5);
+	(150, 1, 1, 1),
+	(151, 1, 4, 1),
+	(152, 1, 11, 1),
+	(153, 1, 9, 1),
+	(154, 1, 8, 1),
+	(155, 1, 10, 1),
+	(156, 1, 5, 1),
+	(157, 1, 3, 1),
+	(158, 1, 7, 1),
+	(159, 1, 28, 1),
+	(160, 1, 19, 1),
+	(161, 1, 21, 1),
+	(162, 1, 27, 1),
+	(163, 1, 25, 1),
+	(164, 1, 24, 1),
+	(165, 1, 26, 1),
+	(166, 1, 22, 1),
+	(167, 1, 20, 1),
+	(168, 1, 23, 1),
+	(169, 1, 29, 1),
+	(170, 1, 31, 1),
+	(171, 1, 32, 1),
+	(172, 1, 30, 1),
+	(173, 1, 37, 1),
+	(174, 1, 2, 1),
+	(175, 1, 13, 1),
+	(176, 1, 18, 1),
+	(177, 1, 16, 1),
+	(178, 1, 15, 1),
+	(179, 1, 17, 1),
+	(180, 1, 14, 1),
+	(181, 1, 12, 1),
+	(182, 1, 6, 1),
+	(183, 1, 36, 1),
+	(184, 1, 34, 1),
+	(185, 1, 35, 1),
+	(186, 1, 33, 1),
+	(187, 1, 1, 3),
+	(188, 1, 4, 3),
+	(189, 1, 11, 3),
+	(190, 1, 9, 3),
+	(191, 1, 8, 3),
+	(192, 1, 10, 3),
+	(193, 1, 3, 3),
+	(194, 1, 7, 3),
+	(195, 1, 28, 3),
+	(196, 1, 19, 3),
+	(197, 1, 21, 3),
+	(198, 1, 27, 3),
+	(199, 1, 25, 3),
+	(200, 1, 24, 3),
+	(201, 1, 26, 3),
+	(202, 1, 23, 3),
+	(203, 1, 29, 3),
+	(204, 1, 31, 3),
+	(205, 1, 32, 3),
+	(206, 1, 37, 3),
+	(207, 1, 2, 3),
+	(208, 1, 13, 3),
+	(209, 1, 18, 3),
+	(210, 1, 16, 3),
+	(211, 1, 15, 3),
+	(212, 1, 17, 3),
+	(213, 1, 6, 3),
+	(214, 1, 36, 3),
+	(215, 1, 34, 3),
+	(216, 1, 35, 3),
+	(217, 1, 33, 3),
+	(218, 1, 4, 4),
+	(219, 1, 7, 4),
+	(220, 1, 21, 4),
+	(221, 1, 23, 4),
+	(222, 1, 29, 4),
+	(223, 1, 37, 4),
+	(224, 1, 6, 4),
+	(225, 1, 1, 5),
+	(226, 1, 11, 5),
+	(227, 1, 9, 5),
+	(228, 1, 8, 5),
+	(229, 1, 10, 5),
+	(230, 1, 7, 5),
+	(231, 1, 37, 5),
+	(232, 1, 36, 5),
+	(233, 1, 34, 5),
+	(234, 1, 35, 5),
+	(235, 1, 33, 5),
+	(236, 1, 1, 7),
+	(237, 1, 4, 7),
+	(238, 1, 11, 7),
+	(239, 1, 9, 7),
+	(240, 1, 8, 7),
+	(241, 1, 10, 7),
+	(242, 1, 3, 7),
+	(243, 1, 7, 7),
+	(244, 1, 6, 7),
+	(245, 1, 36, 7),
+	(246, 1, 34, 7),
+	(247, 1, 35, 7),
+	(248, 1, 33, 7);
 
 -- Volcando estructura para tabla db_invehin.persona
 CREATE TABLE IF NOT EXISTS `persona` (
@@ -1586,7 +1705,7 @@ CREATE TABLE IF NOT EXISTS `persona` (
   `genero_persona` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id_persona`),
   UNIQUE KEY `id_persona_UNIQUE` (`id_persona`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.persona: ~19 rows (aproximadamente)
 INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `numeroidentificacion_persona`, `telefono_persona`, `genero_persona`) VALUES
@@ -1602,16 +1721,19 @@ INSERT INTO `persona` (`id_persona`, `nombres_persona`, `apellidos_persona`, `nu
 	(10, 'Miguel', 'Herrera', '1010101019', '3120000000', 1),
 	(11, 'Isabela', 'Mendoza', '1010101020', '3121111111', 2),
 	(12, 'Sebastián', 'Vargas', '1010101021', '3122222222', 1),
-	(13, 'Alejandra', 'Moreno', '1010101022', '3123333333', 0),
+	(13, 'Alejandra', 'Moreno', '1010101022', '3123333334', 0),
 	(14, 'Jorge', 'Soto', '1010101023', '3124444444', 1),
 	(15, 'María', 'Castro', '1010101024', '3125555555', 2),
-	(17, 'Sebastian', 'Sierra', '1006506525', '3112929178', 1),
+	(17, 'Sebastian', 'Sierra', '1234567890', '+57 3112929178', 1),
 	(18, 'Elias', 'Sierra', '1006506524', '3152919218', 1),
 	(19, 'Fernanda', 'Vargas', '1002603659', '3152926356', 0),
 	(20, 'Sebastian', 'Sierra', NULL, '3112929178', 1),
 	(21, 'Fabian', 'Garcia', '12131515', '312569486', 1),
 	(22, 'Fabian', 'Castro', '15555255', '3254805555', 1),
-	(23, 'Juanito', 'Perez', '1500003', '3112659584', 1);
+	(23, 'Juanito', 'Perez', '1500003', '3112659584', 1),
+	(24, 'Johana', 'Sanchez', '1231350', '3154654556', 0),
+	(28, 'a', 'a', NULL, 'bb', NULL),
+	(32, 'Sebastián', 'Sierra', '123456789', '+57 3112929178', 1);
 
 -- Volcando estructura para tabla db_invehin.prenda
 CREATE TABLE IF NOT EXISTS `prenda` (
@@ -1634,20 +1756,19 @@ CREATE TABLE IF NOT EXISTS `prenda` (
   CONSTRAINT `fk_prenda_talla` FOREIGN KEY (`fk_id_talla`) REFERENCES `talla` (`id_talla`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla db_invehin.prenda: ~14 rows (aproximadamente)
+-- Volcando datos para la tabla db_invehin.prenda: ~55 rows (aproximadamente)
 INSERT INTO `prenda` (`codigo_prenda`, `stock_prenda`, `stockminimo_prenda`, `fk_id_color`, `fk_id_estadoprenda`, `fk_id_subcategoria`, `fk_id_talla`) VALUES
-	('1', 1, 1, 7, 3, 17, 1),
 	('CM001', 36, 7, 8, 1, 21, 5),
 	('FM001', 48, 10, 7, 1, 13, 1),
 	('PR001', 5, 10, 1, 1, 1, 1),
-	('PR002', 184, 10, 2, 1, 2, 2),
+	('PR002', 229, 10, 2, 1, 2, 2),
 	('PR003', 71, 5, 3, 2, 3, 3),
 	('PR004', 32, 5, 4, 1, 4, 4),
 	('PR005', 125, 15, 5, 1, 5, 5),
 	('PR006', 47, 5, 1, 1, 1, 1),
 	('PR007', 57, 5, 2, 1, 2, 2),
 	('PR008', 53, 5, 3, 2, 3, 3),
-	('PR009', 87, 5, 4, 1, 4, 4),
+	('PR009', 88, 5, 4, 1, 4, 4),
 	('PR010', 16, 15, 5, 3, 5, 5),
 	('PR011', 35, 10, 1, 1, 1, 1),
 	('PR012', 65, 15, 2, 1, 2, 2),
@@ -1755,7 +1876,7 @@ CREATE TABLE IF NOT EXISTS `proveedor` (
   PRIMARY KEY (`id_proveedor`),
   KEY `fk_proveedor_persona_idx` (`fk_id_persona`),
   CONSTRAINT `fk_proveedor_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.proveedor: ~10 rows (aproximadamente)
 INSERT INTO `proveedor` (`id_proveedor`, `nombre_proveedor`, `direccion_proveedor`, `correo_proveedor`, `estado_proveedor`, `fk_id_persona`) VALUES
@@ -1963,7 +2084,7 @@ CREATE TABLE IF NOT EXISTS `rol` (
   `nombre_rol` varchar(50) NOT NULL,
   `estado_rol` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id_rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.rol: ~6 rows (aproximadamente)
 INSERT INTO `rol` (`id_rol`, `nombre_rol`, `estado_rol`) VALUES
@@ -1971,7 +2092,8 @@ INSERT INTO `rol` (`id_rol`, `nombre_rol`, `estado_rol`) VALUES
 	(2, 'Invitado', 1),
 	(3, 'Administrador', 1),
 	(4, 'Empleado', 1),
-	(5, 'Contador', 1);
+	(5, 'Contador', 1),
+	(7, 'Invitado', 1);
 
 -- Volcando estructura para procedimiento db_invehin.select_categorias
 DELIMITER //
@@ -3556,7 +3678,7 @@ CREATE TABLE IF NOT EXISTS `subcategoria` (
   KEY `fk_subcategoria_promocion_idx` (`fk_id_promocion`) USING BTREE,
   CONSTRAINT `fk_subcategoria_categoria` FOREIGN KEY (`fk_id_categoria`) REFERENCES `categoria` (`id_categoria`) ON UPDATE CASCADE,
   CONSTRAINT `fk_subcategoria_promocion` FOREIGN KEY (`fk_id_promocion`) REFERENCES `promocion` (`id_promocion`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.subcategoria: ~45 rows (aproximadamente)
 INSERT INTO `subcategoria` (`id_subcategoria`, `nombre_subcategoria`, `precio_subcategoria`, `imagen_subcategoria`, `estado_subcategoria`, `fk_id_categoria`, `fk_id_promocion`) VALUES
@@ -3605,8 +3727,7 @@ INSERT INTO `subcategoria` (`id_subcategoria`, `nombre_subcategoria`, `precio_su
 	(43, 'Bomber', 70000, 'bomber.jpg', 1, 9, 5),
 	(44, 'Blazer', 75000, 'blazer.jpg', 1, 9, NULL),
 	(45, 'Parka', 80000, 'parka_chaqueta.jpg', 1, 9, NULL),
-	(46, 'Seda', 85000, NULL, 0, 7, NULL),
-	(47, 'Clasico', 60000, NULL, 1, 10, NULL);
+	(46, 'Seda', 85000, NULL, 0, 7, NULL);
 
 -- Volcando estructura para tabla db_invehin.talla
 CREATE TABLE IF NOT EXISTS `talla` (
@@ -4175,15 +4296,16 @@ CREATE TABLE IF NOT EXISTS `usuario` (
   KEY `fk_usuario_rol_idx` (`fk_id_rol`),
   CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`fk_id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`fk_id_rol`) REFERENCES `rol` (`id_rol`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.usuario: ~5 rows (aproximadamente)
 INSERT INTO `usuario` (`id_usuario`, `correo_usuario`, `contrasenia_usuario`, `estado_usuario`, `fk_id_persona`, `fk_id_rol`) VALUES
-	(1, 'sebsirra13@gmail.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 17, 1),
-	(2, 'empleado@invehin.com', 'hashed_password_2', 1, 7, 4),
-	(3, 'contador@invehin.com', 'hashed_password_4', 1, 8, 5),
+	(1, 'superadmin@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 17, 1),
+	(2, 'empleado@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 7, 4),
+	(3, 'contador@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 8, 5),
 	(4, 'admin@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 20, 3),
-	(5, 'recepcionista@email.com', '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', 0, 19, 4);
+	(5, 'recepcionista@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 0, 19, 4),
+	(9, 'invitado@invehin.com', '5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5', 1, 32, 7);
 
 -- Volcando estructura para tabla db_invehin.venta
 CREATE TABLE IF NOT EXISTS `venta` (
@@ -4201,26 +4323,26 @@ CREATE TABLE IF NOT EXISTS `venta` (
   CONSTRAINT `fk_venta_cliente` FOREIGN KEY (`fk_id_cliente`) REFERENCES `cliente` (`id_cliente`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_metodopago` FOREIGN KEY (`fk_id_metodopago`) REFERENCES `metodopago` (`id_metodopago`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_venta_usuario` FOREIGN KEY (`fk_id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando datos para la tabla db_invehin.venta: ~25 rows (aproximadamente)
 INSERT INTO `venta` (`id_venta`, `fecha_venta`, `montorecibido_venta`, `estado_venta`, `fk_id_cliente`, `fk_id_metodopago`, `fk_id_usuario`) VALUES
-	(1, '2025-07-22 19:28:30', 100000, 0, 2, 1, 4),
+	(1, '2025-06-22 19:28:30', 100000, 0, 2, 1, 4),
 	(2, '2025-05-21 19:28:30', 250000, 1, 2, 1, 2),
 	(3, '2025-05-22 19:28:30', 180000, 1, 3, 1, 3),
-	(4, '2025-07-23 19:28:30', 90000, 1, 4, 1, 1),
+	(4, '2025-06-23 19:28:30', 90000, 1, 4, 1, 1),
 	(5, '2025-05-22 19:28:30', 300000, 1, 5, 1, 4),
 	(6, '2025-05-21 19:28:30', 150000, 1, 1, 1, 2),
 	(7, '2025-05-22 19:28:30', 220000, 1, 2, 1, 3),
 	(8, '2025-05-21 19:28:30', 120000, 1, 3, 1, 1),
 	(9, '2025-05-22 19:28:30', 400000, 1, 4, 1, 4),
 	(10, '2025-05-23 19:28:30', 95000, 1, 5, 1, 2),
-	(11, '2025-07-21 19:28:30', 170000, 1, 1, 1, 3),
+	(11, '2025-06-21 19:28:30', 170000, 1, 1, 1, 3),
 	(12, '2025-05-21 19:28:30', 210000, 1, 2, 1, 1),
 	(13, '2025-05-21 19:28:30', 80000, 1, 3, 1, 4),
 	(14, '2025-05-22 19:28:30', 260000, 1, 4, 1, 2),
 	(15, '2025-05-23 19:28:30', 110000, 1, 5, 1, 3),
-	(16, '2025-07-21 19:28:30', 300000, 1, 1, 1, 1),
+	(16, '2025-07-11 19:28:30', 300000, 1, 1, 1, 1),
 	(17, '2025-05-22 19:28:30', 90000, 1, 2, 1, 4),
 	(18, '2025-05-23 19:28:30', 140000, 1, 3, 1, 2),
 	(19, '2025-05-23 19:28:30', 50000, 1, 4, 1, 3),
@@ -4341,10 +4463,1271 @@ CREATE TABLE `view_venta` (
 	`usuario_id` INT NULL
 ) ENGINE=MyISAM;
 
--- Volcando estructura para disparador db_invehin.trigger_detallepedido_after_insert
+-- Volcando estructura para disparador db_invehin.tr_auditorias_after_update_proveedor
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
-CREATE TRIGGER `trigger_detallepedido_after_insert` AFTER INSERT ON `detallepedido` FOR EACH ROW BEGIN
+CREATE TRIGGER `tr_auditorias_after_update_proveedor` AFTER UPDATE ON `proveedor` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'proveedor',
+		'UPDATE',
+		NEW.id_proveedor,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_proveedor":"', OLD.id_proveedor, '",',
+				'"nombre_proveedor":"', OLD.nombre_proveedor, '",',
+				'"direccion_proveedor":"', OLD.direccion_proveedor, '",',
+				'"correo_proveedor":"', OLD.correo_proveedor, '",',
+				'"estado_proveedor":"', OLD.estado_proveedor, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_proveedor":"', NEW.id_proveedor, '",',
+				'"nombre_proveedor":"', NEW.nombre_proveedor, '",',
+				'"direccion_proveedor":"', NEW.direccion_proveedor, '",',
+				'"correo_proveedor":"', NEW.correo_proveedor, '",',
+				'"estado_proveedor":"', NEW.estado_proveedor, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_ delete_rol
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_ delete_rol` AFTER DELETE ON `rol` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'rol',
+		'DELETE',
+		OLD.id_rol,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_rol":"', OLD.id_rol, '",',
+				'"nombre_rol":"', OLD.nombre_rol, '",',
+				'"estado_rol":"', OLD.estado_rol, '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_categoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_categoria` AFTER DELETE ON `categoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'categoria',
+		'DELETE',
+		OLD.id_categoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_categoria":"', OLD.id_categoria, '",',
+				'"nombre_categoria":"', OLD.nombre_categoria, '",',
+				'"estado_categoria":"', OLD.estado_categoria, '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_cliente
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_cliente` AFTER DELETE ON `cliente` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	) 
+	VALUES (
+		'cliente',
+		'DELETE',
+		OLD.id_cliente,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_cliente":"', OLD.id_cliente, '",',
+				'"direccion_cliente":"', OLD.direccion_cliente, '",',
+				'"fecharegistro_cliente":"', OLD.fecharegistro_cliente, '",',
+				'"estado_cliente":"', OLD.estado_cliente, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '"',
+			'}'
+		),
+		NULL
+	);
+	
+	-- Eliminar datos persona
+	DELETE
+	FROM
+		persona p
+	WHERE
+		p.id_persona = OLD.fk_id_persona;
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_inventario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_inventario` AFTER DELETE ON `inventario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'inventario',
+		'DELETE',
+		OLD.id_inventario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_inventario":"', OLD.id_inventario, '",',
+				'"fecha_inventario":"', OLD.fecha_inventario, '",',
+				'"observacion_inventario":"', IFNULL(OLD.observacion_inventario, ''), '",',
+				'"estado_inventario":"', OLD.estado_inventario, '",',
+				'"fk_id_usuario":"', IFNULL(OLD.fk_id_usuario, ''), '"',
+			'}'
+		),
+		NULL
+	);
+	
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_pedido
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_pedido` AFTER DELETE ON `pedido` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'pedido',
+		'DELETE',
+		OLD.id_pedido,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_pedido":"', OLD.id_pedido, '",',
+				'"fecha_pedido":"', OLD.fecha_pedido, '",',
+				'"estado_pedido":"', OLD.estado_pedido, '",',
+				'"fk_id_proveedor":"', OLD.fk_id_proveedor, '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_persona
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_persona` AFTER DELETE ON `persona` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'persona',
+		'DELETE',
+		OLD.id_persona,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_persona":"', OLD.id_persona, '",',
+				'"nombres_persona":"', OLD.nombres_persona, '",',
+				'"apellidos_persona":"', OLD.apellidos_persona, '",',
+				'"numeroidentificacion_persona":"', IFNULL(OLD.numeroidentificacion_persona, ''), '",',
+				'"telefono_persona":"', OLD.telefono_persona, '",',
+				'"genero_persona":"', IFNULL(OLD.genero_persona, ''), '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_proveedor
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_proveedor` AFTER DELETE ON `proveedor` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'proveedor',
+		'DELETE',
+		OLD.id_proveedor,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_proveedor":"', OLD.id_proveedor, '",',
+				'"nombre_proveedor":"', OLD.nombre_proveedor, '",',
+				'"direccion_proveedor":"', OLD.direccion_proveedor, '",',
+				'"correo_proveedor":"', OLD.correo_proveedor, '",',
+				'"estado_proveedor":"', OLD.estado_proveedor, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '"',
+			'}'
+		),
+		NULL
+	);
+
+	-- Eliminar datos persona
+	DELETE
+	FROM
+		persona p
+	WHERE
+		p.id_persona = OLD.fk_id_persona;
+		
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_subcategoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_subcategoria` AFTER DELETE ON `subcategoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'subcategoria',
+		'DELETE',
+		OLD.id_subcategoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_subcategoria":"', OLD.id_subcategoria, '",',
+				'"nombre_subcategoria":"', OLD.nombre_subcategoria, '",',
+				'"precio_subcategoria":"', OLD.precio_subcategoria, '",',
+				'"imagen_subcategoria":"', IFNULL(OLD.imagen_subcategoria, ''), '",',
+				'"estado_subcategoria":"', OLD.estado_subcategoria, '",',
+				'"fk_id_categoria":"', OLD.fk_id_categoria, '",',
+				'"fk_id_promocion":"', IFNULL(OLD.fk_id_promocion, ''), '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_usuario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_usuario` AFTER DELETE ON `usuario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'usuario',
+		'DELETE',
+		OLD.id_usuario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_usuario":"', OLD.id_usuario, '",',
+				'"correo_usuario":"', OLD.correo_usuario, '",',
+				'"estado_usuario":"', OLD.estado_usuario, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '",',
+				'"fk_id_rol":"', OLD.fk_id_rol, '"',
+			'}'
+		),
+		NULL
+	);
+
+	-- Eliminar datos persona
+	DELETE
+	FROM
+		persona p
+	WHERE
+		p.id_persona = OLD.fk_id_persona;
+		
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_delete_venta
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_delete_venta` AFTER DELETE ON `venta` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'venta',
+		'DELETE',
+		OLD.id_venta,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_venta":"', OLD.id_venta, '",',
+				'"fecha_venta":"', DATE_FORMAT(OLD.fecha_venta, '%Y-%m-%d %H:%i:%s'), '",',
+				'"montorecibido_venta":"', OLD.montorecibido_venta, '",',
+				'"estado_venta":"', OLD.estado_venta, '",',
+				'"fk_id_cliente":"', IFNULL(OLD.fk_id_cliente, ''), '",',
+				'"fk_id_metodopago":"', IFNULL(OLD.fk_id_metodopago, ''), '",',
+				'"fk_id_usuario":"', IFNULL(OLD.fk_id_usuario, ''), '"',
+			'}'
+		),
+		NULL
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_categoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_categoria` AFTER INSERT ON `categoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'categoria',
+		'INSERT',
+		NEW.id_categoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"nombre_categoria":"', NEW.nombre_categoria, '",',
+				'"estado_categoria":"', NEW.estado_categoria, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_cliente
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_cliente` AFTER INSERT ON `cliente` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	) 
+	VALUES (
+		'cliente',
+		'INSERT',
+		NEW.id_cliente,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"direccion_cliente":"', NEW.direccion_cliente, '",',
+				'"fecharegistro_cliente":"', NEW.fecharegistro_cliente, '",',
+				'"estado_cliente":"', NEW.estado_cliente, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_inventario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_inventario` AFTER INSERT ON `inventario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'inventario',
+		'INSERT',
+		NEW.id_inventario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"fecha_inventario":"', NEW.fecha_inventario, '",',
+				'"observacion_inventario":"', IFNULL(NEW.observacion_inventario, ''), '",',
+				'"estado_inventario":"', NEW.estado_inventario, '",',
+				'"fk_id_usuario":"', IFNULL(NEW.fk_id_usuario, ''), '"',
+			'}'
+		)
+	);
+	
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_pedido
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_pedido` AFTER INSERT ON `pedido` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'pedido',
+		'INSERT',
+		NEW.id_pedido,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"fecha_pedido":"', NEW.fecha_pedido, '",',
+				'"estado_pedido":"', NEW.estado_pedido, '",',
+				'"fk_id_proveedor":"', NEW.fk_id_proveedor, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_persona
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_persona` AFTER INSERT ON `persona` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'persona',
+		'INSERT',
+		NEW.id_persona,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"nombres_persona":"', NEW.nombres_persona, '",',
+				'"apellidos_persona":"', NEW.apellidos_persona, '",',
+				'"numeroidentificacion_persona":"', IFNULL(NEW.numeroidentificacion_persona, ''), '",',
+				'"telefono_persona":"', NEW.telefono_persona, '",',
+				'"genero_persona":"', IFNULL(NEW.genero_persona, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_prenda
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_prenda` AFTER INSERT ON `prenda` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'prenda',
+		'INSERT',
+		NEW.codigo_prenda,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"codigo_prenda":"', NEW.codigo_prenda, '",',
+				'"stock_prenda":"', NEW.stock_prenda, '",',
+				'"stockminimo_prenda":"', NEW.stockminimo_prenda, '",',
+				'"fk_id_color":"', IFNULL(NEW.fk_id_color, ''), '",',
+				'"fk_id_estadoprenda":"', IFNULL(NEW.fk_id_estadoprenda, ''), '",',
+				'"fk_id_subcategoria":"', IFNULL(NEW.fk_id_subcategoria, ''), '",',
+				'"fk_id_talla":"', IFNULL(NEW.fk_id_talla, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_proveedor
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_proveedor` AFTER INSERT ON `proveedor` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'proveedor',
+		'INSERT',
+		NEW.id_proveedor,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"nombre_proveedor":"', NEW.nombre_proveedor, '",',
+				'"direccion_proveedor":"', NEW.direccion_proveedor, '",',
+				'"correo_proveedor":"', NEW.correo_proveedor, '",',
+				'"estado_proveedor":"', NEW.estado_proveedor, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_rol
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_rol` AFTER INSERT ON `rol` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'rol',
+		'INSERT',
+		NEW.id_rol,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"nombre_rol":"', NEW.nombre_rol, '",',
+				'"estado_rol":"', NEW.estado_rol, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_subcategoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_subcategoria` AFTER INSERT ON `subcategoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'subcategoria',
+		'INSERT',
+		NEW.id_subcategoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"nombre_subcategoria":"', NEW.nombre_subcategoria, '",',
+				'"precio_subcategoria":"', NEW.precio_subcategoria, '",',
+				'"imagen_subcategoria":"', IFNULL(NEW.imagen_subcategoria, ''), '",',
+				'"estado_subcategoria":"', NEW.estado_subcategoria, '",',
+				'"fk_id_categoria":"', NEW.fk_id_categoria, '",',
+				'"fk_id_promocion":"', IFNULL(NEW.fk_id_promocion, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_usuario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_usuario` AFTER INSERT ON `usuario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'usuario',
+		'INSERT',
+		NEW.id_usuario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"correo_usuario":"', NEW.correo_usuario, '",',
+				'"estado_usuario":"', NEW.estado_usuario, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '",',
+				'"fk_id_rol":"', NEW.fk_id_rol, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_insert_venta
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_insert_venta` AFTER INSERT ON `venta` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'venta',
+		'INSERT',
+		NEW.id_venta,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		NULL,
+		CONCAT(
+			'{',
+				'"fecha_venta":"', DATE_FORMAT(NEW.fecha_venta, '%Y-%m-%d %H:%i:%s'), '",',
+				'"montorecibido_venta":"', NEW.montorecibido_venta, '",',
+				'"estado_venta":"', NEW.estado_venta, '",',
+				'"fk_id_cliente":"', IFNULL(NEW.fk_id_cliente, ''), '",',
+				'"fk_id_metodopago":"', IFNULL(NEW.fk_id_metodopago, ''), '",',
+				'"fk_id_usuario":"', IFNULL(NEW.fk_id_usuario, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_categoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_categoria` AFTER UPDATE ON `categoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'categoria',
+		'UPDATE',
+		NEW.id_categoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_categoria":"', OLD.id_categoria, '",',
+				'"nombre_categoria":"', OLD.nombre_categoria, '",',
+				'"estado_categoria":"', OLD.estado_categoria, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_categoria":"', NEW.id_categoria, '",',
+				'"nombre_categoria":"', NEW.nombre_categoria, '",',
+				'"estado_categoria":"', NEW.estado_categoria, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_cliente
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_cliente` AFTER UPDATE ON `cliente` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	) 
+	VALUES (
+		'cliente',
+		'UPDATE',
+		NEW.id_cliente,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_cliente":"', OLD.id_cliente, '",',
+				'"direccion_cliente":"', OLD.direccion_cliente, '",',
+				'"fecharegistro_cliente":"', OLD.fecharegistro_cliente, '",',
+				'"estado_cliente":"', OLD.estado_cliente, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_cliente":"', NEW.id_cliente, '",',
+				'"direccion_cliente":"', NEW.direccion_cliente, '",',
+				'"fecharegistro_cliente":"', NEW.fecharegistro_cliente, '",',
+				'"estado_cliente":"', NEW.estado_cliente, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_inventario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_inventario` AFTER UPDATE ON `inventario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'inventario',
+		'UPDATE',
+		NEW.id_inventario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_inventario":"', OLD.id_inventario, '",',
+				'"fecha_inventario":"', OLD.fecha_inventario, '",',
+				'"observacion_inventario":"', IFNULL(OLD.observacion_inventario, ''), '",',
+				'"estado_inventario":"', OLD.estado_inventario, '",',
+				'"fk_id_usuario":"', IFNULL(OLD.fk_id_usuario, ''), '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_inventario":"', NEW.id_inventario, '",',
+				'"fecha_inventario":"', NEW.fecha_inventario, '",',
+				'"observacion_inventario":"', IFNULL(NEW.observacion_inventario, ''), '",',
+				'"estado_inventario":"', NEW.estado_inventario, '",',
+				'"fk_id_usuario":"', IFNULL(NEW.fk_id_usuario, ''), '"',
+			'}'
+		)
+	);
+	
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_pedido
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_pedido` AFTER UPDATE ON `pedido` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'pedido',
+		'UPDATE',
+		NEW.id_pedido,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_pedido":"', OLD.id_pedido, '",',
+				'"fecha_pedido":"', OLD.fecha_pedido, '",',
+				'"estado_pedido":"', OLD.estado_pedido, '",',
+				'"fk_id_proveedor":"', OLD.fk_id_proveedor, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_pedido":"', NEW.id_pedido, '",',
+				'"fecha_pedido":"', NEW.fecha_pedido, '",',
+				'"estado_pedido":"', NEW.estado_pedido, '",',
+				'"fk_id_proveedor":"', NEW.fk_id_proveedor, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_persona
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_persona` AFTER UPDATE ON `persona` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'persona',
+		'UPDATE',
+		NEW.id_persona,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_persona":"', OLD.id_persona, '",',
+				'"nombres_persona":"', OLD.nombres_persona, '",',
+				'"apellidos_persona":"', OLD.apellidos_persona, '",',
+				'"numeroidentificacion_persona":"', IFNULL(OLD.numeroidentificacion_persona, ''), '",',
+				'"telefono_persona":"', OLD.telefono_persona, '",',
+				'"genero_persona":"', IFNULL(OLD.genero_persona, ''), '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_persona":"', NEW.id_persona, '",',
+				'"nombres_persona":"', NEW.nombres_persona, '",',
+				'"apellidos_persona":"', NEW.apellidos_persona, '",',
+				'"numeroidentificacion_persona":"', IFNULL(NEW.numeroidentificacion_persona, ''), '",',
+				'"telefono_persona":"', NEW.telefono_persona, '",',
+				'"genero_persona":"', IFNULL(NEW.genero_persona, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_prenda
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_prenda` AFTER UPDATE ON `prenda` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'prenda',
+		'UPDATE',
+		NEW.codigo_prenda,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"codigo_prenda":"', OLD.codigo_prenda, '",',
+				'"stock_prenda":"', OLD.stock_prenda, '",',
+				'"stockminimo_prenda":"', OLD.stockminimo_prenda, '",',
+				'"fk_id_color":"', IFNULL(OLD.fk_id_color, ''), '",',
+				'"fk_id_estadoprenda":"', IFNULL(OLD.fk_id_estadoprenda, ''), '",',
+				'"fk_id_subcategoria":"', IFNULL(OLD.fk_id_subcategoria, ''), '",',
+				'"fk_id_talla":"', IFNULL(OLD.fk_id_talla, ''), '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"codigo_prenda":"', NEW.codigo_prenda, '",',
+				'"stock_prenda":"', NEW.stock_prenda, '",',
+				'"stockminimo_prenda":"', NEW.stockminimo_prenda, '",',
+				'"fk_id_color":"', IFNULL(NEW.fk_id_color, ''), '",',
+				'"fk_id_estadoprenda":"', IFNULL(NEW.fk_id_estadoprenda, ''), '",',
+				'"fk_id_subcategoria":"', IFNULL(NEW.fk_id_subcategoria, ''), '",',
+				'"fk_id_talla":"', IFNULL(NEW.fk_id_talla, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_rol
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_rol` AFTER UPDATE ON `rol` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'rol',
+		'UPDATE',
+		NEW.id_rol,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_rol":"', OLD.id_rol, '",',
+				'"nombre_rol":"', OLD.nombre_rol, '",',
+				'"estado_rol":"', OLD.estado_rol, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_rol":"', NEW.id_rol, '",',
+				'"nombre_rol":"', NEW.nombre_rol, '",',
+				'"estado_rol":"', NEW.estado_rol, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_subcategoria
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_subcategoria` AFTER UPDATE ON `subcategoria` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'subcategoria',
+		'UPDATE',
+		NEW.id_subcategoria,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_subcategoria":"', OLD.id_subcategoria, '",',
+				'"nombre_subcategoria":"', OLD.nombre_subcategoria, '",',
+				'"precio_subcategoria":"', OLD.precio_subcategoria, '",',
+				'"imagen_subcategoria":"', IFNULL(OLD.imagen_subcategoria, ''), '",',
+				'"estado_subcategoria":"', OLD.estado_subcategoria, '",',
+				'"fk_id_categoria":"', OLD.fk_id_categoria, '",',
+				'"fk_id_promocion":"', IFNULL(OLD.fk_id_promocion, ''), '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_subcategoria":"', NEW.id_subcategoria, '",',
+				'"nombre_subcategoria":"', NEW.nombre_subcategoria, '",',
+				'"precio_subcategoria":"', NEW.precio_subcategoria, '",',
+				'"imagen_subcategoria":"', IFNULL(NEW.imagen_subcategoria, ''), '",',
+				'"estado_subcategoria":"', NEW.estado_subcategoria, '",',
+				'"fk_id_categoria":"', NEW.fk_id_categoria, '",',
+				'"fk_id_promocion":"', IFNULL(NEW.fk_id_promocion, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_usuario
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_usuario` AFTER UPDATE ON `usuario` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'usuario',
+		'UPDATE',
+		NEW.id_usuario,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_usuario":"', OLD.id_usuario, '",',
+				'"correo_usuario":"', OLD.correo_usuario, '",',
+				'"estado_usuario":"', OLD.estado_usuario, '",',
+				'"fk_id_persona":"', OLD.fk_id_persona, '",',
+				'"fk_id_rol":"', OLD.fk_id_rol, '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_usuario":"', NEW.id_usuario, '",',
+				'"correo_usuario":"', NEW.correo_usuario, '",',
+				'"estado_usuario":"', NEW.estado_usuario, '",',
+				'"fk_id_persona":"', NEW.fk_id_persona, '",',
+				'"fk_id_rol":"', NEW.fk_id_rol, '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_auditoria_after_update_venta
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_auditoria_after_update_venta` AFTER UPDATE ON `venta` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'venta',
+		'UPDATE',
+		NEW.id_venta,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"id_venta":"', OLD.id_venta, '",',
+				'"fecha_venta":"', DATE_FORMAT(OLD.fecha_venta, '%Y-%m-%d %H:%i:%s'), '",',
+				'"montorecibido_venta":"', OLD.montorecibido_venta, '",',
+				'"estado_venta":"', OLD.estado_venta, '",',
+				'"fk_id_cliente":"', IFNULL(OLD.fk_id_cliente, ''), '",',
+				'"fk_id_metodopago":"', IFNULL(OLD.fk_id_metodopago, ''), '",',
+				'"fk_id_usuario":"', IFNULL(OLD.fk_id_usuario, ''), '"',
+			'}'
+		),
+		CONCAT(
+			'{',
+				'"id_venta":"', NEW.id_venta, '",',
+				'"fecha_venta":"', DATE_FORMAT(NEW.fecha_venta, '%Y-%m-%d %H:%i:%s'), '",',
+				'"montorecibido_venta":"', NEW.montorecibido_venta, '",',
+				'"estado_venta":"', NEW.estado_venta, '",',
+				'"fk_id_cliente":"', IFNULL(NEW.fk_id_cliente, ''), '",',
+				'"fk_id_metodopago":"', IFNULL(NEW.fk_id_metodopago, ''), '",',
+				'"fk_id_usuario":"', IFNULL(NEW.fk_id_usuario, ''), '"',
+			'}'
+		)
+	);
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_detallepedido_after_insert
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_detallepedido_after_insert` AFTER INSERT ON `detallepedido` FOR EACH ROW BEGIN
 
 	UPDATE
 		prenda p
@@ -4357,10 +5740,10 @@ END//
 DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
--- Volcando estructura para disparador db_invehin.trigger_detalleventa_after_insert
+-- Volcando estructura para disparador db_invehin.tr_detalleventa_after_insert
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
-CREATE TRIGGER `trigger_detalleventa_after_insert` AFTER INSERT ON `detalleventa` FOR EACH ROW BEGIN
+CREATE TRIGGER `tr_detalleventa_after_insert` AFTER INSERT ON `detalleventa` FOR EACH ROW BEGIN
 
 	UPDATE
 		prenda p
@@ -4368,6 +5751,44 @@ CREATE TRIGGER `trigger_detalleventa_after_insert` AFTER INSERT ON `detalleventa
 		p.stock_prenda = p.stock_prenda - NEW.cantidad_detalleventa
 	WHERE
 		p.codigo_prenda = NEW.fk_codigo_prenda;
+
+END//
+DELIMITER ;
+SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Volcando estructura para disparador db_invehin.tr_update_after_delete_prenda
+SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+DELIMITER //
+CREATE TRIGGER `tr_update_after_delete_prenda` AFTER DELETE ON `prenda` FOR EACH ROW BEGIN
+
+	INSERT INTO auditoria (
+		auditoria.tabla_auditoria,
+		auditoria.operacion_auditoria,
+		auditoria.idregistro_auditoria,
+		auditoria.usuario_auditoria,
+		auditoria.fecha_auditoria,
+		auditoria.detalleanterior_auditoria,
+		auditoria.detallenuevo_auditoria
+	)
+	VALUES (
+		'prenda',
+		'DELETE',
+		OLD.codigo_prenda,
+		@id_usuario_auditoria, -- recibido desde el backend
+		NOW(),
+		CONCAT(
+			'{',
+				'"codigo_prenda":"', OLD.codigo_prenda, '",',
+				'"stock_prenda":"', OLD.stock_prenda, '",',
+				'"stockminimo_prenda":"', OLD.stockminimo_prenda, '",',
+				'"fk_id_color":"', IFNULL(OLD.fk_id_color, ''), '",',
+				'"fk_id_estadoprenda":"', IFNULL(OLD.fk_id_estadoprenda, ''), '",',
+				'"fk_id_subcategoria":"', IFNULL(OLD.fk_id_subcategoria, ''), '",',
+				'"fk_id_talla":"', IFNULL(OLD.fk_id_talla, ''), '"',
+			'}'
+		),
+		NULL
+	);
 
 END//
 DELIMITER ;
