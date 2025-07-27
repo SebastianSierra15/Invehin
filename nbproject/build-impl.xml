@@ -17,7 +17,9 @@
         - cleanup
 
         -->
-<project xmlns:webproject1="http://www.netbeans.org/ns/web-project/1" xmlns:webproject2="http://www.netbeans.org/ns/web-project/2" xmlns:webproject3="http://www.netbeans.org/ns/web-project/3" basedir=".." default="default" name="INVEHIN-impl">
+<project xmlns:webproject1="http://www.netbeans.org/ns/web-project/1"
+    xmlns:webproject2="http://www.netbeans.org/ns/web-project/2"
+    xmlns:webproject3="http://www.netbeans.org/ns/web-project/3" basedir=".." default="default" name="INVEHIN-impl">
     <import file="ant-deploy.xml"/>
     <fail message="Please build using Ant 1.7.1 or higher.">
         <condition>
@@ -259,14 +261,14 @@ The Java EE server classpath is not correctly set up - server home directory is 
 Either open the project in the IDE and assign the server or setup the server classpath manually.
 For example like this:
    ant -Dj2ee.server.home=&lt;app_server_installation_directory&gt;
-                </fail>
+        </fail>
         <fail unless="j2ee.platform.classpath">
 The Java EE server classpath is not correctly set up. Your active server type is ${j2ee.server.type}.
 Either open the project in the IDE and assign the server or setup the server classpath manually.
 For example like this:
    ant -Duser.properties.file=&lt;path_to_property_file&gt; (where you put the property "j2ee.platform.classpath" in a .properties file)
 or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties file is used)
-                </fail>
+        </fail>
     </target>
     <target name="-init-macrodef-property">
         <macrodef name="property" uri="http://www.netbeans.org/ns/web-project/1">
@@ -778,7 +780,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
             </sequential>
         </macrodef>
     </target>
-    <target name="-init-taskdefs">
+    <!-- <target name="-init-taskdefs">
         <fail unless="libs.CopyLibs.classpath">
 The libs.CopyLibs.classpath property is not set up.
 This property must point to 
@@ -790,7 +792,7 @@ exists or setup the property manually. For example like this:
  ant -Dlibs.CopyLibs.classpath=a/path/to/org-netbeans-modules-java-j2seproject-copylibstask.jar
                 </fail>
         <taskdef classpath="${libs.CopyLibs.classpath}" resource="org/netbeans/modules/java/j2seproject/copylibstask/antlib.xml"/>
-    </target>
+    </target> -->
     <target name="-init-ap-cmdline-properties">
         <property name="annotation.processing.enabled" value="true"/>
         <property name="annotation.processing.processors.list" value=""/>
@@ -1000,7 +1002,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.log4j-api-2.18.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.xmlbeans-5.1.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.commons-compress-1.21.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${libs.CopyLibs.classpath}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <!-- <copyfiles files="${libs.CopyLibs.classpath}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/> -->
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
     </target>
@@ -1023,7 +1025,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.log4j-api-2.18.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.xmlbeans-5.1.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.commons-compress-1.21.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${libs.CopyLibs.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <!-- <copyfiles files="${libs.CopyLibs.classpath}" todir="${build.web.dir}/WEB-INF/lib"/> -->
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
         <delete dir="${build.web.dir}/WEB-INF/lib"/>
@@ -1149,7 +1151,7 @@ exists or setup the property manually. For example like this:
     <target depends="-get-browser" if="do.display.browser.cl" name="-display-browser-cl">
         <fail unless="browser">
                     Browser not found, cannot launch the deployed application. Try to set the BROWSER environment variable.
-                </fail>
+        </fail>
         <property name="browse.url" value="${deploy.ant.client.url}${client.urlPart}"/>
         <echo>Launching ${browse.url}</echo>
         <exec executable="${browser}" spawn="true">
